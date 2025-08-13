@@ -27,18 +27,24 @@
     "ws": "^8.18.3"
   },
   "build": {
-    "appId": "com.ilcustode.app",
-    "productName": "Il Custode",
-    "win": {
-      "icon": "icon.ico"
+  "appId": "com.ilcustode.app",
+  "productName": "Il Custode",
+  "win": {
+    "icon": "icon.ico",
+    "target": "nsis"
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "Il-Custode",
+      "repo": "il-custode",
+      "releaseType": "release"
     },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "Il-Custode",
-        "repo": "il-custode",
-        "releaseType": "release"
-      }
-    ]
-  }
+    {
+      "provider": "github",
+      "owner": "Il-Custode",
+      "repo": "il-custode-beta",
+      "releaseType": "release"
+    }
+  ]
 }
