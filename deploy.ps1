@@ -6,15 +6,15 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # ===== CONFIG SEMPLICE =====
-# Useremo i remoti che hai già: pubblico = origin, privato = beta
+# Remoti già presenti: pubblico = origin, privato = beta
 $PublicRemoteName  = "origin"
 $PrivateRemoteName = "beta"
 $Branch            = "main"
 $ArtifactsDir      = "dist"
-# Costruiamo localmente e pubblichiamo noi su ENTRAMBE le release:
+# Costruiamo localmente e pubblichiamo noi su ENTRAMBE le release
 $BuildCmd          = 'npm run build -- --publish never'
-# Formati tipici degli artefatti (estendi se serve)
-$AssetGlobs        = @("*.exe","*.msi","*.dmg","*.pkg","*.AppImage","*.deb","*.rpm","*.zip","*.tar.gz","*.yml","*.blockmap")
+# Formati artefatti da caricare (ESCLUSI i .yml per evitare conflitti tipo latest.yml)
+$AssetGlobs        = @("*.exe","*.msi","*.dmg","*.pkg","*.AppImage","*.deb","*.rpm","*.zip","*.tar.gz","*.blockmap")
 # ===========================
 
 function Step([string]$m){ Write-Host "`n==> $m" -ForegroundColor Cyan }
@@ -38,11 +38,15 @@ function Collect-Assets([string]$dir, [string[]]$globs){
   foreach($g in $globs){
     $files += Get-ChildItem -Path $dir -Recurse -Filter $g -File -ErrorAction SilentlyContinue
   }
-  $files | Select-Object -Unique
+  # Rimuove duplicati con lo stesso nome (es. due exe uguali in cartelle diverse): tiene il più grande
+  $files |
+    Sort-Object Length -Descending |
+    Group-Object Name |
+    ForEach-Object { $_.Group | Select-Object -First 1 }
 }
 
 function Create-Or-Update-Release([string]$repo, [string]$tag, [System.IO.FileInfo[]]$assets, [string]$title, [string]$notes){
-  # Se la release esiste, la eliminiamo e ricreiamo per avere stato pulito
+  # Se la release esiste, la eliminiamo per caricare asset puliti
   & gh release view $tag -R $repo *> $null
   if ($LASTEXITCODE -eq 0){
     Step "Rimuovo release esistente '$tag' su $repo"
@@ -98,8 +102,8 @@ try{
   if (-not $assets -or $assets.Count -eq 0){ Fail "Nessun artefatto trovato in '$ArtifactsDir'." }
 
   # Tag univoco basato su data/ora
-  $ts  = Get-Date -Format "yyyyMMdd-HHmmss"
-  $tag = "deploy-$ts"
+  $ts    = Get-Date -Format "yyyyMMdd-HHmmss"
+  $tag   = "deploy-$ts"
   $title = "Build $ts"
   $notes = "Commit: $Message"
 
