@@ -62,7 +62,6 @@
     <div class="wrap">
       <!-- Lato immagine mago -->
       <div class="mago">
-        <!-- Sostituisci il src con la tua immagine quando l’avrai -->
         <img src="./assets/img/mago-placeholder.jpg" alt="Il Custode (mago)" />
       </div>
 
@@ -71,14 +70,13 @@
         <h1 class="titolo">Benvenuto, viandante</h1>
         <div id="frase" class="testo"></div>
         <div class="actions">
-          <button id="btnAvanti" class="btn" type="button">Avanti ➜</button>
+          <button id="btnAvanti" class="btn" type="button">Entra (v1.0.2)</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // 10 frasi nello stesso stile (la prima è quella “base” che mi hai dato)
     const FRASI = [
       "Chi bussa alla Porta del Custode? Ah, sei tu. Benvenuto. Lascia che illumini la tua vita.",
       "Io sono il Custode. Entra pure: il fuoco è acceso e le mappe attendono la tua mano.",
@@ -92,7 +90,6 @@
       "Hai bussato con coraggio. Benvenuto. Io sono il Custode: apri il libro, scegli il capitolo, agisci."
     ];
 
-    // Mostra una frase casuale
     const fraseEl = document.getElementById('frase');
     function pickRandom() {
       const i = Math.floor(Math.random() * FRASI.length);
@@ -100,13 +97,8 @@
     }
     fraseEl.textContent = pickRandom();
 
-    // Avanti → vai alla home (index.html)
     const goNext = () => { window.location.href = 'index.html'; };
-
-    // Click sul bottone
     document.getElementById('btnAvanti').addEventListener('click', goNext);
-
-    // Tasto Invio abilita “Avanti”
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') goNext();
     });
