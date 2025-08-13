@@ -3,17 +3,27 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Il Custode — Benvenuto</title>
+  <title>Il Custode — Home</title>
   <style>
-    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    :root{
+      --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178;
+      --inchiostro:#3e2f1c; --pergamena:#fff3d4;
+    }
     *{ box-sizing:border-box }
     body{
-      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
-      background:url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro);
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        var(--pergamena)
+        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+      background-size:cover; text-align:center;
     }
     .cornice{
-      border:40px solid transparent; -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('./assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+      border:40px solid transparent;
+      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      min-height:100vh; display:flex; flex-direction:column;
+      background: linear-gradient(180deg, rgba(255,243,212,.30), rgba(255,243,212,.15));
     }
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
@@ -28,60 +38,118 @@
     .btn:hover{ background:var(--pelle-scura); }
     .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
 
-    .container{ width:100%; max-width:980px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+    .container{ width:100%; max-width:1080px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+
+    .hero{ display:grid; grid-template-columns:1fr; gap:18px; align-items:center; margin-top:18px; }
+    @media(min-width:900px){ .hero{ grid-template-columns: 1fr 1.2fr; } }
+
+    .mago{ display:flex; align-items:center; justify-content:center; padding:10px; }
+    .mago img{
+      width:min(380px, 70vw); max-width:100%;
+      border:6px solid var(--legno); border-radius:16px; background:#fff9;
+      box-shadow:0 8px 22px rgba(0,0,0,.25);
+      opacity:0; transform: translateY(8px) scale(0.98);
+    }
+    .mago img.img-in{ animation: fadeInImg 1.2s ease-out forwards; }
+    @keyframes fadeInImg{ to{ opacity:1; transform:none; } }
+
+    .fumetto{
+      position:relative; overflow:visible;
+      background: rgba(255,248,220,.95);
+      border:4px solid var(--legno); border-radius:16px;
+      padding:22px; box-shadow:0 8px 22px rgba(0,0,0,.2);
+      transform-origin: top center; transform: scaleY(0); opacity:0;
+    }
+    .fumetto.fumetto-in{ animation: unroll .9s ease-out forwards; }
+    @keyframes unroll{ 0%{ transform:scaleY(0); opacity:0; } 100%{ transform:scaleY(1); opacity:1; } }
+    .fumetto .titolo{ font-size:26px; margin:0 0 6px; }
+    .fumetto .testo{ font-size:18px; line-height:1.5; margin:10px 0 0; }
+    .fumetto::after{
+      content:""; position:absolute; left:-18px; top:48%; transform: translateY(-50%);
+      border-top:14px solid transparent; border-bottom:14px solid transparent; border-right:18px solid rgba(255,248,220,.95);
+      filter: drop-shadow(-2px 2px 0 rgba(0,0,0,.15));
+    }
+    .fumetto::before{
+      content:""; position:absolute; left:-22px; top:48%; transform: translateY(-50%);
+      border-top:16px solid transparent; border-bottom:16px solid transparent; border-right:22px solid var(--legno);
+    }
+    @media(max-width:899px){
+      .fumetto::after{
+        left:50%; top:-18px; transform: translateX(-50%);
+        border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:18px solid rgba(255,248,220,.95); border-top:none;
+        filter: drop-shadow(0 -2px 0 rgba(0,0,0,.15));
+      }
+      .fumetto::before{
+        left:50%; top:-22px; transform: translateX(-50%);
+        border-left:16px solid transparent; border-right:16px solid transparent; border-bottom:22px solid var(--legno); border-top:none;
+      }
+    }
+
     .card{
-      background:rgba(255,248,220,.90); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:14px 0;
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:18px 0;
       box-shadow:0 4px 10px rgba(0,0,0,.12);
     }
+    .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
+
     .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
     label{ display:block; font-weight:bold; margin:6px 0 2px; }
     input{
       padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
     }
+    .remember{ display:flex; align-items:center; gap:8px; margin-top:8px; font-size:14px; }
     .muted{ opacity:.85; font-size:14px; }
-    .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
-    @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
-    .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
-    .toast{
-      position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px;
-      box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000;
-    }
-    .toast.error{ background:#b23b3b; }
+    .spacer{ height:24px; } @media(min-width:900px){ .spacer{ height:36px; } }
   </style>
 </head>
 <body>
 <div class="cornice">
   <header>
     <span id="userBadge"></span>
-    🎲 Il Custode — Benvenuto
+    🎲 Il Custode — Home
     <div class="header-actions">
       <button id="btnLogout" class="btn red" style="display:none;">Logout</button>
     </div>
   </header>
 
   <div class="container">
-    <!-- LOGIN / REGISTRAZIONE -->
+    <section class="hero" aria-label="Presentazione">
+      <div class="mago">
+        <img id="imgMago" src="./assets/img/mago.png" alt="Il Custode (mago)"/>
+      </div>
+      <div id="fumetto" class="fumetto" role="complementary" aria-live="polite">
+        <h2 class="titolo">Il Custode ti osserva</h2>
+        <p id="frase" class="testo"></p>
+      </div>
+    </section>
+
+    <div class="spacer"></div>
+
     <section id="authCard" class="card" aria-live="polite">
       <h2>Accedi o Registrati</h2>
-      <div class="row">
-        <div>
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="esempio@posta.it" autocomplete="email"/>
+      <form id="authForm" autocomplete="on">
+        <div class="row">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="esempio@posta.it" autocomplete="email"/>
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="Password" autocomplete="current-password"/>
+            <label class="remember">
+              <input type="checkbox" id="remember"/> Ricordami su questo dispositivo
+            </label>
+          </div>
+          <div class="row" style="align-items:flex-end;">
+            <button id="btnLogin" class="btn" type="submit">Login</button>
+            <button id="btnSignup" class="btn" type="button">Registrati</button>
+          </div>
         </div>
-        <div>
-          <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
-        </div>
-        <div class="row" style="align-items:flex-end;">
-          <button id="btnLogin" class="btn">Login</button>
-          <button id="btnSignup" class="btn">Registrati</button>
-        </div>
-      </div>
-      <p class="muted">Puoi premere <strong>Invio</strong> per fare login. Il <em>Tab</em> sposta tra i campi.</p>
+      </form>
       <div id="authStatus" class="muted"></div>
     </section>
 
-    <!-- HOME DOPO LOGIN -->
     <section id="homeCard" class="card" style="display:none;">
       <h2>Seleziona una sezione</h2>
       <div class="grid">
@@ -102,36 +170,49 @@
         </div>
       </div>
     </section>
-
-    <section class="card" style="background:rgba(255,255,255,.6);">
-      <strong>Nota tecnica:</strong> autenticazione con Supabase; le sezioni interne al momento usano <em>localStorage</em> (MVP).
-    </section>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" style="display:none;"></div>
 
-<!-- Supabase JS UMD (compatibile file://) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  /* ==== Config Supabase (già impostati) ==== */
   const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  /* ==== Helper UI ==== */
   const $ = (s)=>document.querySelector(s);
-  function toast(msg, err=false){ const t=$('#toast'); t.className='toast'+(err?' error':''); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1600); }
+  function toast(msg, err=false){ const t=$('#toast'); t.style.display='block'; t.textContent=msg; t.style.background = err ? '#b23b3b' : '#2d7a36'; setTimeout(()=>t.style.display='none',1600); }
 
   const authCard = $('#authCard');
   const homeCard = $('#homeCard');
   const emailEl = $('#email');
   const passEl  = $('#password');
+  const rememberEl = $('#remember');
   const btnLogin = $('#btnLogin');
   const btnSignup = $('#btnSignup');
   const btnLogout = $('#btnLogout');
   const authStatus = $('#authStatus');
   const userBadge = $('#userBadge');
+
+  const FRASI = [
+    "Prima di entrare nel Salone, lascia il tuo nome sulla pergamena.",
+    "Il fuoco è acceso. Identifica il tuo sigillo e siediti al tavolo.",
+    "Scrivi le tue credenziali: le mappe non attendono i ritardatari.",
+    "Dimmi chi sei e ti indicherò la stanza giusta: Master o Viandante?",
+    "La chiave è semplice: una parola, una formula (la tua password).",
+    "Chi entra senza bussare sveglia i draghi. Meglio autenticarsi, vero?",
+    "Ogni storia inizia con un segno d’inchiostro: email e password.",
+    "Se cerchi la Sala delle Mappe, occorre passare dal Custode.",
+    "I tuoi passi sono sicuri qui, purché tu sia riconosciuto.",
+    "Apri la porta con le parole giuste: poi scegli il tuo cammino."
+  ];
+
+  const fraseEl = $('#frase');
+  const imgMago = $('#imgMago');
+  const fumetto = $('#fumetto');
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 
   function showHome(email){
     authCard.style.display='none';
@@ -148,11 +229,30 @@
 
   async function refreshSession(){
     const { data } = await supabaseClient.auth.getSession();
-    if (data && data.session){ showHome(data.session.user?.email || ''); authStatus.textContent='Sessione attiva.'; }
-    else { showAuth(); authStatus.textContent='Accedi o registrati per continuare.'; }
+    if (data && data.session){
+      showHome(data.session.user?.email || '');
+      authStatus.textContent='Sessione attiva.';
+    } else {
+      showAuth();
+      authStatus.textContent='Accedi o registrati per continuare.';
+    }
   }
 
-  // Login
+  const authForm = document.getElementById('authForm');
+  authForm.addEventListener('submit', (e) => { e.preventDefault(); btnLogin.click(); });
+
+  async function loadSavedCreds(){
+    try{
+      const { email, password } = await window.authCreds.getSaved();
+      if (email) { emailEl.value = email; rememberEl.checked = true; }
+      if (password) { passEl.value = password; }
+    } catch{}
+  }
+  async function saveCredsIfNeeded(email, password){
+    if (!rememberEl.checked) { await window.authCreds.clear(); return; }
+    try { await window.authCreds.save(email, password); } catch{}
+  }
+
   btnLogin.addEventListener('click', async ()=>{
     const email = (emailEl.value||'').trim();
     const password = (passEl.value||'').trim();
@@ -160,15 +260,10 @@
     authStatus.textContent='Accesso…';
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if(error){ authStatus.textContent='Errore login: '+error.message; toast('Errore login', true); return; }
+    await saveCredsIfNeeded(email, password);
     toast('Benvenuto!'); refreshSession();
   });
 
-  // Invio da tastiera (Tab è già nativo)
-  [emailEl, passEl].forEach(el=>{
-    el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); btnLogin.click(); }});
-  });
-
-  // Registrazione
   btnSignup.addEventListener('click', async ()=>{
     const email = (emailEl.value||'').trim();
     const password = (passEl.value||'').trim();
@@ -176,14 +271,25 @@
     authStatus.textContent='Registrazione…';
     const { error } = await supabaseClient.auth.signUp({ email, password });
     if(error){ authStatus.textContent='Errore registrazione: '+error.message; toast('Errore registrazione', true); return; }
+    rememberEl.checked = true;
+    await saveCredsIfNeeded(email, password);
     authStatus.textContent='Registrato! Se la conferma email è attiva, controlla la posta.';
     toast('Registrazione OK');
   });
 
-  // Logout
-  btnLogout.addEventListener('click', async ()=>{ await supabaseClient.auth.signOut(); toast('Disconnesso'); refreshSession(); });
+  btnLogout.addEventListener('click', async ()=>{
+    await supabaseClient.auth.signOut();
+    toast('Disconnesso');
+    refreshSession();
+  });
 
-  // Start
+  document.addEventListener('DOMContentLoaded', ()=>{
+    fraseEl.textContent = pickRandom(FRASI);
+    requestAnimationFrame(()=> imgMago.classList.add('img-in'));
+    setTimeout(()=> fumetto.classList.add('fumetto-in'), 1200);
+  });
+
+  loadSavedCreds();
   refreshSession();
 </script>
 </body>

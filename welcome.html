@@ -5,21 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Il Custode — Benvenuto</title>
   <style>
-    :root{ --legno:#4b3621; --pelle:#d2b48c; --inchiostro:#3e2f1c; }
+    :root{
+      --legno:#4b3621;
+      --pelle:#d2b48c;
+      --inchiostro:#3e2f1c;
+      --pergamena:#fff3d4;
+    }
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
       margin:0; font-family:'Papyrus', fantasy; color:var(--inchiostro);
-      background:url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center/cover fixed;
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        var(--pergamena)
+        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center/cover fixed;
       display:flex; align-items:center; justify-content:center;
     }
+
     .cornice{
       border:40px solid transparent;
       -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
       border-image:url('./assets/img/cornice-legno.png') 40 stretch;
       width:min(1100px, 96vw); min-height:70vh; display:flex; align-items:center; justify-content:center;
       padding:20px;
+      background: linear-gradient(180deg, rgba(255,243,212,.35), rgba(255,243,212,.15));
+      border-radius: 6px;
     }
+
     .wrap{
       width:100%; display:grid; gap:20px; grid-template-columns: 1fr; align-items:center;
       animation: fadeIn .6s ease-out both;
@@ -31,16 +43,70 @@
       padding:10px;
     }
     .mago img{
-      width: min(380px, 70vw); max-width:100%; border:6px solid var(--legno); border-radius:16px; background:#fff9;
+      width: min(380px, 70vw); max-width:100%;
+      border:6px solid var(--legno); border-radius:16px; background:#fff9;
       box-shadow:0 8px 22px rgba(0,0,0,.25);
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
     }
+    .mago img.img-in { animation: fadeInImg 1.2s ease-out forwards; }
+    @keyframes fadeInImg { to { opacity: 1; transform: none; } }
 
+    /* fumetto */
     .pergamena{
-      background: rgba(255,248,220,.9);
+      position:relative; overflow:visible;
+      background: rgba(255,248,220,.95);
       border:4px solid var(--legno); border-radius:16px;
       padding:22px; box-shadow:0 8px 22px rgba(0,0,0,.2);
-      position:relative; overflow:hidden;
+      transform-origin: top center;
+      transform: scaleY(0);
+      opacity: 0;
     }
+    .pergamena.pergamena-in { animation: unroll .9s ease-out forwards; }
+    @keyframes unroll {
+      0% { transform: scaleY(0); opacity: 0; }
+      100% { transform: scaleY(1); opacity: 1; }
+    }
+
+    /* coda fumetto (desktop) */
+    .pergamena::after{
+      content:"";
+      position:absolute;
+      left:-18px; top:48%;
+      transform: translateY(-50%);
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-right: 18px solid rgba(255,248,220,.95);
+      filter: drop-shadow(-2px 2px 0 rgba(0,0,0,.15));
+    }
+    .pergamena::before{
+      content:"";
+      position:absolute;
+      left:-22px; top:48%;
+      transform: translateY(-50%);
+      border-top: 16px solid transparent;
+      border-bottom: 16px solid transparent;
+      border-right: 22px solid var(--legno);
+    }
+    /* coda mobile */
+    @media (max-width: 899px){
+      .pergamena::after{
+        left: 50%; top: -18px; transform: translateX(-50%);
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-bottom: 18px solid rgba(255,248,220,.95);
+        border-top: none;
+        filter: drop-shadow(0 -2px 0 rgba(0,0,0,.15));
+      }
+      .pergamena::before{
+        left: 50%; top: -22px; transform: translateX(-50%);
+        border-left: 16px solid transparent;
+        border-right: 16px solid transparent;
+        border-bottom: 22px solid var(--legno);
+        border-top: none;
+      }
+    }
+
     .titolo{ font-size:28px; margin:0 0 8px 0; }
     .testo{ font-size:20px; line-height:1.5; margin:12px 0 22px; min-height:4.5em; }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; }
@@ -60,13 +126,11 @@
 <body>
   <div class="cornice">
     <div class="wrap">
-      <!-- Lato immagine mago -->
       <div class="mago">
-        <img src="./assets/img/mago-placeholder.jpg" alt="Il Custode (mago)" />
+        <img id="imgMago" src="./assets/img/mago.png" alt="Il Custode (mago)" />
       </div>
 
-      <!-- Lato pergamena con frase -->
-      <div class="pergamena" role="dialog" aria-label="Benvenuto">
+      <div id="pergamena" class="pergamena" role="dialog" aria-label="Benvenuto">
         <h1 class="titolo">Benvenuto, viandante</h1>
         <div id="frase" class="testo"></div>
         <div class="actions">
@@ -91,17 +155,25 @@
     ];
 
     const fraseEl = document.getElementById('frase');
-    function pickRandom() {
-      const i = Math.floor(Math.random() * FRASI.length);
-      return FRASI[i];
-    }
-    fraseEl.textContent = pickRandom();
+    const imgMago = document.getElementById('imgMago');
+    const pergamena = document.getElementById('pergamena');
+
+    const IMG_FADE_MS = 1200;
+
+    function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fraseEl.textContent = pickRandom(FRASI);
+      imgMago.classList.add('img-in');
+
+      setTimeout(() => {
+        pergamena.classList.add('pergamena-in');
+      }, IMG_FADE_MS);
+    });
 
     const goNext = () => { window.location.href = 'index.html'; };
     document.getElementById('btnAvanti').addEventListener('click', goNext);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') goNext();
-    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') goNext(); });
   </script>
 </body>
 </html>
