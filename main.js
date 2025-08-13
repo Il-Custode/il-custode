@@ -17,18 +17,28 @@ let connections = [];
 let masterPassword = null;
 let wss;
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+// Helper per creare finestre con il preload "combinato" che inietta il pulsante Chiudi
+function createWindowWithDefaults({ filePath, width = 1200, height = 800 } = {}) {
+  const win = new BrowserWindow({
+    width,
+    height,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      // 👇 usiamo un preload che carica sia le tue API (preload.js) sia il pulsante globale
+      preload: path.join(__dirname, 'preload-combined.js'),
       contextIsolation: true,
-      nodeIntegration: false,
+      nodeIntegration: false
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'welcome.html'));
+  if (filePath) {
+    win.loadFile(path.join(__dirname, filePath));
+  }
+
+  return win;
+}
+
+function createWindow() {
+  mainWindow = createWindowWithDefaults({ filePath: 'welcome.html' });
 }
 
 function setupAutoUpdater() {
@@ -60,10 +70,12 @@ app.whenReady().then(() => {
   });
 });
 
+// Se chiudi tutte le finestre su Windows, termina l’app
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+/* ============ CREDENZIALI (keytar) ============ */
 ipcMain.handle('cred:get', async (_event, email) => {
   if (!email) return '';
   try {
@@ -94,6 +106,7 @@ ipcMain.handle('cred:clear', async () => {
   }
 });
 
+/* ============ WEBSOCKET / CHAT ============ */
 ipcMain.on('start-server', (_event, password) => {
   masterPassword = password;
   wss = new WebSocketServer({ port: 8080 });
@@ -166,15 +179,15 @@ function broadcastPlayerList() {
   broadcast({ type: 'player-list', count: connections.length });
 }
 
+/* ============ NAVIGAZIONE MULTI-PAGINA ============ */
 ipcMain.on('open-page', (_event, page) => {
-  const win = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-  win.loadFile(path.join(__dirname, page));
+  const win = createWindowWithDefaults({ filePath: page, width: 1000, height: 700 });
+});
+
+/* ============ CHIUSURA COMPLETA APP ============ */
+/* riceve la richiesta dal pulsante globale (in preload-combined.js) e chiude TUTTO */
+ipcMain.on('close-app', () => {
+  // Chiudi tutte le finestre e termina l'app
+  BrowserWindow.getAllWindows().forEach(w => w.destroy());
+  app.quit();
 });
