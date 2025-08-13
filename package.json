@@ -33,6 +33,16 @@
       "icon": "icon.ico",
       "target": "nsis"
     },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Il Custode",
+      "uninstallDisplayName": "Disinstalla Il Custode"
+    },
     "publish": [
       {
         "provider": "github",
