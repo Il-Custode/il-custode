@@ -28,7 +28,11 @@
     }
     #userBadge{ position:absolute; left:20px; top:14px; color:#fff8dc; font-size:14px; opacity:.9; }
     .header-actions{ position:absolute; right:20px; top:10px; display:flex; gap:10px; }
-    .btn{ background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px; font-family:'Papyrus', fantasy; cursor:pointer; font-size:16px; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:0 14px;
+      border-radius:10px; font-family:'Papyrus', fantasy; cursor:pointer; font-size:16px;
+      line-height:42px; height:44px;
+    }
     .btn:hover{ background:var(--pelle-scura); }
     .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
     .container{ width:100%; max-width:1080px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
@@ -78,14 +82,81 @@
     @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
     .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
 
-    .row{ display:flex; flex-wrap:wrap; gap:10px; }
-    .fields-row{ align-items:flex-start; }
-    .field{ display:flex; flex-direction:column; gap:6px; flex:1 1 300px; min-width:280px; }
-    label{ display:block; font-weight:bold; margin:6px 0 2px; }
-    input{ padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3; width:100%; }
-    .remember{ display:flex; align-items:center; gap:8px; margin-top:8px; font-size:14px; }
     .muted{ opacity:.85; font-size:14px; }
     .spacer{ height:24px; } @media(min-width:900px){ .spacer{ height:36px; } }
+
+    /* ========== FORM: LAYOUT ALLINEATO ========== */
+    #authForm{ display:grid; gap:14px; }
+    .fields-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:16px;
+      align-items:end;
+    }
+    @media(min-width:900px){
+      .fields-grid{
+        grid-template-columns: 1fr 1fr auto auto; /* Email | Password | Bottoni | Ricordami */
+      }
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
+    label{ font-weight:bold; margin:6px 0 2px; }
+
+    .control{
+      padding:10px 12px;
+      border:2px solid var(--legno);
+      border-radius:8px;
+      font-size:16px;
+      font-family:'Papyrus', fantasy;
+      background:#fffdf3;
+      height:44px; line-height:42px;
+      width:100%;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-self:end;
+      flex-wrap:wrap;
+    }
+
+    /* ====== CHECKBOX “RICORDAMI” cliccabile e vicino ====== */
+    .remember{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;                 /* vicino al quadratino */
+      font-size:14px;
+      line-height:1;
+      cursor:pointer;
+      user-select:none;
+      align-self:end;          /* si allinea alla baseline su desktop */
+      height:44px;             /* stessa altezza riga */
+    }
+    .remember input[type="checkbox"]{
+      appearance:none; -webkit-appearance:none;
+      width:18px; height:18px;
+      border:2px solid var(--legno);
+      border-radius:4px;
+      background:#fffdf3;
+      margin:0; padding:0;
+      position:relative;
+    }
+    .remember input[type="checkbox"]:checked::after{
+      content:"✓";
+      position:absolute; left:2px; top:-2px;
+      font-size:18px; line-height:18px; color:var(--legno); font-weight:bold;
+    }
+    .remember input[type="checkbox"]:focus-visible{
+      outline:3px solid #b19a6b; outline-offset:2px;
+    }
+    .remember span{ margin:0; padding:0; }
+    /* =============================================== */
   </style>
 </head>
 <body>
@@ -94,7 +165,7 @@
     <span id="userBadge"></span>
     🎲 Il Custode — Home
     <div class="header-actions">
-      <button id="btnLogout" class="btn red" style="display:none;">Logout</button>
+      <button id="btnLogout" class="btn red" style="display:none;" title="Disconnetti">Disconnetti</button>
     </div>
   </header>
 
@@ -113,23 +184,35 @@
 
     <section id="authCard" class="card" aria-live="polite">
       <h2>Accedi o Registrati</h2>
+
       <form id="authForm" autocomplete="on">
-        <div class="row fields-row">
+        <div class="fields-grid">
+          <!-- Email -->
           <div class="field">
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="esempio@posta.it" autocomplete="email"/>
+            <input id="email" name="email" type="email" class="control" placeholder="esempio@posta.it" autocomplete="email"/>
           </div>
+
+          <!-- Password -->
           <div class="field">
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" placeholder="Password" autocomplete="current-password"/>
-            <label class="remember"><input type="checkbox" id="remember"/> Ricordami su questo dispositivo</label>
+            <input id="password" name="password" type="password" class="control" placeholder="Password" autocomplete="current-password"/>
           </div>
-          <div class="row" style="align-items:flex-end;">
+
+          <!-- Bottoni -->
+          <div class="actions">
             <button id="btnLogin" class="btn" type="submit">Login</button>
             <button id="btnSignup" class="btn" type="button">Registrati</button>
           </div>
+
+          <!-- Ricordami (separato: non alza la cella Password) -->
+          <label class="remember" for="remember">
+            <input type="checkbox" id="remember"/>
+            <span>Ricordami su questo dispositivo</span>
+          </label>
         </div>
       </form>
+
       <div id="authStatus" class="muted"></div>
     </section>
 

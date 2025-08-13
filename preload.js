@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('authCreds', {
   },
 });
 
+// ----- scorciatoie tastiera globali (già presenti) -----
 (function installGlobalKeys() {
   const KEY = '__ilcustode_keys_installed__';
   if (window[KEY]) return;
@@ -51,7 +52,7 @@ contextBridge.exposeInMainWorld('authCreds', {
     const tag = (tgt.tagName || '').toUpperCase();
     if (tgt.isContentEditable) return;
 
-    // ENTER
+    // ENTER invia il form corrente
     if (e.key === 'Enter' && tag !== 'TEXTAREA') {
       let form = tgt.form || (typeof tgt.closest === 'function' ? tgt.closest('form') : null);
       if (form) {
@@ -73,7 +74,7 @@ contextBridge.exposeInMainWorld('authCreds', {
       }
     }
 
-    // TAB
+    // TAB cicla tra gli elementi focusabili
     if (e.key === 'Tab') {
       const focusable = Array.from(
         document.querySelectorAll(
@@ -91,3 +92,43 @@ contextBridge.exposeInMainWorld('authCreds', {
     }
   }, true);
 })();
+
+// ===== Pulsante "Chiudi app" visibile in TUTTE le pagine =====
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    // evita duplicati
+    if (document.getElementById('app-close-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'app-close-btn';
+    btn.textContent = '✖ Chiudi app';
+
+    // stile fisso nell'angolo in basso a destra
+    Object.assign(btn.style, {
+      position: 'fixed',
+      bottom: '14px',
+      right: '14px',
+      zIndex: '999999',
+      background: '#8b0000',
+      color: '#fff',
+      border: 'none',
+      padding: '10px 14px',
+      cursor: 'pointer',
+      fontSize: '14px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 6px rgba(0,0,0,.25)'
+    });
+
+    btn.addEventListener('mouseenter', () => { btn.style.background = '#a40000'; });
+    btn.addEventListener('mouseleave', () => { btn.style.background = '#8b0000'; });
+
+    // Chiude la finestra corrente (se è l'unica, chiude tutta l'app)
+    btn.addEventListener('click', () => {
+      window.close();
+    });
+
+    document.body.appendChild(btn);
+  } catch (e) {
+    console.error('Errore nel pulsante Chiudi app:', e);
+  }
+});
