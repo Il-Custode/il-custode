@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Custode - Generatore di Mappe</title>
+    <style>
+        body {
+            font-family: 'Papyrus', fantasy;
+            margin: 0;
+            padding: 0;
+            color: #3e2f1c;
+            text-align: center;
+            background: url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .cornice {
+            border: 40px solid transparent;
+            -webkit-border-image: url('../assets/img/cornice-legno.png') 40 stretch;
+            border-image: url('../assets/img/cornice-legno.png') 40 stretch;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        header {
+            background-color: rgba(75, 54, 33, 0.85);
+            color: #fff8dc;
+            padding: 20px;
+            font-size: 28px;
+            position: relative;
+        }
+        button {
+            background-color: #d2b48c;
+            border: 3px solid #4b3621;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-family: 'Papyrus', fantasy;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: #a9745b;
+            color: white;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cornice">
+        <header>
+            <button class="back-btn" onclick="window.history.back()">⬅ Indietro</button>
+            🗺 Generatore di Mappe
+        </header>
+        <div class="container">
+            <h2>Crea e personalizza le tue mappe</h2>
+            <p>Qui potrai generare mappe personalizzate per la tua campagna.</p>
+        </div>
+    </div>
+</body>
+</html>

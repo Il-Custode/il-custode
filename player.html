@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Il Custode - Interfaccia Giocatore</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #fdf6e3;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #8b4513;
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+    main {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+    }
+    section {
+        flex: 1;
+        background-color: #fff;
+        padding: 15px;
+        border: 1px solid #ccc;
+    }
+    h2 {
+        margin-top: 0;
+    }
+    input, button {
+        padding: 8px;
+        margin: 5px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+    .chat-box {
+        height: 200px;
+        overflow-y: auto;
+        background: #eee;
+        padding: 10px;
+        border: 1px solid #aaa;
+        margin-bottom: 10px;
+    }
+    .menu-btns {
+        margin-top: 15px;
+    }
+    .menu-btns button {
+        width: 100%;
+        background-color: #8b4513;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        margin-bottom: 5px;
+    }
+    .menu-btns button:hover {
+        background-color: #a0522d;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>Interfaccia Giocatore</h1>
+</header>
+
+<main>
+    <section>
+        <h2>Connessione al Server</h2>
+        <input type="text" id="serverAddress" placeholder="IP del Master">
+        <input type="text" id="serverPassword" placeholder="Password campagna">
+        <button id="connectBtn">Connettiti</button>
+    </section>
+
+    <section>
+        <h2>Giocatori Connessi</h2>
+        <ul id="playerList"></ul>
+    </section>
+
+    <section>
+        <h2>Chat</h2>
+        <div class="chat-box" id="chatBox"></div>
+        <input type="text" id="chatInput" placeholder="Scrivi messaggio...">
+        <button id="sendChatBtn">Invia</button>
+    </section>
+</main>
+
+<div class="menu-btns">
+    <button onclick="openSection('mappe.html')">Gestione Mappe</button>
+    <button onclick="openSection('notes.html')">Note Condivise</button>
+</div>
+
+<script>
+    const { ipcRenderer } = require('electron');
+
+    // Connessione
+    document.getElementById('connectBtn').addEventListener('click', () => {
+        const ip = document.getElementById('serverAddress').value;
+        const pwd = document.getElementById('serverPassword').value;
+        if (ip.trim() && pwd.trim()) {
+            ipcRenderer.send('connect-to-server', { ip, pwd });
+        }
+    });
+
+    // Aggiorna lista giocatori
+    ipcRenderer.on('update-player-list', (event, players) => {
+        const list = document.getElementById('playerList');
+        list.innerHTML = '';
+        for (let i = 0; i < players; i++) {
+            const li = document.createElement('li');
+            li.textContent = `Giocatore ${i+1}`;
+            list.appendChild(li);
+        }
+    });
+
+    // Chat
+    document.getElementById('sendChatBtn').addEventListener('click', () => {
+        const msg = document.getElementById('chatInput').value;
+        if (msg.trim()) {
+            ipcRenderer.send('chat-message', msg);
+            document.getElementById('chatInput').value = '';
+        }
+    });
+
+    ipcRenderer.on('chat-message', (event, message) => {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<div>${message}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    // Apertura sezioni
+    function openSection(page) {
+        ipcRenderer.send('open-page', page);
+    }
+</script>
+</body>
+</html>

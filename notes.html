@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Il Custode - Note Condivise</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+        body {
+            font-family: 'MedievalSharp', cursive;
+            background-image: url('assets/background-parchment.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            color: #3b2f2f;
+        }
+        header {
+            background: url('assets/header-wood.jpg') repeat-x;
+            color: #f5deb3;
+            padding: 20px;
+            text-align: center;
+            font-size: 2em;
+            border-bottom: 5px solid #3b2f2f;
+            text-shadow: 2px 2px #000;
+        }
+        textarea {
+            width: 90%;
+            height: 500px;
+            margin: 40px auto 20px auto;
+            display: block;
+            background-color: rgba(255, 248, 220, 0.9);
+            border: 3px solid #5b4636;
+            padding: 15px;
+            font-size: 18px;
+            resize: none;
+            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4);
+        }
+        button {
+            display: block;
+            margin: 20px auto 40px auto;
+            padding: 15px 30px;
+            font-size: 18px;
+            background: url('assets/button-parchment.png') no-repeat center;
+            background-size: cover;
+            color: #3b2f2f;
+            border: 3px solid #5b4636;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        ✒️ Note Condivise ✒️
+    </header>
+
+    <textarea id="notes" placeholder="Scrivi qui le tue note..."></textarea>
+    <button onclick="saveNotes()">💾 Salva Note</button>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        function saveNotes() {
+            const text = document.getElementById('notes').value;
+            ipcRenderer.send('save-notes', text);
+        }
+
+        ipcRenderer.on('load-notes', (event, data) => {
+            document.getElementById('notes').value = data;
+        });
+    </script>
+</body>
+</html>

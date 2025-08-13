@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode - Mappe</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+    }
+    .back-btn{
+      position:absolute; left:20px; top:14px;
+      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
+    }
+    .back-btn:hover{ background:#8b5e47; }
+    .container{ width:100%; max-width:1200px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+
+    .row{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+    .card{
+      background:rgba(255,248,220,.88); border:3px solid var(--legno); border-radius:14px; padding:16px; margin:14px 0;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
+    }
+    .uploader{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width:900px){ .uploader{ grid-template-columns:2fr 3fr; } }
+
+    .drop{
+      border:3px dashed var(--legno); border-radius:12px; padding:18px; text-align:center; background:rgba(255,255,255,.6);
+    }
+    .drop.drag{ background:rgba(210,180,140,.35); }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy;
+    }
+    .btn:hover{ background:var(--pelle-scura); }
+    input[type="file"]{ display:none; }
+
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; }
+    .tile{
+      background:rgba(255,255,255,.7); border:3px solid var(--legno); border-radius:12px; overflow:hidden; display:flex; flex-direction:column;
+    }
+    .thumb{
+      aspect-ratio: 16/10; width:100%; object-fit:cover; background:#fff;
+    }
+    .tile-body{ padding:10px; display:flex; flex-direction:column; gap:6px; }
+    .name{ font-weight:bold; word-break:break-word; }
+    .muted{ font-size:12px; opacity:.85; }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+    .btn.red{ background:#c67a6b; color:#fff; }
+    .btn.red:hover{ background:#b16556; }
+    .btn.gray{ background:#ddd4c6; }
+
+    /* Modal viewer */
+    .modal{
+      position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; padding:20px;
+    }
+    .modal.open{ display:flex; }
+    .modal-card{
+      width:min(96vw, 1400px); height:min(92vh, 900px); background:rgba(255,248,220,.97);
+      border:4px solid var(--legno); border-radius:14px; display:flex; flex-direction:column; overflow:hidden;
+    }
+    .modal-head{
+      background:rgba(75,54,33,.85); color:#fff8dc; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .modal-body{ flex:1; display:flex; align-items:center; justify-content:center; background:#000; }
+    .modal-body img{ max-width:100%; max-height:100%; object-fit:contain; }
+    .modal-foot{ padding:10px; display:flex; gap:10px; justify-content:flex-end; background:rgba(255,255,255,.8); }
+    .toast{
+      position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px;
+      box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000;
+    }
+    .toast.error{ background:#b23b3b; }
+  </style>
+</head>
+<body>
+<div class="cornice">
+  <header>
+    <!-- Torna al Master -->
+    <button class="back-btn" onclick="location.href='master.html'">⬅ Indietro</button>
+    🗺 Mappe
+  </header>
+
+  <div class="container">
+    <!-- Importazione -->
+    <section class="card">
+      <h2>Importa le tue mappe</h2>
+      <div class="uploader">
+        <div class="drop" id="dropZone">
+          <p><strong>Trascina qui</strong> le immagini delle tue mappe</p>
+          <p class="muted">Formati consigliati: JPG, PNG, WEBP (anche GIF/ JPEG).</p>
+          <label class="btn" for="fileInput">Scegli file…</label>
+          <input id="fileInput" type="file" accept="image/*" multiple />
+        </div>
+        <div>
+          <h3>Consigli</h3>
+          <ul style="margin:0 0 0 18px; padding:0; line-height:1.4;">
+            <li>Rinomina le mappe dopo l’import per tenerle ordinate.</li>
+            <li>Click su <em>Visualizza</em> per aprire l’anteprima a schermo.</li>
+            <li>Puoi fare <em>backup</em> e <em>ripristino</em> dell’archivio mappe.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Elenco -->
+    <section class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <h2>Le tue mappe</h2>
+        <div class="actions">
+          <button class="btn gray" onclick="exportMaps()">Esporta (backup)</button>
+          <label class="btn gray" for="importBackup">Importa backup</label>
+          <input id="importBackup" type="file" accept="application/json"/>
+          <button class="btn red" onclick="clearAll()" title="Rimuove tutte le mappe salvate">Cancella tutto</button>
+        </div>
+      </div>
+      <div id="grid" class="grid" aria-live="polite"></div>
+      <p id="emptyState" class="muted" style="display:none; margin-top:10px;">Nessuna mappa salvata.</p>
+    </section>
+  </div>
+</div>
+
+<!-- Modal viewer -->
+<div id="viewer" class="modal" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div id="viewerTitle">Mappa</div>
+      <div class="actions">
+        <button class="btn gray" id="btnRename">Rinomina</button>
+        <button class="btn red" id="btnDelete">Elimina</button>
+        <button class="btn" onclick="closeViewer()">Chiudi</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <img id="viewerImg" alt="Mappa"/>
+    </div>
+    <div class="modal-foot">
+      <span class="muted" id="viewerInfo"></span>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ========= UTIL ========= */
+const $ = (s)=>document.querySelector(s);
+function toast(msg, isError=false){
+  const t = $('#toast'); if(!t) return;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=>{ t.style.display='none'; }, 1600);
+}
+function uid(){ return 'm_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+
+/* ========= STORAGE ========= */
+const MAPS_KEY = 'custode.maps'; // [{id,name,dataUrl, w,h, addedAt}]
+function loadMaps(){ try{ const raw=localStorage.getItem(MAPS_KEY); return raw? JSON.parse(raw):[]; }catch(_){ return []; } }
+function saveMaps(arr){ localStorage.setItem(MAPS_KEY, JSON.stringify(arr)); render(); }
+
+/* ========= RENDER ========= */
+function render(){
+  const list = loadMaps();
+  const grid = $('#grid'); const empty = $('#emptyState');
+  grid.innerHTML='';
+  if(!list.length){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.sort((a,b)=>b.addedAt-a.addedAt).forEach(m=>{
+    const card = document.createElement('div');
+    card.className='tile';
+    card.innerHTML = `
+      <img class="thumb" src="${m.dataUrl}" alt="${m.name}">
+      <div class="tile-body">
+        <div class="name">${m.name || 'Senza nome'}</div>
+        <div class="muted">${m.w||'?'}×${m.h||'?'} | ${new Date(m.addedAt).toLocaleString()}</div>
+        <div class="actions">
+          <button class="btn" data-view="${m.id}">Visualizza</button>
+          <button class="btn gray" data-rename="${m.id}">Rinomina</button>
+          <button class="btn red" data-del="${m.id}">Elimina</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ========= IMPORT ========= */
+const drop = $('#dropZone');
+const fileInput = $('#fileInput');
+drop.addEventListener('dragover', (e)=>{ e.preventDefault(); drop.classList.add('drag'); });
+drop.addEventListener('dragleave', ()=> drop.classList.remove('drag'));
+drop.addEventListener('drop', (e)=>{
+  e.preventDefault(); drop.classList.remove('drag');
+  const files = Array.from(e.dataTransfer.files || []).filter(f=>f.type.startsWith('image/'));
+  if(!files.length){ toast('Nessuna immagine riconosciuta', true); return; }
+  importFiles(files);
+});
+fileInput.addEventListener('change', (e)=>{
+  const files = Array.from(e.target.files || []);
+  importFiles(files);
+  fileInput.value = '';
+});
+
+async function importFiles(files){
+  if(!files.length) return;
+  const maps = loadMaps();
+  for(const f of files){
+    try{
+      const dataUrl = await readAsDataURL(f);
+      const {width,height} = await getImgSize(dataUrl);
+      maps.push({ id: uid(), name: f.name.replace(/\.(png|jpg|jpeg|webp|gif)$/i,''),
+                  dataUrl, w: width, h: height, addedAt: Date.now() });
+    }catch(err){
+      console.error(err); toast('Errore su: '+f.name, true);
+    }
+  }
+  saveMaps(maps);
+  toast('Mappe importate');
+}
+function readAsDataURL(file){
+  return new Promise((res, rej)=>{
+    const r = new FileReader();
+    r.onload = ()=>res(r.result);
+    r.onerror = rej; r.readAsDataURL(file);
+  });
+}
+function getImgSize(src){
+  return new Promise((res, rej)=>{
+    const i = new Image();
+    i.onload = ()=>res({width:i.naturalWidth, height:i.naturalHeight});
+    i.onerror = rej; i.src = src;
+  });
+}
+
+/* ========= GRID ACTIONS ========= */
+document.addEventListener('click', (e)=>{
+  const v = e.target.closest('[data-view]'); if(v){ openViewer(v.getAttribute('data-view')); return; }
+  const r = e.target.closest('[data-rename]'); if(r){ renameMap(r.getAttribute('data-rename')); return; }
+  const d = e.target.closest('[data-del]'); if(d){ deleteMap(d.getAttribute('data-del')); return; }
+});
+
+function renameMap(id){
+  const maps = loadMaps();
+  const m = maps.find(x=>x.id===id); if(!m) return;
+  const nv = prompt('Nuovo nome mappa:', m.name || '');
+  if(nv===null) return;
+  m.name = (nv || 'Senza nome').trim();
+  saveMaps(maps);
+  toast('Rinominata');
+}
+function deleteMap(id){
+  if(!confirm('Eliminare questa mappa?')) return;
+  const maps = loadMaps().filter(x=>x.id!==id);
+  saveMaps(maps);
+  toast('Eliminata');
+}
+function clearAll(){
+  if(!confirm('Eliminare TUTTE le mappe?')) return;
+  saveMaps([]);
+  toast('Archivio mappe svuotato');
+}
+
+/* ========= BACKUP ========= */
+function exportMaps(){
+  const data = JSON.stringify(loadMaps(), null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'custode-mappe-backup.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+}
+$('#importBackup').addEventListener('change', async (e)=>{
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  try{
+    const text = await f.text();
+    const arr = JSON.parse(text);
+    if(!Array.isArray(arr)) throw new Error('Formato non valido');
+    saveMaps(arr);
+    toast('Backup importato');
+  }catch(err){
+    console.error(err); toast('Backup non valido', true);
+  }finally{
+    e.target.value = '';
+  }
+});
+
+/* ========= VIEWER ========= */
+let currentId = null;
+function openViewer(id){
+  const m = loadMaps().find(x=>x.id===id); if(!m) return;
+  currentId = id;
+  $('#viewerTitle').textContent = m.name || 'Mappa';
+  $('#viewerImg').src = m.dataUrl;
+  $('#viewerInfo').textContent = `${m.w||'?'}×${m.h||'?'} — ${new Date(m.addedAt).toLocaleString()}`;
+  $('#viewer').classList.add('open'); $('#viewer').setAttribute('aria-hidden','false');
+}
+function closeViewer(){
+  $('#viewer').classList.remove('open'); $('#viewer').setAttribute('aria-hidden','true');
+  currentId = null;
+}
+$('#viewer').addEventListener('click', (e)=>{
+  if(e.target.id==='viewer') closeViewer();
+});
+$('#btnRename').addEventListener('click', ()=>{
+  if(!currentId) return;
+  renameMap(currentId);
+});
+$('#btnDelete').addEventListener('click', ()=>{
+  if(!currentId) return;
+  deleteMap(currentId);
+  closeViewer();
+});
+
+/* ========= INIT ========= */
+render();
+</script>
+</body>
+</html>

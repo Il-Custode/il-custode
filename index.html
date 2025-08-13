@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode — Benvenuto</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('./assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+    }
+    #userBadge{ position:absolute; left:20px; top:14px; color:#fff8dc; font-size:14px; opacity:.9; }
+    .header-actions{ position:absolute; right:20px; top:10px; display:flex; gap:10px; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px;
+      font-family:'Papyrus', fantasy; cursor:pointer; font-size:16px;
+    }
+    .btn:hover{ background:var(--pelle-scura); }
+    .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
+
+    .container{ width:100%; max-width:980px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+    .card{
+      background:rgba(255,248,220,.90); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:14px 0;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
+    }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    label{ display:block; font-weight:bold; margin:6px 0 2px; }
+    input{
+      padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
+    }
+    .muted{ opacity:.85; font-size:14px; }
+    .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
+    .toast{
+      position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px;
+      box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000;
+    }
+    .toast.error{ background:#b23b3b; }
+  </style>
+</head>
+<body>
+<div class="cornice">
+  <header>
+    <span id="userBadge"></span>
+    🎲 Il Custode — Benvenuto
+    <div class="header-actions">
+      <button id="btnLogout" class="btn red" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- LOGIN / REGISTRAZIONE -->
+    <section id="authCard" class="card" aria-live="polite">
+      <h2>Accedi o Registrati</h2>
+      <div class="row">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="esempio@posta.it" autocomplete="email"/>
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
+        </div>
+        <div class="row" style="align-items:flex-end;">
+          <button id="btnLogin" class="btn">Login</button>
+          <button id="btnSignup" class="btn">Registrati</button>
+        </div>
+      </div>
+      <p class="muted">Puoi premere <strong>Invio</strong> per fare login. Il <em>Tab</em> sposta tra i campi.</p>
+      <div id="authStatus" class="muted"></div>
+    </section>
+
+    <!-- HOME DOPO LOGIN -->
+    <section id="homeCard" class="card" style="display:none;">
+      <h2>Seleziona una sezione</h2>
+      <div class="grid">
+        <div class="tile">
+          <h3>🎩 Modalità Master</h3>
+          <p class="muted">Pannello del Master (campagne, strumenti).</p>
+          <button class="btn" onclick="location.href='pages/master.html'">Entra come Master</button>
+        </div>
+        <div class="tile">
+          <h3>🧝‍♂️ Modalità Giocatore</h3>
+          <p class="muted">Connessione alla sessione (MVP).</p>
+          <button class="btn" onclick="location.href='pages/player.html'">Entra come Giocatore</button>
+        </div>
+        <div class="tile">
+          <h3>🗺 Mappe</h3>
+          <p class="muted">Gestisci e visualizza le mappe.</p>
+          <button class="btn" onclick="location.href='pages/mappe.html'">Apri Mappe</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="background:rgba(255,255,255,.6);">
+      <strong>Nota tecnica:</strong> autenticazione con Supabase; le sezioni interne al momento usano <em>localStorage</em> (MVP).
+    </section>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Supabase JS UMD (compatibile file://) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* ==== Config Supabase (già impostati) ==== */
+  const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ==== Helper UI ==== */
+  const $ = (s)=>document.querySelector(s);
+  function toast(msg, err=false){ const t=$('#toast'); t.className='toast'+(err?' error':''); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',1600); }
+
+  const authCard = $('#authCard');
+  const homeCard = $('#homeCard');
+  const emailEl = $('#email');
+  const passEl  = $('#password');
+  const btnLogin = $('#btnLogin');
+  const btnSignup = $('#btnSignup');
+  const btnLogout = $('#btnLogout');
+  const authStatus = $('#authStatus');
+  const userBadge = $('#userBadge');
+
+  function showHome(email){
+    authCard.style.display='none';
+    homeCard.style.display='';
+    btnLogout.style.display='';
+    userBadge.textContent = email ? 'Connesso: '+email : '';
+  }
+  function showAuth(){
+    authCard.style.display='';
+    homeCard.style.display='none';
+    btnLogout.style.display='none';
+    userBadge.textContent='';
+  }
+
+  async function refreshSession(){
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session){ showHome(data.session.user?.email || ''); authStatus.textContent='Sessione attiva.'; }
+    else { showAuth(); authStatus.textContent='Accedi o registrati per continuare.'; }
+  }
+
+  // Login
+  btnLogin.addEventListener('click', async ()=>{
+    const email = (emailEl.value||'').trim();
+    const password = (passEl.value||'').trim();
+    if(!email || !password){ authStatus.textContent='Inserisci email e password.'; return; }
+    authStatus.textContent='Accesso…';
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if(error){ authStatus.textContent='Errore login: '+error.message; toast('Errore login', true); return; }
+    toast('Benvenuto!'); refreshSession();
+  });
+
+  // Invio da tastiera (Tab è già nativo)
+  [emailEl, passEl].forEach(el=>{
+    el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); btnLogin.click(); }});
+  });
+
+  // Registrazione
+  btnSignup.addEventListener('click', async ()=>{
+    const email = (emailEl.value||'').trim();
+    const password = (passEl.value||'').trim();
+    if(!email || !password){ authStatus.textContent='Inserisci email e password.'; return; }
+    authStatus.textContent='Registrazione…';
+    const { error } = await supabaseClient.auth.signUp({ email, password });
+    if(error){ authStatus.textContent='Errore registrazione: '+error.message; toast('Errore registrazione', true); return; }
+    authStatus.textContent='Registrato! Se la conferma email è attiva, controlla la posta.';
+    toast('Registrazione OK');
+  });
+
+  // Logout
+  btnLogout.addEventListener('click', async ()=>{ await supabaseClient.auth.signOut(); toast('Disconnesso'); refreshSession(); });
+
+  // Start
+  refreshSession();
+</script>
+</body>
+</html>

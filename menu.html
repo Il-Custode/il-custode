@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Custode - Menu Principale</title>
+    <style>
+        body {
+            font-family: 'Papyrus', fantasy;
+            margin: 0;
+            padding: 0;
+            color: #3e2f1c;
+            text-align: center;
+            background: url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .cornice {
+            border: 40px solid transparent;
+            -webkit-border-image: url('./assets/img/cornice-legno.png') 40 stretch;
+            border-image: url('./assets/img/cornice-legno.png') 40 stretch;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        header {
+            background-color: rgba(75, 54, 33, 0.85);
+            color: #fff8dc;
+            padding: 20px;
+            font-size: 28px;
+            border-bottom: 5px solid #4b3621;
+        }
+
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        button {
+            background-color: #d2b48c;
+            border: 3px solid #4b3621;
+            padding: 15px 25px;
+            font-size: 20px;
+            font-family: 'Papyrus', fantasy;
+            cursor: pointer;
+            border-radius: 8px;
+            min-width: 200px;
+        }
+
+        button:hover {
+            background-color: #c2a178;
+        }
+    </style>
+</head>
+<body>
+    <div class="cornice">
+        <header>📜 Il Custode</header>
+
+        <div class="menu-container">
+            <button onclick="window.location.href='./pages/master.html'">Modalità Master</button>
+            <button onclick="window.location.href='./pages/player.html'">Modalità Giocatore</button>
+        </div>
+    </div>
+</body>
+</html>

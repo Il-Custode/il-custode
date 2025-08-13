@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode — Benvenuto</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font-family:'Papyrus', fantasy; color:var(--inchiostro);
+      background:url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center/cover fixed;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .cornice{
+      border:40px solid transparent;
+      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      width:min(1100px, 96vw); min-height:70vh; display:flex; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .wrap{
+      width:100%; display:grid; gap:20px; grid-template-columns: 1fr; align-items:center;
+      animation: fadeIn .6s ease-out both;
+    }
+    @media (min-width: 900px){ .wrap{ grid-template-columns: 1fr 1.2fr; } }
+
+    .mago{
+      display:flex; align-items:center; justify-content:center;
+      padding:10px;
+    }
+    .mago img{
+      width: min(380px, 70vw); max-width:100%; border:6px solid var(--legno); border-radius:16px; background:#fff9;
+      box-shadow:0 8px 22px rgba(0,0,0,.25);
+    }
+
+    .pergamena{
+      background: rgba(255,248,220,.9);
+      border:4px solid var(--legno); border-radius:16px;
+      padding:22px; box-shadow:0 8px 22px rgba(0,0,0,.2);
+      position:relative; overflow:hidden;
+    }
+    .titolo{ font-size:28px; margin:0 0 8px 0; }
+    .testo{ font-size:20px; line-height:1.5; margin:12px 0 22px; min-height:4.5em; }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno);
+      padding:10px 16px; font-size:18px; border-radius:12px; cursor:pointer;
+      font-family:'Papyrus', fantasy;
+    }
+    .btn:hover{ filter:brightness(.95); }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cornice">
+    <div class="wrap">
+      <!-- Lato immagine mago -->
+      <div class="mago">
+        <!-- Sostituisci il src con la tua immagine quando l’avrai -->
+        <img src="./assets/img/mago-placeholder.jpg" alt="Il Custode (mago)" />
+      </div>
+
+      <!-- Lato pergamena con frase -->
+      <div class="pergamena" role="dialog" aria-label="Benvenuto">
+        <h1 class="titolo">Benvenuto, viandante</h1>
+        <div id="frase" class="testo"></div>
+        <div class="actions">
+          <button id="btnAvanti" class="btn" type="button">Avanti ➜</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 10 frasi nello stesso stile (la prima è quella “base” che mi hai dato)
+    const FRASI = [
+      "Chi bussa alla Porta del Custode? Ah, sei tu. Benvenuto. Lascia che illumini la tua vita.",
+      "Io sono il Custode. Entra pure: il fuoco è acceso e le mappe attendono la tua mano.",
+      "Benvenuto, viandante. Il Custode veglia: attraversa la soglia e lascia che l’avventura ti trovi.",
+      "Sei giunto fin qui: onore a te. Io sono il Custode, e il sentiero ora si rischiara.",
+      "Bussa forte e senza timore: il Custode ascolta. Entra, prendi posto, agisci.",
+      "Ah, un volto nuovo! Benvenuto nelle mie sale. Io sono il Custode: guida e testimone dei tuoi passi.",
+      "Gli astri ti hanno condotto: benvenuto. Varca la soglia, entra nel cerchio e dai inizio all’opera.",
+      "La pergamena si srotola per te. Io sono il Custode: è tempo di scrivere la tua leggenda.",
+      "Sento la tua presenza. Entra, amico: la notte è lunga e le storie chiedono voce.",
+      "Hai bussato con coraggio. Benvenuto. Io sono il Custode: apri il libro, scegli il capitolo, agisci."
+    ];
+
+    // Mostra una frase casuale
+    const fraseEl = document.getElementById('frase');
+    function pickRandom() {
+      const i = Math.floor(Math.random() * FRASI.length);
+      return FRASI[i];
+    }
+    fraseEl.textContent = pickRandom();
+
+    // Avanti → vai alla home (index.html)
+    const goNext = () => { window.location.href = 'index.html'; };
+
+    // Click sul bottone
+    document.getElementById('btnAvanti').addEventListener('click', goNext);
+
+    // Tasto Invio abilita “Avanti”
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') goNext();
+    });
+  </script>
+</body>
+</html>

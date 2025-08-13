@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2400" height="200" viewBox="0 0 2400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5c3b1e"/>
+      <stop offset="100%" stop-color="#3c2412"/>
+    </linearGradient>
+    <filter id="woodGrain" x="-10%" y="-50%" width="120%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.25" numOctaves="3" seed="3" result="noise"/>
+      <feColorMatrix in="noise" type="matrix" values="
+        1 0 0 0 0
+        0 0.85 0 0 0
+        0 0 0.6 0 0
+        0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="2400" height="200" fill="url(#wood)"/>
+  <rect x="0" y="0" width="2400" height="200" filter="url(#woodGrain)" opacity="0.35"/>
+  <rect x="8" y="8" width="2384" height="184" fill="none" stroke="#b58b3b" stroke-width="12" opacity="0.9"/>
+  <g fill="#b58b3b" opacity="0.9">
+    <circle cx="40" cy="40" r="8"/><circle cx="2360" cy="40" r="8"/>
+    <circle cx="40" cy="160" r="8"/><circle cx="2360" cy="160" r="8"/>
+  </g>
+</svg>

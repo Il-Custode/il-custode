@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Giocatore — Il Custode</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .app-header {
+      display: flex;
+      align-items: center;
+      background-color: #5c3b2e;
+      color: white;
+      padding: 10px;
+    }
+    .back-btn {
+      background-color: #a9745b;
+      color: white;
+      font-size: 16px;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+    .back-btn:hover {
+      background-color: #8b5e47;
+    }
+    .app-header h2 {
+      flex: 1;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <button class="back-btn" onclick="window.history.back()">⬅ Indietro</button>
+    <h2>Giocatore — Il Custode</h2>
+  </header>
+
+  <main class="content">
+    <section class="panel">
+      <h3>Connessione</h3>
+      <div id="connInfo"></div>
+      <div id="connStatus" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Chat</h3>
+      <div id="chatLog" style="height:240px; overflow:auto;"></div>
+      <div class="row">
+        <input id="chatMsg" placeholder="Scrivi un messaggio..." />
+        <button id="sendChat">Invia</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Socket.IO client locale (no internet) -->
+  <script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
+
+  <script>
+    const $ = (s)=>document.querySelector(s);
+    const io = window.io;
+    let socket;
+
+    function loadLast() {
+      try {
+        const raw = localStorage.getItem('custode.lastConnection');
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function appendLog(from, text) {
+      const box = $('#chatLog');
+      const line = document.createElement('div');
+      const time = new Date().toLocaleTimeString();
+      line.textContent = `[${time}] ${from}: ${text}`;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function connect() {
+      const last = loadLast();
+      if (!last) {
+        $('#connStatus').textContent = 'Nessun profilo salvato. Torna alla Home e premi "Connetti" prima.';
+        return;
+      }
+
+      $('#connInfo').textContent = `Campagna: ${last.campaignId} | Nome: ${last.name} | ${last.host}:${last.port}`;
+
+      socket = io(`ws://${last.host}:${last.port}`, {
+        auth: {
+          token: last.password || '',
+          campaignId: last.campaignId || 'default',
+          role: 'player',
+          name: last.name || 'Giocatore'
+        }
+      });
+
+      socket.on('connect', () => { $('#connStatus').textContent = 'Connesso.'; });
+      socket.on('disconnect', () => { $('#connStatus').textContent = 'Disconnesso. Riprovo...'; });
+      socket.on('connect_error', (e) => { $('#connStatus').textContent = `Errore: ${e.message}`; });
+
+      socket.on('auth:error', (e) => { $('#connStatus').textContent = `Autenticazione fallita: ${e && e.message ? e.message : 'Errore'}`; });
+      socket.on('auth:ok', () => { $('#connStatus').textContent = 'Autenticato.'; });
+
+      socket.on('chat:new', (pkt) => {
+        appendLog(pkt.from && pkt.from.name ? pkt.from.name : 'Sconosciuto', pkt.text || '');
+      });
+
+      $('#sendChat').addEventListener('click', () => {
+        const txt = ($('#chatMsg').value || '').trim();
+        if (!txt) return;
+        socket.emit('chat:send', txt);
+        $('#chatMsg').value = '';
+      });
+      $('#chatMsg').addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter') $('#sendChat').click();
+      });
+    }
+
+    connect();
+  </script>
+</body>
+</html>

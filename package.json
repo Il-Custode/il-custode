@@ -1,0 +1,43 @@
+{
+  "name": "il-custode-pc",
+  "version": "1.0.0",
+  "description": "Applicazione fantasy per Master e Giocatori (D&D) con login Supabase, mappe e strumenti.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "electron-store": "^10.1.0",
+    "electron-updater": "^6.6.2",
+    "express": "^5.1.0",
+    "fs-extra": "^11.2.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "ws": "^8.18.3"
+  },
+  "build": {
+    "appId": "com.ilcustode.app",
+    "productName": "Il Custode",
+    "win": {
+      "icon": "icon.ico"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Il-Custode",
+        "repo": "il-custode",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

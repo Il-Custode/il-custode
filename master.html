@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode - Modalità Master</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+    }
+    .back-btn{
+      position:absolute; left:20px; top:14px;
+      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
+    }
+    .back-btn:hover{ background:#8b5e47; }
+    /* badge + logout */
+    #userBadge{ position:absolute; right:120px; font-size:14px; opacity:.9; }
+    #headerLogout{ position:absolute; right:20px; background:var(--pelle); border:3px solid var(--legno); padding:6px 10px; border-radius:8px; cursor:pointer; }
+    #headerLogout:hover{ background:var(--pelle-scura); }
+
+    .container{ width:100%; max-width:980px; margin:0 auto; padding:24px 16px 60px; text-align:left; }
+    .panel{
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:18px; margin:16px auto;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
+    }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    input[type="password"], input[type="text"], input[type="email"]{
+      flex:1 1 260px; padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
+    }
+    button{
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px;
+    }
+    button:hover{ background:var(--pelle-scura); }
+    .list{ list-style:none; padding:0; margin:0; }
+    .list li{
+      display:flex; justify-content:space-between; align-items:center; gap:8px;
+      border:2px solid var(--legno); border-radius:10px; background:#fff8dc; padding:10px 12px; margin-top:8px;
+    }
+    .muted{ opacity:.85; font-size:14px; }
+    .tag{ padding:2px 8px; border:2px solid var(--legno); border-radius:8px; background:#fffef5; font-size:13px; }
+    .pin-box{ display:inline-block; font-size:20px; font-weight:bold; letter-spacing:2px; padding:6px 12px; border:3px solid var(--legno); border-radius:8px; background:#fffef5; margin-right:8px; }
+    .qr{ display:block; margin-top:12px; max-width:220px; border:3px solid var(--legno); border-radius:8px; background:#fff; }
+    .status{ margin-top:8px; font-style:italic; min-height:1.2em; }
+  </style>
+</head>
+<body>
+<div class="cornice">
+  <header>
+    <button class="back-btn" onclick="window.history.back()">⬅ Indietro</button>
+    🎩 Modalità Master
+    <span id="userBadge"></span>
+    <button id="headerLogout" hidden>Logout</button>
+  </header>
+
+  <div class="container">
+
+    <!-- LOGIN/REGISTRAZIONE CLOUD (Supabase) -->
+    <section id="supaPanel" class="panel">
+      <h3>Accedi con il tuo account</h3>
+      <div class="row">
+        <!-- tabindex + autofocus per navigazione da tastiera -->
+        <input id="supEmail" type="email" placeholder="Email" tabindex="1" autofocus />
+        <input id="supPass"  type="password" placeholder="Password" tabindex="2" />
+        <button id="supSignIn"  tabindex="3">Login</button>
+        <button id="supSignUp"  tabindex="4">Registrati</button>
+        <button id="supSignOut" tabindex="5" style="display:none;">Esci</button>
+      </div>
+      <div class="status" id="supStatus"></div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboardPanel" class="panel" style="display:none;">
+      <h3>Storico del Master</h3>
+      <div class="row" style="margin-bottom:12px;">
+        <input id="campName" type="text" placeholder="Nome nuova campagna (es. La sete del sangue)" />
+        <button id="newCampBtn">Nuova Campagna (genera PIN/QR)</button>
+      </div>
+      <ul id="campList" class="list"></ul>
+      <div class="status" id="dashStatus"></div>
+    </section>
+
+    <!-- DETTAGLIO CAMPAGNA -->
+    <section id="campDetail" class="panel" style="display:none;">
+      <h3 id="campTitle">Dettagli campagna</h3>
+      <div class="row" style="align-items:flex-start;">
+        <div>
+          <div class="muted">PIN (solo prima associazione dei giocatori)</div>
+          <div class="pin-box" id="pinBox">------</div>
+          <div class="row" style="margin-top:6px;">
+            <button id="copyPinBtn">Copia PIN</button>
+            <button id="markSharedBtn" title="Segna come condivisa: i giocatori d'ora in poi si riconnettono automaticamente">Segna come condivisa</button>
+            <button id="closeDetailBtn">Chiudi dettagli</button>
+          </div>
+          <div class="status" id="campStatus"></div>
+        </div>
+        <div style="margin-left:20px;">
+          <div class="muted">QR Code per la prima associazione</div>
+          <img id="qrImg" class="qr" alt="QR Code"/>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Supabase JS (non modulo, funziona da file://) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ========= Inizializza Supabase ========= */
+const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ========= Selettori UI ========= */
+const $ = (s)=>document.querySelector(s);
+
+/* pannello login cloud */
+const supaPanel  = $('#supaPanel');
+const supEmail   = $('#supEmail');
+const supPass    = $('#supPass');
+const supSignIn  = $('#supSignIn');
+const supSignUp  = $('#supSignUp');
+const supSignOut = $('#supSignOut');
+const supStatus  = $('#supStatus');
+
+/* header badge+logout */
+const headerLogout = document.getElementById('headerLogout');
+const userBadge    = document.getElementById('userBadge');
+
+/* dashboard/campagne */
+const dashboard   = $('#dashboardPanel');
+const campList    = $('#campList');
+const dashStatus  = $('#dashStatus');
+const campDetail  = $('#campDetail');
+const campTitle   = $('#campTitle');
+const pinBox      = $('#pinBox');
+const qrImg       = $('#qrImg');
+const campStatus  = $('#campStatus');
+const newCampBtn  = $('#newCampBtn');
+const campName    = $('#campName');
+const copyPinBtn  = $('#copyPinBtn');
+const markSharedBtn = $('#markSharedBtn');
+const closeDetailBtn = $('#closeDetailBtn');
+
+/* ========= Stato locale campagne (MVP) ========= */
+const LS_KEY_CAMPS  = 'custode.master.campaigns';
+function loadCamps(){ try{ return JSON.parse(localStorage.getItem(LS_KEY_CAMPS) || '[]'); }catch(e){ return []; } }
+function saveCamps(arr){ try{ localStorage.setItem(LS_KEY_CAMPS, JSON.stringify(arr)); }catch(e){} }
+
+/* ========= UI Helpers ========= */
+function showDashboard(){
+  supaPanel.style.display = 'none';
+  dashboard.style.display = '';
+  campDetail.style.display = 'none';
+  renderCampList();
+}
+function showLoginPanel(){
+  supaPanel.style.display = '';
+  dashboard.style.display = 'none';
+  campDetail.style.display = 'none';
+}
+
+/* ========= Login/Signup/Logout ========= */
+async function refreshBySession(){
+  try{
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session){
+      const email = data.session.user?.email || '';
+      supStatus.textContent = 'Sei autenticato.';
+      showDashboard();
+      if (userBadge) userBadge.textContent = email ? `Connesso come: ${email}` : '';
+      if (headerLogout) headerLogout.hidden = false;
+      supSignOut.style.display = '';
+    }else{
+      supStatus.textContent = 'Accedi o registrati per continuare.';
+      showLoginPanel();
+      if (userBadge) userBadge.textContent = '';
+      if (headerLogout) headerLogout.hidden = true;
+      supSignOut.style.display = 'none';
+    }
+  }catch(e){
+    supStatus.textContent = 'Errore: ' + (e?.message || e);
+  }
+}
+
+supSignIn.addEventListener('click', async ()=>{
+  const email = (supEmail.value||'').trim();
+  const pass  = (supPass.value||'').trim();
+  if(!email || !pass){ supStatus.textContent = 'Inserisci email e password.'; return; }
+  supStatus.textContent = 'Accesso in corso…';
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if (error){ supStatus.textContent = 'Errore login: ' + error.message; return; }
+  supStatus.textContent = 'Login riuscito.';
+  refreshBySession();
+});
+
+supSignUp.addEventListener('click', async ()=>{
+  const email = (supEmail.value||'').trim();
+  const pass  = (supPass.value||'').trim();
+  if(!email || !pass){ supStatus.textContent = 'Inserisci email e password.'; return; }
+  supStatus.textContent = 'Registrazione…';
+  const { error } = await supabaseClient.auth.signUp({ email, password: pass });
+  if (error){ supStatus.textContent = 'Errore registrazione: ' + error.message; return; }
+  supStatus.textContent = 'Registrato! Controlla l’email (se richiesta conferma) e poi fai Login.';
+});
+
+supSignOut.addEventListener('click', async ()=>{
+  await supabaseClient.auth.signOut();
+  supStatus.textContent = 'Sei uscito.';
+  refreshBySession();
+});
+
+headerLogout.addEventListener('click', async ()=>{
+  await supabaseClient.auth.signOut();
+  refreshBySession();
+});
+
+/* ========= Campagne (MVP locale) ========= */
+function renderCampList(){
+  const arr = loadCamps();
+  campList.innerHTML = '';
+  if(!arr.length){
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="muted">Nessuna campagna salvata. Crea la prima qui sopra.</span>';
+    campList.appendChild(li); return;
+  }
+  arr.sort((a,b)=>b.createdAt-a.createdAt).forEach(c=>{
+    const li = document.createElement('li');
+    const left = document.createElement('div');
+    const tag = c.shared ? '<span class="tag">Condivisa</span>' : '<span class="tag">Da condividere</span>';
+    left.innerHTML = `<strong>${c.name}</strong> ${tag}<br><span class="muted">creata il ${new Date(c.createdAt).toLocaleString()}</span>`;
+    const right = document.createElement('div');
+    const openBtn = document.createElement('button'); openBtn.textContent='Apri'; openBtn.onclick=()=>openCamp(c.id);
+    const delBtn  = document.createElement('button'); delBtn.textContent='Elimina'; delBtn.onclick=()=>deleteCamp(c.id);
+    right.appendChild(openBtn); right.appendChild(delBtn);
+    li.appendChild(left); li.appendChild(right);
+    campList.appendChild(li);
+  });
+}
+function deleteCamp(id){
+  if(!confirm('Eliminare definitivamente questa campagna?')) return;
+  const arr = loadCamps().filter(x=>x.id!==id); saveCamps(arr); renderCampList(); dashStatus.textContent='Campagna eliminata.'; setTimeout(()=>dashStatus.textContent='',1500);
+}
+function uid(){ return (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36)+Math.random().toString(36).slice(2))); }
+async function createCamp(){
+  const name = (campName.value||'').trim();
+  if(!name){ alert('Inserisci un nome per la campagna'); campName.focus(); return; }
+  const arr = loadCamps();
+  const camp = { id: uid(), name, pin: (''+Math.floor(100000+Math.random()*900000)), qr:'', shared:false, createdAt: Date.now() };
+  camp.qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(camp.pin)}`;
+  arr.push(camp); saveCamps(arr); campName.value=''; renderCampList(); openCamp(camp.id);
+}
+function openCamp(id){
+  const arr = loadCamps(); const c = arr.find(x=>x.id===id); if(!c) return;
+  campTitle.textContent = `Campagna: ${c.name}`;
+  if(!c.shared){
+    pinBox.textContent = c.pin;
+    qrImg.src = c.qr;
+    campStatus.textContent = 'Condividi PIN/QR ai giocatori solo questa prima volta.';
+    pinBox.parentElement.style.display=''; qrImg.parentElement.style.display=''; markSharedBtn.style.display='';
+  }else{
+    pinBox.textContent='------'; qrImg.removeAttribute('src');
+    campStatus.textContent='Campagna già condivisa.';
+    pinBox.parentElement.style.display='none'; qrImg.parentElement.style.display='none'; markSharedBtn.style.display='none';
+  }
+  dashboard.style.display='none'; campDetail.style.display='';
+}
+function copyPin(){ const txt=pinBox.textContent||''; if(!txt||txt==='------') return; navigator.clipboard.writeText(txt); campStatus.textContent='PIN copiato.'; setTimeout(()=>campStatus.textContent='',1200); }
+function markShared(){
+  const arr = loadCamps(); const name = campTitle.textContent.replace('Campagna: ',''); const c = arr.find(x=>x.name===name);
+  if(!c) return; c.shared = true; saveCamps(arr); campStatus.textContent='Segnata come condivisa.'; setTimeout(()=>openCamp(c.id),600);
+}
+function closeDetail(){ campDetail.style.display='none'; dashboard.style.display=''; }
+
+/* ========= Bind ========= */
+newCampBtn.addEventListener('click', createCamp);
+copyPinBtn.addEventListener('click', copyPin);
+markSharedBtn.addEventListener('click', markShared);
+closeDetailBtn.addEventListener('click', closeDetail);
+
+/* ========= Start ========= */
+refreshBySession();
+</script>
+
+<!-- ======= Solo tastiera: ENTER per login + focus iniziale ======= -->
+<script>
+  (function(){
+    const emailEl = document.getElementById('supEmail');
+    const passEl  = document.getElementById('supPass');
+    const loginEl = document.getElementById('supSignIn');
+
+    // ENTER nei campi email/password = click su Login
+    function onEnter(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (loginEl) loginEl.click();
+      }
+    }
+    if (emailEl) emailEl.addEventListener('keydown', onEnter);
+    if (passEl)  passEl.addEventListener('keydown', onEnter);
+
+    // Focus automatico su email (per sicurezza su tutti i browser)
+    window.addEventListener('load', ()=>{ emailEl && emailEl.focus(); });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+/* Effetto apertura pergamena */
+@keyframes pergamena-apertura {
+    0% {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+
+body {
+    animation: pergamena-apertura 0.8s ease-out;
+    transform-origin: top;
+}

@@ -1,0 +1,11 @@
+# Dipendenze
+node_modules/
+
+# Build/output
+dist/
+out/
+*.log
+
+# Varie
+.DS_Store
+Thumbs.db
