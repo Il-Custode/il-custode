@@ -2,7 +2,10 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer, WebSocket } from 'ws';
-import { autoUpdater } from 'electron-updater';
+
+// electron-updater è CommonJS: serve import default + destrutturazione
+import updaterPkg from 'electron-updater';
+const { autoUpdater } = updaterPkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +36,6 @@ function createWindow() {
    Auto-update (electron-updater)
    ========================= */
 function setupAutoUpdater() {
-  // Log basilari (vedi output con: npm start)
   autoUpdater.on('checking-for-update', () => console.log('Controllo aggiornamenti...'));
   autoUpdater.on('update-available', (info) => console.log('Aggiornamento disponibile:', info.version));
   autoUpdater.on('update-not-available', () => console.log('Nessun aggiornamento trovato'));
@@ -52,7 +54,6 @@ function setupAutoUpdater() {
     if (response === 0) autoUpdater.quitAndInstall();
   });
 
-  // Avvia il controllo (notifica l’utente e scarica se c’è una release nuova su GitHub)
   autoUpdater.checkForUpdatesAndNotify();
 }
 
@@ -60,7 +61,7 @@ function setupAutoUpdater() {
    App lifecycle
    ========================= */
 app.whenReady().then(() => {
-  // Consigliato su Windows per toast / updater
+  // consigliato su Windows (notifiche / updater)
   app.setAppUserModelId('com.ilcustode.app');
 
   createWindow();
