@@ -126,7 +126,7 @@
       flex-wrap:wrap;
     }
 
-    /* ====== CHECKBOX “RICORDAMI” cliccabile e vicino ====== */
+    /* ====== CHECKBOX “RICORDAMI” ====== */
     .remember{
       display:inline-flex;
       align-items:center;
@@ -223,15 +223,23 @@
           <p class="muted">Pannello del Master (campagne, strumenti).</p>
           <button class="btn" onclick="location.href='pages/master.html'">Entra come Master</button>
         </div>
+
         <div class="tile">
           <h3>🧝‍♂️ Modalità Giocatore</h3>
           <p class="muted">Connessione alla sessione (MVP).</p>
           <button class="btn" onclick="location.href='pages/player.html'">Entra come Giocatore</button>
         </div>
+
         <div class="tile">
-          <h3>🗺 Mappe</h3>
-          <p class="muted">Gestisci e visualizza le mappe.</p>
-          <button class="btn" onclick="location.href='pages/mappe.html'">Apri Mappe</button>
+          <h3>⚙️ Impostazioni</h3>
+          <p class="muted">Preferenze e configurazione dell’app.</p>
+          <button class="btn" onclick="location.href='pages/settings.html'">Apri Impostazioni</button>
+        </div>
+
+        <div class="tile">
+          <h3>📣 Community Hub</h3>
+          <p class="muted">Condividi mappe, mostri, quest e idee.</p>
+          <button class="btn" onclick="location.href='pages/hub.html'">Apri Hub</button>
         </div>
       </div>
     </section>
@@ -280,7 +288,7 @@
 
   function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 
-  // <<< NEW: mostra/nasconde la sezione con il mago
+  // Mostra/nasconde la sezione con il mago
   function hideHero(){ if (heroEl) heroEl.style.display = 'none'; }
   function showHero(){ if (heroEl) heroEl.style.display = ''; }
 
@@ -289,14 +297,14 @@
     homeCard.style.display='';
     btnLogout.style.display='';
     userBadge.textContent = email ? 'Connesso: '+email : '';
-    hideHero(); // <<< nasconde il mago dopo login/sessione attiva
+    hideHero();
   }
   function showAuth(){
     authCard.style.display='';
     homeCard.style.display='none';
     btnLogout.style.display='none';
     userBadge.textContent='';
-    showHero(); // <<< ri-mostra il mago quando non autenticato
+    showHero();
   }
 
   async function refreshSession(){

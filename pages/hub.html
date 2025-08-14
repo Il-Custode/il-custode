@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode - Community Hub</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+    }
+    .back-btn{
+      position:absolute; left:20px; top:14px;
+      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
+    }
+    .back-btn:hover{ background:#8b5e47; }
+    .container{ width:100%; max-width:1200px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+
+    .row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; }
+    .card{ background:rgba(255,248,220,.88); border:3px solid var(--legno); border-radius:14px; padding:16px; margin:14px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
+    .btn{ background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy; }
+    .btn:hover{ background:var(--pelle-scura); }
+    .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
+
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
+    .tile{ background:rgba(255,255,255,.7); border:3px solid var(--legno); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+    .thumb{ width:100%; aspect-ratio: 16/10; object-fit:cover; background:#fff; }
+    .tile-body{ padding:10px; display:flex; flex-direction:column; gap:6px; }
+    .muted{ font-size:12px; opacity:.85; }
+
+    input, select, textarea{
+      width:100%; font-family:'Papyrus', fantasy; border:2px solid var(--legno); border-radius:8px; padding:8px; background:rgba(255,255,255,.85);
+    }
+    textarea{ min-height:100px; resize:vertical; }
+    .chip{ display:inline-block; padding:2px 8px; border-radius:999px; border:2px solid var(--legno); background:rgba(255,255,255,.85); font-size:12px; }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+    .toast{ position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000; }
+    .toast.error{ background:#b23b3b; }
+  </style>
+</head>
+<body>
+<div class="cornice">
+  <header>
+    <button class="back-btn" onclick="history.back()">⬅ Indietro</button>
+    📣 Community Hub
+  </header>
+
+  <div class="container">
+    <!-- Filtro -->
+    <section class="card">
+      <div class="row">
+        <div style="flex:1 1 260px">
+          <label for="q">Cerca</label>
+          <input id="q" placeholder="titolo o testo..."/>
+        </div>
+        <div>
+          <label for="cat">Categoria</label>
+          <select id="cat">
+            <option value="">Tutte</option>
+            <option value="mappe">Mappe</option>
+            <option value="mostri">Mostri</option>
+            <option value="quest">Quest</option>
+            <option value="regole">Regole</option>
+            <option value="altro">Altro</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button class="btn" id="btnRefresh">Aggiorna</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nuovo post (solo loggato) -->
+    <section class="card" id="newPostCard" style="display:none;">
+      <h3>Nuovo post</h3>
+      <div class="row">
+        <div style="flex:1 1 260px">
+          <label for="title">Titolo</label>
+          <input id="title" placeholder="Es. Mappa catacombe livello 2"/>
+        </div>
+        <div>
+          <label for="category">Categoria</label>
+          <select id="category">
+            <option value="mappe">Mappe</option>
+            <option value="mostri">Mostri</option>
+            <option value="quest">Quest</option>
+            <option value="regole">Regole</option>
+            <option value="altro">Altro</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="body">Descrizione</label>
+        <textarea id="body" placeholder="Dettagli, consigli, come usarla..."></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <label class="btn" for="asset">Allega immagine…</label>
+        <input id="asset" type="file" accept="image/*" style="display:none;"/>
+        <span class="muted" id="assetName">—</span>
+      </div>
+      <div class="actions" style="margin-top:10px;">
+        <button class="btn" id="btnPublish">Pubblica</button>
+      </div>
+      <p class="muted" id="postHint" style="margin-top:10px;"></p>
+    </section>
+
+    <!-- Lista -->
+    <section class="card">
+      <h3>Post recenti</h3>
+      <div id="grid" class="grid"></div>
+      <p id="empty" class="muted" style="display:none; margin-top:8px;">Nessun post trovato.</p>
+    </section>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Usa le stesse costanti dell'index
+  const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const $ = (s)=>document.querySelector(s);
+  const grid = $('#grid'); const empty = $('#empty');
+  const newPostCard = $('#newPostCard');
+  const postHint = $('#postHint');
+  const assetInput = $('#asset'); const assetName = $('#assetName');
+
+  function toast(msg, err=false){
+    const t = document.querySelector('#toast');
+    t.textContent = msg;
+    t.className = 'toast' + (err ? ' error' : '');
+    t.style.display = 'block';
+    setTimeout(()=> t.style.display='none', 1600);
+  }
+
+  assetInput.addEventListener('change', ()=>{
+    assetName.textContent = assetInput.files?.[0]?.name || '—';
+  });
+
+  async function getSession(){
+    const { data } = await supabase.auth.getSession();
+    return data?.session || null;
+  }
+
+  async function loadPosts(){
+    const q = ($('#q').value || '').trim();
+    const cat = $('#cat').value || '';
+
+    let query = supabase.from('hub_posts').select('*').order('created_at', { ascending: false }).limit(60);
+    if (cat) query = query.eq('category', cat);
+
+    const { data, error } = await query;
+    if (error) { console.error(error); toast('Errore caricamento', true); return; }
+
+    let list = data || [];
+    if (q) {
+      const ql = q.toLowerCase();
+      list = list.filter(p =>
+        (p.title || '').toLowerCase().includes(ql) ||
+        (p.body || '').toLowerCase().includes(ql)
+      );
+    }
+
+    render(list);
+  }
+
+  function render(list){
+    grid.innerHTML = '';
+    if (!list.length){ empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    list.forEach(p=>{
+      const card = document.createElement('div');
+      card.className = 'tile';
+      card.innerHTML = `
+        ${p.asset_url ? `<img class="thumb" src="${p.asset_url}" alt="${escapeHtml(p.title||'Post')}">` : ''}
+        <div class="tile-body">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <strong>${escapeHtml(p.title||'Senza titolo')}</strong>
+            <span class="chip">${escapeHtml(p.category||'altro')}</span>
+          </div>
+          ${p.body ? `<div class="muted">${escapeHtml(p.body).slice(0,180)}${p.body.length>180?'…':''}</div>` : ''}
+          <div class="actions" style="margin-top:6px;">
+            <button class="btn" data-like="${p.id}">👍 ${p.likes_count||0}</button>
+          </div>
+          <div class="muted">${new Date(p.created_at).toLocaleString()}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  document.addEventListener('click', async (e)=>{
+    const likeBtn = e.target.closest('[data-like]');
+    if (likeBtn){
+      const postId = likeBtn.getAttribute('data-like');
+      const session = await getSession();
+      if (!session){ toast('Serve il login per mettere Mi piace', true); return; }
+      const uid = session.user.id;
+
+      const { error: likeErr } = await supabase.from('hub_likes').insert({ user_id: uid, post_id: postId });
+      if (likeErr && !String(likeErr.message||'').toLowerCase().includes('duplicate')) {
+        console.error(likeErr); toast('Errore like', true); return;
+      }
+      await loadPosts();
+    }
+  });
+
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  // Pubblica
+  $('#btnPublish').addEventListener('click', async ()=>{
+    const session = await getSession();
+    if (!session){ toast('Devi essere autenticato per pubblicare', true); return; }
+
+    const title = ($('#title').value||'').trim();
+    const category = $('#category').value || 'altro';
+    const body = ($('#body').value||'').trim();
+    if (!title){ toast('Titolo obbligatorio', true); return; }
+
+    let asset_url = null;
+    const file = assetInput.files?.[0];
+    if (file){
+      const path = `${session.user.id}/${Date.now()}_${file.name}`;
+      const up = await supabase.storage.from('hub-assets').upload(path, file, { upsert: false });
+      if (up.error){ console.error(up.error); toast('Upload fallito', true); return; }
+      const pub = supabase.storage.from('hub-assets').getPublicUrl(path);
+      asset_url = pub.data.publicUrl;
+    }
+
+    const { error } = await supabase.from('hub_posts').insert({
+      author: session.user.id, title, category, body, asset_url
+    });
+    if (error){ console.error(error); toast('Errore pubblicazione', true); return; }
+
+    $('#title').value=''; $('#body').value=''; assetInput.value=''; assetName.textContent='—'; $('#category').value='mappe';
+    toast('Pubblicato!');
+    await loadPosts();
+  });
+
+  // Init
+  (async function init(){
+    const session = await getSession();
+    if (session){
+      newPostCard.style.display = '';
+      postHint.textContent = `Pubblicherai come: ${session.user.email || session.user.id}`;
+    } else {
+      newPostCard.style.display = 'none';
+      postHint.textContent = 'Accedi dalla Home per pubblicare o mettere "Mi piace".';
+    }
+    await loadPosts();
+    $('#btnRefresh').addEventListener('click', loadPosts);
+    $('#q').addEventListener('input', ()=>{ clearTimeout(window.__t); window.__t=setTimeout(loadPosts, 300); });
+    $('#cat').addEventListener('change', loadPosts);
+  })();
+</script>
+</body>
+</html>
