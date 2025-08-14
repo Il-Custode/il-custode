@@ -4,17 +4,51 @@
   <meta charset="UTF-8">
   <title>Giocatore — Il Custode</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Fallback pergamena: se lo stile globale del preload manca, lo iniettiamo qui -->
+  <script>
+    (function ensureParchment(){
+      var STYLE_ID = 'global-parchment-style';
+      if (document.getElementById(STYLE_ID)) return; // già presente (preload ok)
+
+      function base(){
+        try{
+          var p = (location.pathname||'').replace(/\\/g,'/');
+          return p.indexOf('/pages/') !== -1 ? '..' : '.';
+        }catch{ return '.'; }
+      }
+      var css = [
+        ':root{--legno:#4b3621;--pelle:#d2b48c;--pelle-scura:#c2a178;--inchiostro:#3e2f1c;--pergamena:#fff3d4;}',
+        'body:not(.no-parchment):not([data-no-parchment]){',
+        '  background: radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),',
+        '              var(--pergamena) url(\"'+base()+'/assets/img/sfondo-pergamena-decor.jpg\") no-repeat center center fixed;',
+        '  background-size: cover;',
+        '  color: var(--inchiostro);',
+        '}',
+        '.cornice{',
+        '  border:40px solid transparent;',
+        '  -webkit-border-image:url(\"'+base()+'/assets/img/cornice-legno.png\") 40 stretch;',
+        '  border-image:url(\"'+base()+'/assets/img/cornice-legno.png\") 40 stretch;',
+        '}'
+      ].join('\n');
+
+      var style = document.createElement('style');
+      style.id = STYLE_ID;
+      style.textContent = css;
+      (document.head || document.documentElement).appendChild(style);
+    })();
+  </script>
+
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
     *{ box-sizing:border-box }
     body{
-      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro);
-      text-align:center;
-      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      /* niente background qui: usa quello globale / fallback sopra */
     }
     .cornice{
-      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+      /* la cornice è gestita dal CSS globale/fallback; qui solo layout */
+      min-height:100vh; display:flex; flex-direction:column;
     }
 
     /* HEADER a griglia: [btn] [titolo centrato] [spazio] */
@@ -25,9 +59,9 @@
       padding:12px 16px; font-size:24px; border-bottom:5px solid var(--legno);
       position:relative;
     }
-    /* Annulla lo stile "absolute" iniettato globalmente */
+    /* Disattiva l'absolute per eventuale stile back globale */
     .app-header .back-btn{
-      position:static !important;   /* niente top/left */
+      position:static !important;
       justify-self:start;
       background:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer;
       padding:8px 12px; border-radius:8px;
@@ -55,7 +89,7 @@
 <body>
   <div class="cornice">
     <header class="app-header">
-      <button class="back-btn">⬅ Indietro</button>
+      <button class="back-btn" id="btnBack">⬅ Indietro</button>
       <h2>Giocatore — Il Custode</h2>
       <!-- colonna 3 rimane vuota come “spacer” -->
     </header>
@@ -113,6 +147,18 @@
   </div>
 
   <script>
+    // ===== BACK: una pagina indietro o menu =====
+    (function(){
+      const back = document.getElementById('btnBack');
+      function goBack(){
+        try{
+          if (history.length > 1) { history.back(); return; }
+        }catch{}
+        location.href = '../menu.html';
+      }
+      back?.addEventListener('click', (e)=>{ e.preventDefault(); goBack(); });
+    })();
+
     // ===== Utilities =====
     const $ = (s)=>document.querySelector(s);
     const LS_KEY = 'custode.lastConnection';
