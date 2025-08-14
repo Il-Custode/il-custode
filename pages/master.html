@@ -18,387 +18,84 @@
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
       border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+      padding-left:84px; /* spazio per il back-btn auto-iniettato */
     }
-    .header-actions{
-      position:absolute; left:20px; right:20px; top:10px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    .container{ width:100%; max-width:1100px; margin:0 auto; padding:24px 16px 32px; text-align:left; }
+
+    .grid{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:820px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+
+    .tile{
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:18px;
+      box-shadow:0 4px 10px rgba(0,0,0,.12); text-align:center;
     }
+    .tile h3{ margin:6px 0 8px; }
+    .tile p{ margin:0 0 12px; opacity:.9; }
+    .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn{
-      background-color:var(--pelle); border:3px solid var(--legno);
-      padding:8px 12px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px; color:#1c120a;
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px;
     }
-    .btn:hover{ background-color:var(--pelle-scura); }
-    .btn.red{ background:#c67a6b; color:#fff; }
-    .btn.red:hover{ background:#b16556; }
-    .container{ width:100%; max-width:1100px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
-    h2,h3{ margin:10px 0; }
-    .card{ background:rgba(255,248,220,.85); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:14px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
-    .row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
-    .row > *{ flex:1 1 auto; }
-    label{ display:block; margin:6px 0 4px; font-weight:bold; }
-    input{
-      padding:10px; font-size:16px; border:2px solid var(--legno); border-radius:8px; width:100%; max-width:320px; font-family:'Papyrus', fantasy; background:rgba(255,255,255,.7);
-    }
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
-    .muted{ opacity:.85; font-size:14px; }
-    .list{ display:grid; grid-template-columns:1fr; gap:10px; }
-    .item{ border:2px dashed var(--legno); border-radius:10px; padding:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; background:rgba(255,255,255,.5); }
-    .badge{ border:2px solid var(--legno); padding:4px 8px; border-radius:999px; font-size:14px; background:rgba(255,255,255,.85); }
-    .two-col{ display:grid; grid-template-columns:1fr; gap:16px; }
-    @media(min-width:900px){ .two-col{ grid-template-columns:1fr 1fr; } }
-    .grid{ display:grid; gap:12px; grid-template-columns:1fr; margin-top:8px; }
-    @media(min-width:720px){ .grid{ grid-template-columns:repeat(3,1fr); } }
-    .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.6); border:3px solid var(--legno); border-radius:12px; }
-    .toast{
-      position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px;
-      box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000;
-    }
-    .toast.error{ background:#b23b3b; }
-    .debug{ margin-top:12px; font-family:ui-monospace,Consolas,monospace; background:#fff; border:2px solid var(--legno); border-radius:10px; padding:10px; }
-    .debug pre{ margin:0; white-space:pre-wrap; }
+    .btn:hover{ background:var(--pelle-scura); }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed; }
   </style>
 </head>
-<body data-home="../index.html">
+<body>
 <div class="cornice">
   <header>
-    <div class="header-actions">
-      <button class="btn" type="button" onclick="goBack()">⬅ Indietro</button>
-      <button class="btn red" type="button" onclick="logout()">Logout</button>
-    </div>
     🎩 Modalità Master
+    <!-- Il pulsante "⬅ Indietro" viene gestito dall'iniezione auto del main.js (class .back-btn) -->
   </header>
 
   <div class="container">
-    <!-- LOGIN -->
-    <section class="card" id="loginCard">
-      <h2>Accesso Master</h2>
-      <div class="row">
-        <div>
-          <label for="masterPass">Password Master</label>
-          <input type="password" id="masterPass" placeholder="Inserisci la password master">
-        </div>
+    <!-- RIGA ALTA: Campagne -->
+    <div class="grid" style="margin-bottom:12px;">
+      <div class="tile">
+        <h3>📜 Le tue campagne</h3>
+        <p>Apri l’elenco delle campagne (codici, dettagli, condivisione).</p>
         <div class="actions">
-          <button class="btn" id="btnLogin" type="button">Accedi</button>
-          <button class="btn" id="btnSetPass" type="button" title="Imposta o cambia la password">Imposta/Modifica</button>
+          <button class="btn" id="openCampaigns">Apri elenco</button>
         </div>
       </div>
-      <p class="muted">La password è salvata localmente (solo su questo PC) per l’MVP. (Invio funziona)</p>
-    </section>
 
-    <!-- DASHBOARD -->
-    <section class="card" id="dashboard" style="display:none;">
-      <h2>Pannello Master</h2>
-      <div class="grid">
-        <div class="tile">
-          <h4>Mappe</h4>
-          <p class="muted">Visualizza e gestisci le mappe.</p>
-          <div class="actions">
-            <button class="btn" type="button" data-go="mappe.html">Apri Mappe</button>
-            <button class="btn" type="button" data-go="map-generator.html">Generatore di Mappe</button>
-          </div>
-        </div>
-        <div class="tile">
-          <h4>Note Condivise</h4>
-          <p class="muted">Scrivi e sincronizza appunti.</p>
-          <button class="btn" type="button" data-go="notes.html">Apri Note</button>
-        </div>
-        <div class="tile">
-          <h4>Impostazioni</h4>
-          <p class="muted">Lingua, tema e preferenze.</p>
-          <button class="btn" type="button" data-go="settings.html">Apri Impostazioni</button>
-        </div>
-        <div class="tile">
-          <h4>Condivisione</h4>
-          <p class="muted">Invia contenuti ai giocatori collegati.</p>
-          <button class="btn" type="button" data-go="condivisione.html" disabled title="In arrivo">Apri Condivisione</button>
-        </div>
-        <div class="tile">
-          <h4>Campagna Rapida</h4>
-          <p class="muted">Utility: mostri, tesori, incontri, dadi.</p>
-          <button class="btn" type="button" data-go="quick-tools.html" disabled title="In arrivo">Apri Strumenti</button>
+      <div class="tile">
+        <h3>✨ Crea nuova campagna</h3>
+        <p>Avvia una nuova avventura con PIN/QR (setup iniziale).</p>
+        <div class="actions">
+          <button class="btn" id="createCampaign">Crea</button>
         </div>
       </div>
-    </section>
-
-    <div class="two-col">
-      <!-- LISTA CAMPAGNE -->
-      <section class="card" id="campagneCard" style="display:none;">
-        <h2>Le tue campagne</h2>
-        <div class="actions" style="margin-bottom:10px;">
-          <button class="btn" type="button" onclick="exportMasterData()">Esporta dati Master</button>
-          <label class="btn" for="importMasterBackup">Importa dati Master</label>
-          <input id="importMasterBackup" type="file" accept="application/json" style="display:none;">
-        </div>
-        <div id="campaignList" class="list" aria-live="polite"></div>
-        <div class="debug"><strong>Debug console</strong><pre id="dbg"></pre></div>
-      </section>
-
-      <!-- CREA NUOVA CAMPAGNA -->
-      <section class="card" id="creaCard" style="display:none;">
-        <h2>Crea nuova campagna</h2>
-        <label for="campaignName">Nome campagna</label>
-        <input type="text" id="campaignName" placeholder="Es. Leggende di Zaddinall">
-        <div class="actions" style="margin-top:10px;">
-          <button class="btn" id="btnCreate" type="button">Genera PIN (MVP)</button>
-        </div>
-        <div id="createResult" style="display:none; margin-top:10px;">
-          <div><strong>PIN:</strong> <span id="pinValue">—</span></div>
-          <div style="margin-top:8px;">
-            <span class="badge" id="shareString">—</span>
-          </div>
-          <div style="margin-top:8px;">
-            <button class="btn" id="btnApriSubito" type="button">Apri questa campagna</button>
-          </div>
-        </div>
-      </section>
     </div>
 
-    <!-- DETTAGLI CAMPAGNA APERTA -->
-    <section class="card" id="campagnaAperta" style="display:none;">
-      <h2 id="openTitle">Campagna</h2>
-      <div class="row">
-        <div><span class="badge" id="openId">ID: —</span></div>
-        <div><span class="badge" id="openPin">PIN iniziale: —</span></div>
+    <!-- RIGA BASSA: Strumenti -->
+    <div class="grid">
+      <div class="tile">
+        <h3>🗺 Generatore di mappe</h3>
+        <p>Crea mappe personalizzate da usare nelle campagne.</p>
+        <div class="actions">
+          <button class="btn" onclick="location.href='map-generator.html'">Apri Generatore</button>
+        </div>
       </div>
-      <div class="actions" style="margin-top:10px;">
-        <button class="btn" type="button" data-go="mappe.html">Vai alle Mappe</button>
-        <button class="btn" type="button" data-go="notes.html">Vai alle Note</button>
-        <button class="btn" type="button" data-go="settings.html">Vai alle Impostazioni</button>
-      </div>
-    </section>
 
-    <section class="card" style="background:rgba(255,255,255,.6);">
-      <strong>Nota tecnica:</strong> questa pagina usa <em>localStorage</em> per MVP. Poi sostituiremo con backend Electron/Socket.IO.
-    </section>
+      <div class="tile">
+        <h3>🛠️ Bottega Homebrew</h3>
+        <p>Mostri, oggetti, incontri: salva i tuoi contenuti personalizzati.</p>
+        <div class="actions">
+          <button class="btn" id="openHomebrew" disabled title="In arrivo">In arrivo</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
 <script>
-/* ===== UTIL ===== */
-const $ = (s)=>document.querySelector(s);
-const dbg = (m)=>{ const el = $('#dbg'); if(el){ el.textContent += (m + "\\n"); } };
-function toast(msg, isError=false){
-  const t = $('#toast'); if(!t) return;
-  t.className = 'toast' + (isError ? ' error' : ''); t.textContent = msg;
-  t.style.display = 'block'; setTimeout(()=>{ t.style.display='none'; }, 1800);
-}
-function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16);}); }
-function genPin(){ return '' + Math.floor(100000 + Math.random()*900000); }
-function loadJSON(key, fb){ try{ const raw=localStorage.getItem(key); return raw? JSON.parse(raw): fb; }catch(e){ dbg('loadJSON err '+e.message); return fb; } }
-function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
-
-/* ===== KEYS (storiche) ===== */
-const MASTER_PASS_KEY = 'custode.master.pass';            // <— chiave originale
-const MASTER_SESSION_KEY = 'custode.master.session';
-const CAMPAIGNS_KEY = 'custode.campaigns';                // <— chiave originale
-const CURRENT_CAMPAIGN_KEY = 'custode.currentCampaignId';
-
-/* ===== MIGRAZIONE da chiavi nuove (se presenti) ===== */
-(function migrateKeys(){
-  try{
-    const newPass = localStorage.getItem('custode.master.password');
-    if (newPass && !localStorage.getItem(MASTER_PASS_KEY)) {
-      localStorage.setItem(MASTER_PASS_KEY, newPass);
-    }
-    const newCamps = localStorage.getItem('custode.master.campaigns');
-    if (newCamps && !localStorage.getItem(CAMPAIGNS_KEY)) {
-      localStorage.setItem(CAMPAIGNS_KEY, newCamps);
-    }
-  }catch(e){}
-})();
-
-/* ===== NAV ===== */
-function go(path){ window.location.href = path; }
-function goBack(){
-  if (document.referrer && document.referrer !== location.href) { history.back(); return; }
-  const attrHome = document.body.getAttribute('data-home');
-  const memHome  = localStorage.getItem('custode.HOME');
-  const home = attrHome || memHome || '../index.html';
-  window.location.href = home;
-}
-(function ensureHome(){
-  const attrHome = document.body.getAttribute('data-home');
-  if (attrHome && !localStorage.getItem('custode.HOME')) {
-    localStorage.setItem('custode.HOME', attrHome);
-  }
-})();
-function logout(){
-  try{
-    localStorage.removeItem(MASTER_SESSION_KEY);
-    // opzionale: localStorage.removeItem(CURRENT_CAMPAIGN_KEY);
-  }catch(e){}
-  toast('Disconnesso');
-  setTimeout(()=>{ goBack(); }, 150);
-}
-
-/* ===== INIT BINDINGS ===== */
-window.addEventListener('DOMContentLoaded', ()=>{
-  dbg('DOM pronto');
-
-  // Navigazione generica
-  document.body.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('[data-go]');
-    if(btn){
-      const path = btn.getAttribute('data-go');
-      dbg('go -> ' + path);
-      window.location.href = path;
-    }
+  // Placeholder: per ora non abbiamo le pagine “campagne” e “nuova campagna”.
+  // Li attacchiamo a dei TODO non distruttivi.
+  document.getElementById('openCampaigns').addEventListener('click', ()=>{
+    alert('TODO: pagina "Le tue campagne" (la facciamo dopo).');
   });
-
-  // Imposta/Modifica password
-  $('#btnSetPass').addEventListener('click', ()=>{
-    const v = ($('#masterPass').value||'').trim();
-    if(!v){ toast('Inserisci una password', true); dbg('setPass: vuota'); return; }
-    localStorage.setItem(MASTER_PASS_KEY, JSON.stringify(v));
-    toast('Password salvata'); dbg('setPass: ok');
+  document.getElementById('createCampaign').addEventListener('click', ()=>{
+    alert('TODO: flusso "Crea nuova campagna" (lo facciamo dopo).');
   });
-
-  // Accedi (+ Invio)
-  const doLogin = ()=>{
-    const raw = localStorage.getItem(MASTER_PASS_KEY);
-    const saved = raw ? JSON.parse(raw) : null;
-    if(!saved){ toast('Nessuna password impostata', true); dbg('login: no pass'); return; }
-    if(($('#masterPass').value||'') !== saved){ toast('Password errata', true); dbg('login: wrong'); return; }
-    saveJSON(MASTER_SESSION_KEY, { ok:true, ts:Date.now() });
-    showDashboard(); toast('Accesso riuscito'); dbg('login: ok');
-  };
-  $('#btnLogin').addEventListener('click', doLogin);
-  $('#masterPass').addEventListener('keydown', (e)=>{ if (e.key==='Enter') doLogin(); });
-
-  // Create PIN
-  $('#btnCreate').addEventListener('click', ()=>{ createCampaign(false); });
-
-  // Ripristino sessione e stato
-  const s = loadJSON(MASTER_SESSION_KEY, null);
-  if(s && s.ok){ showDashboard(); dbg('sessione ripristinata'); }
-  renderCampaigns();
-  const cur = loadJSON(CURRENT_CAMPAIGN_KEY, null);
-  if(cur){ openCampaign(cur); dbg('campagna attiva ripristinata'); }
-});
-
-/* ===== UI FUNCS ===== */
-function showDashboard(){
-  $('#loginCard').style.display='none';
-  $('#dashboard').style.display='block';
-  $('#campagneCard').style.display='';
-  $('#creaCard').style.display='';
-}
-
-/* ===== CAMPAGNE ===== */
-function loadCampaigns(){ return loadJSON(CAMPAIGNS_KEY, []); }
-function saveCampaigns(list){ saveJSON(CAMPAIGNS_KEY, list); renderCampaigns(); }
-
-function renderCampaigns(){
-  const list = loadCampaigns();
-  const box = $('#campaignList');
-  if(!box) return;
-  box.innerHTML = '';
-  if(!list.length){
-    const empty = document.createElement('div');
-    empty.className='muted'; empty.textContent='Nessuna campagna salvata.';
-    box.appendChild(empty); return;
-  }
-  list.forEach(c=>{
-    const row = document.createElement('div'); row.className='item';
-    const left = document.createElement('div');
-    left.innerHTML = `<strong>${c.name}</strong><div class="muted">ID: ${c.id}</div>`;
-    const right = document.createElement('div'); right.className='actions';
-
-    const openBtn = document.createElement('button'); openBtn.type='button'; openBtn.className='btn'; openBtn.textContent='Apri';
-    openBtn.addEventListener('click', ()=> openCampaign(c.id));
-
-    const delBtn = document.createElement('button'); delBtn.type='button'; delBtn.className='btn'; delBtn.textContent='Elimina';
-    delBtn.addEventListener('click', ()=>{
-      if(confirm('Eliminare questa campagna?')){
-        const updated = loadCampaigns().filter(x=>x.id!==c.id);
-        saveCampaigns(updated);
-        if(loadJSON(CURRENT_CAMPAIGN_KEY, null)===c.id){
-          localStorage.removeItem(CURRENT_CAMPAIGN_KEY);
-          hideOpenCampaign();
-        }
-      }
-    });
-
-    right.appendChild(openBtn); right.appendChild(delBtn);
-    row.appendChild(left); row.appendChild(right);
-    box.appendChild(row);
-  });
-}
-
-function createCampaign(andOpen){
-  const name = ($('#campaignName').value||'').trim();
-  if(!name){ toast('Inserisci un nome campagna', true); dbg('create: no name'); return; }
-  const id = uuid();
-  const pin = genPin();
-  const list = loadCampaigns();
-  const newCamp = { id, name, pin, createdAt: Date.now(), shared:false };
-  list.push(newCamp);
-  saveCampaigns(list);
-
-  $('#pinValue').textContent = pin;
-  $('#shareString').textContent = JSON.stringify({ t:'CUSTODE_SHARE', id, pin, v:1 });
-  $('#createResult').style.display='block';
-
-  $('#btnApriSubito').onclick = ()=> openCampaign(id);
-  if(andOpen){ openCampaign(id); }
-  toast('Campagna creata'); dbg('create: ok ' + id);
-}
-
-function openCampaign(id){
-  saveJSON(CURRENT_CAMPAIGN_KEY, id);
-  const list = loadCampaigns();
-  const camp = list.find(x=>x.id===id);
-  if(!camp){ dbg('open: camp not found'); return; }
-  $('#openTitle').textContent = 'Campagna — ' + camp.name;
-  $('#openId').textContent = 'ID: ' + camp.id;
-  $('#openPin').textContent = 'PIN iniziale: ' + (camp.pin || '—');
-  $('#campagnaAperta').style.display='block';
-  document.getElementById('campagnaAperta').scrollIntoView({behavior:'smooth'});
-}
-
-function hideOpenCampaign(){ const s = $('#campagnaAperta'); if(s) s.style.display='none'; }
-
-/* ===== BACKUP DATI MASTER (password, campagne, corrente) ===== */
-const BACKUP_KEYS = [MASTER_PASS_KEY, CAMPAIGNS_KEY, CURRENT_CAMPAIGN_KEY];
-
-function exportMasterData(){
-  const data = {};
-  BACKUP_KEYS.forEach(k => data[k] = loadJSON(k, null));
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'custode-master-backup.json';
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
-  toast('Backup Master esportato');
-}
-
-// Import backup (se presente input)
-const _importEl = document.getElementById('importMasterBackup');
-if (_importEl) {
-  _importEl.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0]; if(!f) return;
-    try{
-      const text = await f.text();
-      const obj = JSON.parse(text);
-      if(!obj || typeof obj !== 'object') throw new Error('Formato non valido');
-      BACKUP_KEYS.forEach(k => {
-        if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] !== undefined) {
-          saveJSON(k, obj[k]);
-        }
-      });
-      toast('Backup Master importato');
-      renderCampaigns();
-      const cur = loadJSON(CURRENT_CAMPAIGN_KEY, null);
-      if(cur){ openCampaign(cur); }
-    }catch(err){
-      console.error(err); toast('Backup non valido', true);
-    }finally{
-      e.target.value = '';
-    }
-  });
-}
 </script>
 </body>
 </html>
