@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Quay lại", "logout": "Đăng xuất", "save": "Lưu", "saved": "Đã lưu" },
+  "home": {
+    "authTitle": "Đăng nhập hoặc Đăng ký",
+    "labels": { "email": "Email", "password": "Mật khẩu", "remember": "Ghi nhớ trên thiết bị này" },
+    "buttons": { "login": "Đăng nhập", "signup": "Đăng ký" },
+    "select": "Chọn một mục",
+    "tiles": {
+      "master": { "title": "Chế độ GM", "desc": "Chiến dịch và công cụ." },
+      "player": { "title": "Chế độ Người chơi", "desc": "Kết nối phiên (MVP)." },
+      "settings": { "title": "Cài đặt", "desc": "Ngôn ngữ và tuỳ chọn." }
+    },
+    "wizardPhrases": [
+      "Trước khi vào Sảnh, hãy ghi tên bạn lên tấm da.",
+      "Lửa đã cháy. Nhận diện ấn ký và ngồi vào bàn.",
+      "Nhập thông tin đăng nhập: bản đồ không chờ kẻ đến muộn.",
+      "Hãy nói bạn là ai, tôi sẽ chỉ đúng phòng: GM hay Lãng khách?",
+      "Chìa khóa đơn giản: một từ, một công thức (mật khẩu của bạn)."
+    ]
+  },
+  "settings": { "title": "Cài đặt", "language": { "title": "Ngôn ngữ", "choose": "Chọn ngôn ngữ", "apply": "Áp dụng ngôn ngữ", "applied": "Đã áp dụng ngôn ngữ" } }
+}

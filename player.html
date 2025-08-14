@@ -1,143 +1,271 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Il Custode - Interfaccia Giocatore</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #fdf6e3;
-        margin: 0;
-        padding: 0;
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title data-i18n="player.title">Il Custode — Modalità Giocatore</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        url('../assets/sfondo-pergamena-decor.svg') no-repeat center center fixed;
+      background-size:cover;
     }
-    header {
-        background-color: #8b4513;
-        color: white;
-        padding: 15px;
-        text-align: center;
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/cornice-legno.svg') 40 stretch;
+      border-image:url('../assets/cornice-legno.svg') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
     }
-    main {
-        display: flex;
-        padding: 20px;
-        gap: 20px;
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:14px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:26px;
+      padding-left:80px; /* spazio per il back-button iniettato da main.js */
     }
-    section {
-        flex: 1;
-        background-color: #fff;
-        padding: 15px;
-        border: 1px solid #ccc;
+    .container{ width:100%; max-width:980px; margin:0 auto; padding:20px 16px 40px; text-align:left; }
+    .panel{
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:16px 0;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
     }
-    h2 {
-        margin-top: 0;
+
+    .grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+    @media(min-width:760px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    label{ font-weight:bold; margin:6px 0 2px; }
+
+    input, select{
+      width:100%; padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
     }
-    input, button {
-        padding: 8px;
-        margin: 5px 0;
-        width: 100%;
-        box-sizing: border-box;
+    button{
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px;
     }
-    ul {
-        list-style: none;
-        padding: 0;
+    button:hover{ background:var(--pelle-scura); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .status{ font-size:14px; opacity:.9; min-height:1.2em; }
+
+    #chatLog{
+      height:260px; overflow:auto; border:2px dashed var(--legno); border-radius:10px; padding:10px; background:rgba(255,255,255,.7);
     }
-    .chat-box {
-        height: 200px;
-        overflow-y: auto;
-        background: #eee;
-        padding: 10px;
-        border: 1px solid #aaa;
-        margin-bottom: 10px;
-    }
-    .menu-btns {
-        margin-top: 15px;
-    }
-    .menu-btns button {
-        width: 100%;
-        background-color: #8b4513;
-        color: white;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        margin-bottom: 5px;
-    }
-    .menu-btns button:hover {
-        background-color: #a0522d;
-    }
-</style>
+    .muted{ opacity:.85; font-size:14px; }
+  </style>
+  <script src="../assets/js/i18n.js"></script>
 </head>
 <body>
-<header>
-    <h1>Interfaccia Giocatore</h1>
-</header>
+  <div class="cornice">
+    <header>
+      🧝‍♂️ <span data-i18n="player.title_short">Modalità Giocatore</span>
+    </header>
 
-<main>
-    <section>
-        <h2>Connessione al Server</h2>
-        <input type="text" id="serverAddress" placeholder="IP del Master">
-        <input type="text" id="serverPassword" placeholder="Password campagna">
-        <button id="connectBtn">Connettiti</button>
-    </section>
+    <div class="container">
+      <!-- 1) Setup connessione (se manca il profilo) -->
+      <section id="setupCard" class="panel" style="display:none;">
+        <h3 data-i18n="player.connect.title">Connetti al tavolo</h3>
+        <div class="grid">
+          <div>
+            <label for="host" data-i18n="player.connect.host_label">Host / IP</label>
+            <input id="host" placeholder="es. 192.168.1.50 o localhost" data-i18n-placeholder="player.connect.host_ph">
+          </div>
+          <div>
+            <label for="port" data-i18n="player.connect.port_label">Porta</label>
+            <input id="port" type="number" value="8080" placeholder="8080" data-i18n-placeholder="player.connect.port_ph">
+          </div>
+          <div>
+            <label for="name" data-i18n="player.connect.name_label">Il tuo nome</label>
+            <input id="name" placeholder="es. Giocatore-1" data-i18n-placeholder="player.connect.name_ph">
+          </div>
+          <div>
+            <label for="password" data-i18n="player.connect.pass_label">Password campagna</label>
+            <input id="password" type="password" placeholder="fornita dal Master" data-i18n-placeholder="player.connect.pass_ph">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button id="saveProfile" type="button" data-i18n="player.connect.save">Salva profilo</button>
+          <button id="connectNow" type="button" data-i18n="player.connect.connect">Connetti</button>
+          <button id="clearProfile" type="button" style="margin-left:auto;" data-i18n="player.connect.clear">Cancella profilo</button>
+        </div>
+        <p id="setupStatus" class="status"></p>
+      </section>
 
-    <section>
-        <h2>Giocatori Connessi</h2>
-        <ul id="playerList"></ul>
-    </section>
+      <!-- 2) Info connessione -->
+      <section id="connCard" class="panel" style="display:none;">
+        <h3 data-i18n="player.status.title">Connessione</h3>
+        <div id="connInfo" class="muted"></div>
+        <div id="connStatus" class="status"></div>
+      </section>
 
-    <section>
-        <h2>Chat</h2>
-        <div class="chat-box" id="chatBox"></div>
-        <input type="text" id="chatInput" placeholder="Scrivi messaggio...">
-        <button id="sendChatBtn">Invia</button>
-    </section>
-</main>
+      <!-- 3) Chat -->
+      <section id="chatCard" class="panel" style="display:none;">
+        <h3 data-i18n="player.chat.title">Chat</h3>
+        <div id="chatLog"></div>
+        <div class="row" style="margin-top:8px;">
+          <input id="chatMsg" type="text" placeholder="Scrivi un messaggio…"
+                 data-i18n-placeholder="player.chat.placeholder"/>
+          <button id="sendChat" type="button" data-i18n="player.chat.send">Invia</button>
+        </div>
+      </section>
 
-<div class="menu-btns">
-    <button onclick="openSection('mappe.html')">Gestione Mappe</button>
-    <button onclick="openSection('notes.html')">Note Condivise</button>
-</div>
+      <!-- 4) Giocatori connessi (conteggio semplice dal server) -->
+      <section id="playersCard" class="panel" style="display:none;">
+        <h3 data-i18n="player.players.title">Giocatori Connessi</h3>
+        <div id="playersCount" class="muted">0</div>
+      </section>
+    </div>
+  </div>
 
-<script>
-    const { ipcRenderer } = require('electron');
+  <script>
+    // ===== Utilities =====
+    const $ = (s)=>document.querySelector(s);
+    const LS_KEY = 'custode.lastConnection';
 
-    // Connessione
-    document.getElementById('connectBtn').addEventListener('click', () => {
-        const ip = document.getElementById('serverAddress').value;
-        const pwd = document.getElementById('serverPassword').value;
-        if (ip.trim() && pwd.trim()) {
-            ipcRenderer.send('connect-to-server', { ip, pwd });
-        }
-    });
+    function loadProfile(){ try{ const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; }catch{ return null; } }
+    function saveProfile(p){ try{ localStorage.setItem(LS_KEY, JSON.stringify(p)); }catch{} }
+    function clearProfile(){ try{ localStorage.removeItem(LS_KEY); }catch{} }
 
-    // Aggiorna lista giocatori
-    ipcRenderer.on('update-player-list', (event, players) => {
-        const list = document.getElementById('playerList');
-        list.innerHTML = '';
-        for (let i = 0; i < players; i++) {
-            const li = document.createElement('li');
-            li.textContent = `Giocatore ${i+1}`;
-            list.appendChild(li);
-        }
-    });
+    function showSetup(){ $('#setupCard').style.display=''; $('#connCard').style.display='none'; $('#chatCard').style.display='none'; $('#playersCard').style.display='none'; }
+    function showChat(){ $('#setupCard').style.display='none'; $('#connCard').style.display=''; $('#chatCard').style.display=''; $('#playersCard').style.display=''; }
 
-    // Chat
-    document.getElementById('sendChatBtn').addEventListener('click', () => {
-        const msg = document.getElementById('chatInput').value;
-        if (msg.trim()) {
-            ipcRenderer.send('chat-message', msg);
-            document.getElementById('chatInput').value = '';
-        }
-    });
+    // ===== WebSocket (allineato al server ws del main.js) =====
+    let ws = null;
 
-    ipcRenderer.on('chat-message', (event, message) => {
-        const chatBox = document.getElementById('chatBox');
-        chatBox.innerHTML += `<div>${message}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
-
-    // Apertura sezioni
-    function openSection(page) {
-        ipcRenderer.send('open-page', page);
+    function appendLog(from, text){
+      const box = $('#chatLog');
+      const line = document.createElement('div');
+      const time = new Date().toLocaleTimeString();
+      line.textContent = '['+time+'] ' + from + ': ' + text;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
     }
-</script>
+
+    function connect(){
+      const last = loadProfile();
+      if(!last){
+        showSetup();
+        const msg = (window.i18n?.t?.('player.connect.need_profile')) || 'Compila i dati e premi "Connetti".';
+        $('#setupStatus').textContent = msg;
+        return;
+      }
+
+      showChat();
+      const host = last.host || 'localhost';
+      const port = last.port || 8080;
+      const url  = `ws://${host}:${port}`;
+      const name = last.name || 'Giocatore';
+      const password = last.password || '';
+
+      $('#connInfo').textContent =
+        ((window.i18n?.t?.('player.status.info')) || 'Nome: {name} | {host}:{port}')
+          .replace('{name}', name).replace('{host}', host).replace('{port}', port);
+      $('#connStatus').textContent = (window.i18n?.t?.('player.status.connecting')) || 'Connessione in corso…';
+
+      try { ws = new WebSocket(url); }
+      catch(e){
+        $('#connStatus').textContent = ((window.i18n?.t?.('player.status.open_error')) || 'Errore apertura socket: ') + (e?.message||e);
+        return;
+      }
+
+      ws.addEventListener('open', ()=>{
+        $('#connStatus').textContent = (window.i18n?.t?.('player.status.auth')) || 'Connesso. Autenticazione…';
+        ws.send(JSON.stringify({ type:'auth', password }));
+      });
+
+      ws.addEventListener('message', (ev)=>{
+        let msg; try{ msg = JSON.parse(ev.data); }catch{ return; }
+
+        if (msg.type === 'auth'){
+          if (msg.success){
+            $('#connStatus').textContent = (window.i18n?.t?.('player.status.authed')) || 'Autenticato.';
+            appendLog('Sistema', ((window.i18n?.t?.('player.status.welcome')) || 'Benvenuto {name}!').replace('{name}', name));
+          } else {
+            $('#connStatus').textContent = (window.i18n?.t?.('player.status.auth_fail')) || 'Autenticazione fallita. Password errata.';
+            try{ ws.close(); }catch{}
+          }
+          return;
+        }
+
+        if (msg.type === 'chat'){
+          appendLog((window.i18n?.t?.('player.chat.table')) || 'Tavolo', msg.message || '');
+          return;
+        }
+
+        if (msg.type === 'player-list'){
+          const countEl = $('#playersCount');
+          if (countEl){
+            const lbl = (window.i18n?.t?.('player.players.count')) || 'Connessi: {n}';
+            countEl.textContent = lbl.replace('{n}', msg.count ?? '?');
+          }
+          return;
+        }
+      });
+
+      ws.addEventListener('close', ()=>{
+        $('#connStatus').textContent = (window.i18n?.t?.('player.status.closed')) || 'Disconnesso.';
+      });
+      ws.addEventListener('error', ()=>{
+        $('#connStatus').textContent = (window.i18n?.t?.('player.status.error')) || 'Errore di connessione.';
+      });
+    }
+
+    // ===== Bind form =====
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // traduci i testi statici
+      if (window.i18n && typeof window.i18n.apply === 'function') window.i18n.apply(document);
+
+      const prof = loadProfile();
+      if(!prof){ showSetup(); } else { showChat(); }
+      connect();
+
+      $('#saveProfile').addEventListener('click', ()=>{
+        const p = {
+          host: ($('#host').value||'').trim(),
+          port: parseInt($('#port').value||'8080', 10) || 8080,
+          name: ($('#name').value||'').trim() || 'Giocatore',
+          password: ($('#password').value||'').trim()
+        };
+        if(!p.host || !p.password){
+          $('#setupStatus').textContent = (window.i18n?.t?.('player.connect.need_host_pass')) || 'Host e Password sono obbligatori.';
+          return;
+        }
+        saveProfile(p);
+        $('#setupStatus').textContent = (window.i18n?.t?.('player.connect.saved')) || 'Profilo salvato.';
+        setTimeout(()=> $('#setupStatus').textContent = '', 1200);
+      });
+
+      $('#connectNow').addEventListener('click', ()=>{
+        const p = {
+          host: ($('#host').value||'').trim(),
+          port: parseInt($('#port').value||'8080', 10) || 8080,
+          name: ($('#name').value||'').trim() || 'Giocatore',
+          password: ($('#password').value||'').trim()
+        };
+        if(p.host && p.password) saveProfile(p);
+        connect();
+      });
+
+      $('#clearProfile').addEventListener('click', ()=>{
+        clearProfile();
+        $('#setupStatus').textContent = (window.i18n?.t?.('player.connect.cleared')) || 'Profilo rimosso.';
+        showSetup();
+        setTimeout(()=> $('#setupStatus').textContent = '', 1200);
+      });
+
+      $('#sendChat').addEventListener('click', ()=>{
+        const txt = ($('#chatMsg').value||'').trim();
+        if(!txt) return;
+        if(!ws || ws.readyState !== WebSocket.OPEN){
+          appendLog('Sistema', (window.i18n?.t?.('player.chat.not_connected')) || 'Non connesso al server.');
+          return;
+        }
+        try{
+          ws.send(JSON.stringify({ type:'chat', message: txt }));
+          appendLog(((window.i18n?.t?.('player.chat.you')) || 'Tu'), txt);
+          $('#chatMsg').value='';
+        }catch{}
+      });
+      $('#chatMsg').addEventListener('keydown', (e)=>{ if(e.key==='Enter') $('#sendChat').click(); });
+
+      // Ritraduci live quando cambia lingua
+      window.addEventListener('i18n:change', ()=>{ window.i18n && window.i18n.apply && window.i18n.apply(document); });
+    });
+  </script>
 </body>
 </html>

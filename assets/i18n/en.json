@@ -1,0 +1,42 @@
+{
+  "common": {
+    "back": "Back",
+    "logout": "Logout",
+    "save": "Save",
+    "saved": "Saved"
+  },
+  "home": {
+    "authTitle": "Sign in or Sign up",
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "remember": "Remember me on this device"
+    },
+    "buttons": {
+      "login": "Login",
+      "signup": "Sign up"
+    },
+    "select": "Choose a section",
+    "tiles": {
+      "master": { "title": "Master Mode", "desc": "Campaigns and tools." },
+      "player": { "title": "Player Mode", "desc": "Connect to a session (MVP)." },
+      "settings": { "title": "Settings", "desc": "Language and preferences." }
+    },
+    "wizardPhrases": [
+      "Before you enter the Hall, leave your name on the parchment.",
+      "The fire is lit. Identify your seal and sit at the table.",
+      "Type your credentials: maps don’t wait for latecomers.",
+      "Tell me who you are and I’ll show you the right room: Master or Wanderer?",
+      "The key is simple: a word, a formula (your password)."
+    ]
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "choose": "Choose your language",
+      "apply": "Apply language",
+      "applied": "Language applied"
+    }
+  }
+}

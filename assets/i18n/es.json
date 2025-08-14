@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Atrás", "logout": "Cerrar sesión", "save": "Guardar", "saved": "Guardado" },
+  "home": {
+    "authTitle": "Iniciar sesión o Registrarse",
+    "labels": { "email": "Correo", "password": "Contraseña", "remember": "Recordarme en este dispositivo" },
+    "buttons": { "login": "Entrar", "signup": "Registrarse" },
+    "select": "Elige una sección",
+    "tiles": {
+      "master": { "title": "Modo Máster", "desc": "Campañas y herramientas." },
+      "player": { "title": "Modo Jugador", "desc": "Conectarse a una sesión (MVP)." },
+      "settings": { "title": "Ajustes", "desc": "Idioma y preferencias." }
+    },
+    "wizardPhrases": [
+      "Antes de entrar al Salón, deja tu nombre en el pergamino.",
+      "El fuego está encendido. Identifica tu sello y siéntate a la mesa.",
+      "Escribe tus credenciales: los mapas no esperan a los tardones.",
+      "Dime quién eres y te indicaré la sala correcta: ¿Máster o Caminante?",
+      "La llave es simple: una palabra, una fórmula (tu contraseña)."
+    ]
+  },
+  "settings": { "title": "Ajustes", "language": { "title": "Idioma", "choose": "Elige tu idioma", "apply": "Aplicar idioma", "applied": "Idioma aplicado" } }
+}

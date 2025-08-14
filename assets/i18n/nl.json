@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Terug", "logout": "Afmelden", "save": "Opslaan", "saved": "Opgeslagen" },
+  "home": {
+    "authTitle": "Inloggen of Registreren",
+    "labels": { "email": "E-mail", "password": "Wachtwoord", "remember": "Onthoud mij op dit apparaat" },
+    "buttons": { "login": "Inloggen", "signup": "Registreren" },
+    "select": "Kies een sectie",
+    "tiles": {
+      "master": { "title": "Mastermodus", "desc": "Campagnes en tools." },
+      "player": { "title": "Spelermodus", "desc": "Verbind met een sessie (MVP)." },
+      "settings": { "title": "Instellingen", "desc": "Taal en voorkeuren." }
+    },
+    "wizardPhrases": [
+      "Voordat je de hal binnengaat, schrijf je naam op het perkament.",
+      "Het vuur brandt. Herken je zegel en neem plaats.",
+      "Vul je gegevens in: kaarten wachten niet op laatkomers.",
+      "Zeg wie je bent; ik wijs je de juiste kamer: Master of Wandelaar?",
+      "De sleutel is eenvoudig: een woord, een formule (je wachtwoord)."
+    ]
+  },
+  "settings": { "title": "Instellingen", "language": { "title": "Taal", "choose": "Kies je taal", "apply": "Taal toepassen", "applied": "Taal toegepast" } }
+}

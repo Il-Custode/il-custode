@@ -93,7 +93,63 @@ contextBridge.exposeInMainWorld('authCreds', {
   }, true);
 })();
 
-// ===== Pulsante "Chiudi app" visibile in TUTTE le pagine =====
+/* ======= SFONDO PERGAMENA GLOBALE (un solo punto) ======= */
+(function installGlobalParchmentTheme(){
+  const STYLE_ID = 'global-parchment-style';
+
+  function computeAssetsBase(){
+    try{
+      const p = (location.pathname || '').replace(/\\/g,'/');
+      return p.includes('/pages/') ? '..' : '.';
+    }catch{ return '.'; }
+  }
+
+  function injectStyle(){
+    if (document.getElementById(STYLE_ID)) return;
+
+    const base = computeAssetsBase();
+
+    const css = `
+      :root{
+        --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; --pergamena:#fff3d4;
+      }
+      /* Applica solo se la pagina NON chiede esplicitamente di disattivarlo */
+      body:not(.no-parchment):not([data-no-parchment]) {
+        background:
+          radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+          var(--pergamena)
+          url('${base}/assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: var(--inchiostro);
+      }
+      /* Cornice legno se la pagina usa .cornice */
+      .cornice {
+        border: 40px solid transparent;
+        -webkit-border-image: url('${base}/assets/img/cornice-legno.png') 40 stretch;
+        border-image: url('${base}/assets/img/cornice-legno.png') 40 stretch;
+      }
+    `;
+
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = css;
+
+    // Inseriamo come PRIMO nodo di <head> così gli stili interni delle singole pagine (che arrivano dopo) possono sovrascrivere
+    const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+    if (head.firstChild) head.insertBefore(style, head.firstChild);
+    else head.appendChild(style);
+  }
+
+  if (document.head) {
+    try { injectStyle(); } catch(e){ console.warn('Parchment inject error:', e); }
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      try { injectStyle(); } catch(e){ console.warn('Parchment inject error:', e); }
+    }, { once:true });
+  }
+})();
+
+/* ===== Pulsante "Chiudi app" visibile in TUTTE le pagine ===== */
 window.addEventListener('DOMContentLoaded', () => {
   try {
     // evita duplicati

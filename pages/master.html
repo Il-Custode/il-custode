@@ -1,101 +1,268 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Il Custode - Modalità Master</title>
+  <title data-i18n="master.page_title">Il Custode - Modalità Master</title>
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
     *{ box-sizing:border-box }
+    html,body{ height:100%; }
     body{
       font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
-      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+      background-size:cover;
+      overflow-anchor:none;
     }
     .cornice{
-      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+      border:40px solid transparent;
+      -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      min-height:100vh; display:flex; flex-direction:column;
     }
     header{
-      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
-      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
-      padding-left:84px; /* spazio per il back-btn auto-iniettato */
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:14px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:26px;
+      padding-left:80px; /* spazio per il bottone Indietro iniettato dal main */
     }
-    .container{ width:100%; max-width:1100px; margin:0 auto; padding:24px 16px 32px; text-align:left; }
+    /* .back-btn è iniettato da main.js */
 
-    .grid{ display:grid; gap:14px; grid-template-columns:1fr; }
-    @media(min-width:820px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    #userBadge{ position:absolute; right:120px; font-size:14px; opacity:.9; white-space:nowrap; }
+    #headerLogout{ position:absolute; right:20px; background:var(--pelle); border:3px solid var(--legno); padding:6px 10px; border-radius:8px; cursor:pointer; }
+    #headerLogout:hover{ background:var(--pelle-scura); }
 
-    .tile{
-      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:18px;
-      box-shadow:0 4px 10px rgba(0,0,0,.12); text-align:center;
+    .container{ width:100%; max-width:1100px; margin:0 auto; padding:18px 14px 24px; text-align:left; }
+
+    .grid-2{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:960px){ .grid-2{ grid-template-columns:1fr 1fr; } }
+
+    .panel{
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px;
+      box-shadow:0 4px 10px rgba(0,0,0,.12);
     }
-    .tile h3{ margin:6px 0 8px; }
-    .tile p{ margin:0 0 12px; opacity:.9; }
-    .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .btn{
-      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px;
+    h3{ margin:0 0 10px; }
+    .row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    input[type="text"], input[type="email"], input[type="password"]{
+      flex:1 1 260px; padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
     }
-    .btn:hover{ background:var(--pelle-scura); }
-    .btn[disabled]{ opacity:.6; cursor:not-allowed; }
+    button{
+      background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; font-size:16px; font-family:'Papyrus', fantasy; cursor:pointer; border-radius:10px;
+    }
+    button:hover{ background:var(--pelle-scura); }
+    .muted{ opacity:.9; font-size:14px; }
+
+    #campDetail{ display:none; }
+    .pin-box{ display:inline-block; font-weight:bold; letter-spacing:2px; padding:6px 10px; border:3px solid var(--legno); border-radius:8px; background:#fffef5; }
   </style>
 </head>
 <body>
 <div class="cornice">
   <header>
-    🎩 Modalità Master
-    <!-- Il pulsante "⬅ Indietro" viene gestito dall'iniezione auto del main.js (class .back-btn) -->
+    🎩 <span data-i18n="master.title_short">Modalità Master</span>
+    <span id="userBadge"></span>
+    <button id="headerLogout" data-role="logout" hidden data-i18n="common.logout">Logout</button>
   </header>
 
   <div class="container">
-    <!-- RIGA ALTA: Campagne -->
-    <div class="grid" style="margin-bottom:12px;">
-      <div class="tile">
-        <h3>📜 Le tue campagne</h3>
-        <p>Apri l’elenco delle campagne (codici, dettagli, condivisione).</p>
-        <div class="actions">
-          <button class="btn" id="openCampaigns">Apri elenco</button>
-        </div>
+    <!-- LOGIN CLOUD (Supabase) -->
+    <section id="supaPanel" class="panel">
+      <h3 data-i18n="master.login.title">Accedi con il tuo account</h3>
+      <div class="row">
+        <input id="supEmail" type="email" placeholder="Email" data-i18n-placeholder="master.login.email"/>
+        <input id="supPass"  type="password" placeholder="Password" data-i18n-placeholder="master.login.password"/>
+        <button id="supSignIn" data-i18n="master.login.signin">Login</button>
+        <button id="supSignUp" data-i18n="master.login.signup">Registrati</button>
+        <button id="supSignOut" style="display:none;" data-i18n="master.login.signout">Esci</button>
+      </div>
+      <div class="muted" id="supStatus"></div>
+    </section>
+
+    <!-- DASHBOARD (dopo login) -->
+    <section id="dashboard" style="display:none;">
+      <div class="grid-2">
+        <section class="panel">
+          <h3 data-i18n="master.dashboard.campaigns.title">Le tue campagne</h3>
+          <p class="muted" data-i18n="master.dashboard.campaigns.desc">Gestisci campagne, codici di ingresso e condivisione con i giocatori.</p>
+          <button id="openCampPage" data-i18n="master.dashboard.campaigns.open">Apri gestione campagne</button>
+        </section>
+
+        <section class="panel">
+          <h3 data-i18n="master.dashboard.new.title">Crea nuova campagna</h3>
+          <div class="row">
+            <input id="campName" type="text" placeholder="Nome campagna (es. La Leggenda di Zardruul)" data-i18n-placeholder="master.dashboard.new.placeholder">
+            <button id="newCampBtn" data-i18n="master.dashboard.new.create">Crea</button>
+          </div>
+          <div id="newCampStatus" class="muted"></div>
+        </section>
       </div>
 
-      <div class="tile">
-        <h3>✨ Crea nuova campagna</h3>
-        <p>Avvia una nuova avventura con PIN/QR (setup iniziale).</p>
-        <div class="actions">
-          <button class="btn" id="createCampaign">Crea</button>
-        </div>
-      </div>
-    </div>
+      <div class="grid-2" style="margin-top:14px;">
+        <section class="panel">
+          <h3 data-i18n="master.dashboard.bottom.maps.title">Mappe</h3>
+          <p class="muted" data-i18n="master.dashboard.bottom.maps.desc">Genera nuove mappe procedurali. Le mappe salvate vivranno dentro ogni campagna.</p>
+          <button id="openMapGen" data-i18n="master.dashboard.bottom.maps.open">Generatore di mappe</button>
+        </section>
 
-    <!-- RIGA BASSA: Strumenti -->
-    <div class="grid">
-      <div class="tile">
-        <h3>🗺 Generatore di mappe</h3>
-        <p>Crea mappe personalizzate da usare nelle campagne.</p>
-        <div class="actions">
-          <button class="btn" onclick="location.href='map-generator.html'">Apri Generatore</button>
-        </div>
+        <section class="panel">
+          <h3 data-i18n="master.dashboard.bottom.homebrew.title">Homebrew</h3>
+          <p class="muted" data-i18n="master.dashboard.bottom.homebrew.desc">Mostri, tesori, incontri, tabelle personalizzate. Salvate sul tuo profilo Master.</p>
+          <button id="openHomebrew" data-i18n="master.dashboard.bottom.homebrew.open">Apri Homebrew</button>
+        </section>
       </div>
 
-      <div class="tile">
-        <h3>🛠️ Bottega Homebrew</h3>
-        <p>Mostri, oggetti, incontri: salva i tuoi contenuti personalizzati.</p>
-        <div class="actions">
-          <button class="btn" id="openHomebrew" disabled title="In arrivo">In arrivo</button>
+      <section id="campDetail" class="panel" style="margin-top:14px;">
+        <h3 id="campTitle" data-i18n="master.detail.created.title">Campagna creata</h3>
+        <div class="row">
+          <div class="muted" data-i18n="master.detail.pin.label">PIN iniziale:</div>
+          <div id="pinBox" class="pin-box">------</div>
+          <button id="copyPinBtn" data-i18n="master.detail.pin.copy">Copia PIN</button>
         </div>
-      </div>
-    </div>
+        <div class="muted" id="campStatus"></div>
+      </section>
+    </section>
   </div>
 </div>
 
+<script src="../assets/js/i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Placeholder: per ora non abbiamo le pagine “campagne” e “nuova campagna”.
-  // Li attacchiamo a dei TODO non distruttivi.
-  document.getElementById('openCampaigns').addEventListener('click', ()=>{
-    alert('TODO: pagina "Le tue campagne" (la facciamo dopo).');
+(() => {
+  const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const $ = (s)=>document.querySelector(s);
+
+  const supaPanel=$('#supaPanel'), supEmail=$('#supEmail'), supPass=$('#supPass');
+  const supSignIn=$('#supSignIn'), supSignUp=$('#supSignUp'), supSignOut=$('#supSignOut'), supStatus=$('#supStatus');
+  const userBadge=$('#userBadge'), headerLogout=$('#headerLogout');
+
+  const dashboard=$('#dashboard');
+  const campName=$('#campName'), newCampBtn=$('#newCampBtn'), newCampStatus=$('#newCampStatus');
+  const campDetail=$('#campDetail'), campTitle=$('#campTitle'), pinBox=$('#pinBox'), copyPinBtn=$('#copyPinBtn');
+
+  const LS_KEY_CAMPS='custode.master.campaigns';
+  function loadCamps(){ try{ return JSON.parse(localStorage.getItem(LS_KEY_CAMPS)||'[]'); }catch{ return []; } }
+  function saveCamps(a){ try{ localStorage.setItem(LS_KEY_CAMPS, JSON.stringify(a)); }catch{} }
+  function uid(){ return (crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2))); }
+
+  // i18n helpers sicuri
+  function tSafe(key, fb){
+    try{
+      const t = window.i18n?.t?.(key);
+      if (!t || t===key) return fb ?? '';
+      return t;
+    }catch{ return fb ?? ''; }
+  }
+  function applyI18n(){
+    // Applica placeholders e data-i18n dichiarativi
+    window.i18n?.apply?.(document);
+
+    // Titolo e lang
+    try{
+      const lang = window.i18n?.getLang?.() || localStorage.getItem('custode.lang') || 'it';
+      document.documentElement.setAttribute('lang', lang);
+    }catch{}
+
+    // Per sicurezza settiamo anche document.title
+    const title = tSafe('master.page_title','Il Custode - Modalità Master');
+    if (title) document.title = title;
+
+    // Logout label/title
+    if (headerLogout){
+      headerLogout.textContent = tSafe('common.logout','Logout');
+      headerLogout.title = tSafe('common.logout','Logout');
+    }
+  }
+
+  function setConnectedBadge(email){
+    const prefix = tSafe('common.connected_as','Connesso come:');
+    userBadge.textContent = email ? `${prefix} ${email}` : '';
+  }
+
+  async function refreshBySession(){
+    const { data } = await supabaseClient.auth.getSession();
+    if (data?.session){
+      const email = data.session.user?.email || '';
+      supStatus.textContent = tSafe('master.login.status.logged_in','Sei autenticato.');
+      supaPanel.style.display='none'; dashboard.style.display='';
+      setConnectedBadge(email);
+      headerLogout.hidden=false; supSignOut.style.display='';
+    } else {
+      supStatus.textContent = tSafe('master.login.status.need_login','Accedi o registrati per continuare.');
+      supaPanel.style.display=''; dashboard.style.display='none';
+      setConnectedBadge('');
+      headerLogout.hidden=true; supSignOut.style.display='none';
+    }
+  }
+
+  // Logout robusto (vale per entrambi i pulsanti)
+  async function doLogout(){
+    try { await supabaseClient.auth.signOut(); } catch {}
+
+    try {
+      // Pulisci storage locale: chiavi app + token supabase
+      const keys = [];
+      for (let i=0; i<localStorage.length; i++){
+        const k = localStorage.key(i); if (k) keys.push(k);
+      }
+      keys.forEach(k=>{
+        if (k.startsWith('custode.') || k.startsWith('sb-')) localStorage.removeItem(k);
+      });
+      sessionStorage.clear();
+    } catch {}
+
+    try { location.replace('../welcome.html'); }
+    catch { location.href = '../welcome.html'; }
+  }
+
+  // Eventi Auth
+  supSignIn.addEventListener('click', async ()=>{
+    const email=(supEmail.value||'').trim(), pass=(supPass.value||'').trim();
+    if(!email||!pass){
+      supStatus.textContent = tSafe('master.login.status.fill_both','Inserisci email e password.');
+      return;
+    }
+    supStatus.textContent = tSafe('master.login.status.signing_in','Accesso in corso…');
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password:pass });
+    if(error){
+      supStatus.textContent = tSafe('master.login.status.error_login_prefix','Errore login: ') + (error.message||'');
+      return;
+    }
+    supStatus.textContent = tSafe('master.login.status.ok','Login riuscito.');
+    refreshBySession();
   });
-  document.getElementById('createCampaign').addEventListener('click', ()=>{
-    alert('TODO: flusso "Crea nuova campagna" (lo facciamo dopo).');
+
+  supSignUp.addEventListener('click', async ()=>{
+    const email=(supEmail.value||'').trim(), pass=(supPass.value||'').trim();
+    if(!email||!pass){
+      supStatus.textContent = tSafe('master.login.status.fill_both','Inserisci email e password.');
+      return;
+    }
+    supStatus.textContent = tSafe('master.login.status.registering','Registrazione…');
+    const { error } = await supabaseClient.auth.signUp({ email, password:pass });
+    if(error){
+      supStatus.textContent = tSafe('master.login.status.error_signup_prefix','Errore registrazione: ') + (error.message||'');
+      return;
+    }
+    supStatus.textContent = tSafe('master.login.status.registered','Registrato! Controlla l’email (se richiesta) e poi fai Login.');
   });
+
+  [supSignOut, headerLogout].forEach(btn=>btn.addEventListener('click', doLogout));
+
+  // Navigazione
+  document.getElementById('openCampPage').addEventListener('click', ()=>{ location.href='campaigns.html'; });
+  document.getElementById('openMapGen').addEventListener('click', ()=>{ location.href='map-generator.html'; });
+  document.getElementById('openHomebrew').addEventListener('click', ()=>{ location.href='hub.html'; });
+
+  // i18n change — ascolta su DOCUMENT
+  document.addEventListener('i18n:change', ()=>{ applyI18n(); refreshBySession(); });
+
+  // Avvio
+  applyI18n();
+  refreshBySession();
+})();
 </script>
 </body>
 </html>

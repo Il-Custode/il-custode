@@ -18,22 +18,12 @@
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
       border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+      padding-left:80px; /* spazio per il back auto-iniettato */
     }
-    .back-btn{
-      position:absolute; left:20px; top:14px;
-      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
-    }
-    .back-btn:hover{ background:#8b5e47; }
-
     .container{ width:100%; max-width:1200px; margin:0 auto; padding:20px; text-align:left; }
 
-    .layout{
-      display:grid; gap:16px;
-      grid-template-columns: 1fr;
-    }
-    @media(min-width:1000px){
-      .layout{ grid-template-columns: 2fr 1fr; }
-    }
+    .layout{ display:grid; gap:16px; grid-template-columns: 1fr; }
+    @media(min-width:1000px){ .layout{ grid-template-columns: 2fr 1fr; } }
 
     .card{
       background:rgba(255,248,220,.88); border:3px solid var(--legno); border-radius:14px; padding:16px;
@@ -44,8 +34,7 @@
       background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy;
     }
     .btn:hover{ background:var(--pelle-scura); }
-    .btn.red{ background:#c67a6b; color:#fff; }
-    .btn.red:hover{ background:#b16556; }
+    .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
     .btn.gray{ background:#ddd4c6; }
     .badge{ border:2px solid var(--legno); padding:4px 8px; border-radius:999px; font-size:14px; background:rgba(255,255,255,.85); }
 
@@ -71,7 +60,7 @@
     }
     .dot{ width:8px; height:8px; border-radius:50%; background:#2d7a36; border:1px solid #1e4f25; }
 
-    /* Modal Condividi (stub per passo 7) */
+    /* Modal Condividi (stub) */
     .modal{ position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; padding:20px; }
     .modal.open{ display:flex; }
     .modal-card{ width:min(95vw,700px); background:rgba(255,248,220,.97); border:4px solid var(--legno); border-radius:14px; overflow:hidden; }
@@ -89,8 +78,8 @@
 <body>
 <div class="cornice">
   <header>
-    <button class="back-btn" onclick="location.href='master.html'">⬅ Indietro</button>
-    📝 Note Condivise
+    <!-- back-btn auto (iniettato da main.js) -->
+    📝 <span id="hdrTitle">Note Condivise</span>
   </header>
 
   <div class="container">
@@ -102,7 +91,7 @@
             <button class="btn" id="btnShare">Condividi…</button>
             <button class="btn gray" id="btnSaveVer" title="Salva una versione a mano">Salva versione</button>
             <button class="btn gray" id="btnExport">Esporta</button>
-            <label class="btn gray" for="importFile">Importa</label>
+            <label class="btn gray" for="importFile" id="lblImport">Importa</label>
             <input id="importFile" type="file" accept="text/plain,application/json"/>
           </div>
           <div class="row">
@@ -111,30 +100,23 @@
         </div>
 
         <div class="row" style="margin-top:8px; justify-content:space-between;">
-          <div class="presence" id="presence">
-            <!-- Popolato dinamicamente (stub) -->
-          </div>
-          <div class="badge" id="campInfo">Campagna: —</div>
+          <div class="presence" id="presence"></div>
+          <div class="badge"><span id="campLbl">Campagna:</span> <span id="campVal">—</span></div>
         </div>
 
         <textarea id="editor" placeholder="Scrivi qui le note condivise…"></textarea>
-        <p class="badge" id="lastSaved" style="margin-top:8px;">Ultimo salvataggio: —</p>
+        <p class="badge" id="lastSaved">Ultimo salvataggio: —</p>
       </section>
 
       <!-- Versioni -->
       <aside class="card">
-        <h3>Versioni</h3>
+        <h3 id="versionsHdr">Versioni</h3>
         <div class="versions" id="versions"></div>
         <div class="row" style="margin-top:10px;">
           <button class="btn red" id="btnClearVersions">Svuota versioni</button>
         </div>
       </aside>
     </div>
-
-    <section class="card" style="margin-top:14px; background:rgba(255,255,255,.65);">
-      <strong>Nota tecnica:</strong> salvataggio locale via <em>localStorage</em> (MVP).
-      Il pulsante <em>Condividi…</em> è uno <em>stub</em> per il punto 7: collegheremo Socket.IO per scegliere i giocatori e sincronizzare in tempo reale.
-    </section>
   </div>
 </div>
 
@@ -142,22 +124,55 @@
 <div id="shareModal" class="modal" aria-hidden="true">
   <div class="modal-card">
     <div class="modal-head">
-      <div>Condividi Note</div>
-      <button class="btn" onclick="closeShare()">Chiudi</button>
+      <div id="shareTitle">Condividi Note</div>
+      <button class="btn" id="btnCloseShareHead">Chiudi</button>
     </div>
     <div class="modal-body">
-      <p class="muted">Quando implementeremo la sezione <em>Condivisione</em>, qui vedrai l’elenco dei giocatori collegati alla campagna corrente e potrai scegliere con chi sincronizzare queste note.</p>
+      <p class="muted" id="shareHint">Quando implementeremo la sezione Condivisione, qui vedrai l’elenco dei giocatori collegati alla campagna corrente e potrai scegliere con chi sincronizzare queste note.</p>
       <div id="playersList"></div>
     </div>
     <div class="modal-foot">
-      <button class="btn" onclick="closeShare()">Ok</button>
+      <button class="btn" id="btnCloseShare">Ok</button>
     </div>
   </div>
 </div>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- i18n -->
+<script src="../assets/js/i18n.js"></script>
 <script>
+/* ====== i18n helper (non sovrascrive se la chiave manca) ====== */
+function L(key, fallback){
+  try{
+    const v = window.i18n && typeof window.i18n.t==='function' ? window.i18n.t(key) : null;
+    return (v && v !== key) ? v : fallback;
+  }catch{ return fallback; }
+}
+function applyStaticTexts(){
+  document.title         = L('notes.page_title', 'Il Custode - Note Condivise');
+  document.getElementById('hdrTitle').textContent = L('notes.title', 'Note Condivise');
+
+  document.getElementById('btnShare').textContent      = L('notes.actions.share', 'Condividi…');
+  document.getElementById('btnSaveVer').textContent    = L('notes.actions.save_version', 'Salva versione');
+  document.getElementById('btnExport').textContent     = L('notes.actions.export', 'Esporta');
+  document.getElementById('lblImport').textContent     = L('notes.actions.import', 'Importa');
+
+  document.getElementById('campLbl').textContent       = L('notes.campaign_label', 'Campagna:');
+  document.getElementById('lastSaved').textContent     = L('notes.last_saved_prefix', 'Ultimo salvataggio:') + ' ' + (window.__lastSavedWhen || '—');
+  document.getElementById('saveState').textContent     = L('notes.saved', 'Salvato');
+  document.getElementById('editor').setAttribute('placeholder', L('notes.placeholder', 'Scrivi qui le note condivise…'));
+
+  document.getElementById('versionsHdr').textContent   = L('notes.versions.title', 'Versioni');
+  document.getElementById('btnClearVersions').textContent = L('notes.versions.clear', 'Svuota versioni');
+
+  document.getElementById('shareTitle').textContent    = L('notes.share.title', 'Condividi Note');
+  document.getElementById('shareHint').textContent     = L('notes.share.hint', 'Quando implementeremo la sezione Condivisione, qui vedrai l’elenco dei giocatori collegati alla campagna corrente e potrai scegliere con chi sincronizzare queste note.');
+  document.getElementById('btnCloseShareHead').textContent = L('common.close', 'Chiudi');
+  document.getElementById('btnCloseShare').textContent = L('common.ok', 'Ok');
+}
+window.addEventListener('i18n:change', applyStaticTexts);
+
 /* ====== UTIL ====== */
 const $ = (s)=>document.querySelector(s);
 function toast(msg, isError=false){
@@ -173,9 +188,9 @@ function debounce(fn, ms){
 
 /* ====== STORAGE KEYS (namespaced per campagna) ====== */
 const CURRENT_CAMPAIGN_KEY = 'custode.currentCampaignId';
-const NOTES_PREFIX = 'custode.notes.';           // testo note per campagna
-const VERSIONS_PREFIX = 'custode.notes.vers.';   // elenco versioni per campagna
-const PRESENCE_PREFIX = 'custode.notes.pres.';   // stub presenza
+const NOTES_PREFIX    = 'custode.notes.';         // testo note per campagna
+const VERSIONS_PREFIX = 'custode.notes.vers.';    // elenco versioni per campagna
+const PRESENCE_PREFIX = 'custode.notes.pres.';    // stub presenza
 
 function getCampId(){ try { return JSON.parse(localStorage.getItem(CURRENT_CAMPAIGN_KEY)) || 'default'; } catch { return 'default'; } }
 function notesKey(){ return NOTES_PREFIX + getCampId(); }
@@ -186,34 +201,36 @@ function loadJSON(key, fb){ try{ const raw=localStorage.getItem(key); return raw
 function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
 /* ====== INIT ====== */
-const editor = $('#editor');
-const saveState = $('#saveState');
-const lastSaved = $('#lastSaved');
-const versionsBox = $('#versions');
-const campInfo = $('#campInfo');
+const editor     = $('#editor');
+const saveState  = $('#saveState');
+const lastSaved  = $('#lastSaved');
+const versionsBox= $('#versions');
+const campVal    = $('#campVal');
 
-campInfo.textContent = 'Campagna: ' + getCampId();
+campVal.textContent = getCampId();
 
 /* Ripristina testo */
 const initial = loadJSON(notesKey(), { text:'', ts:null });
 editor.value = initial.text || '';
-lastSaved.textContent = 'Ultimo salvataggio: ' + (initial.ts ? new Date(initial.ts).toLocaleString() : '—');
+window.__lastSavedWhen = initial.ts ? new Date(initial.ts).toLocaleString() : '—';
+lastSaved.textContent = L('notes.last_saved_prefix', 'Ultimo salvataggio:') + ' ' + window.__lastSavedWhen;
 
 /* Autosave (debounced) */
 const doSave = ()=>{
   const payload = { text: editor.value, ts: Date.now() };
   saveJSON(notesKey(), payload);
-  saveState.textContent = 'Salvato';
-  lastSaved.textContent = 'Ultimo salvataggio: ' + nowStr();
+  saveState.textContent = L('notes.saved', 'Salvato');
+  window.__lastSavedWhen = nowStr();
+  lastSaved.textContent = L('notes.last_saved_prefix', 'Ultimo salvataggio:') + ' ' + window.__lastSavedWhen;
 };
 const debouncedSave = debounce(()=>{
-  saveState.textContent = 'Salvataggio…';
+  saveState.textContent = L('notes.saving', 'Salvataggio…');
   doSave();
 }, 400);
 
 editor.addEventListener('input', debouncedSave);
 
-/* Versioning: snapshot automatico ogni X min e manuale */
+/* Versioning */
 function loadVersions(){ return loadJSON(versionsKey(), []); }
 function saveVersions(arr){ saveJSON(versionsKey(), arr); renderVersions(); }
 
@@ -226,13 +243,11 @@ function addVersion(reason='manuale'){
     size: (editor.value||'').length,
     preview: (editor.value||'').slice(0,120)
   });
-  // tieni solo le ultime 30 versioni
   if(arr.length>30) arr.length = 30;
   saveVersions(arr);
-  toast('Versione salvata');
+  toast(L('notes.version_saved', 'Versione salvata'));
 }
 
-// snapshot automatico ogni 5 minuti se ci sono modifiche rispetto all’ultimo snapshot
 let lastSnapText = initial.text || '';
 setInterval(()=>{
   const cur = editor.value || '';
@@ -249,7 +264,7 @@ function renderVersions(){
   versionsBox.innerHTML = '';
   if(!arr.length){
     const d = document.createElement('div');
-    d.className='muted'; d.textContent='Nessuna versione salvata.';
+    d.className='muted'; d.textContent=L('notes.no_versions', 'Nessuna versione salvata.');
     versionsBox.appendChild(d); return;
   }
   arr.forEach(v=>{
@@ -257,12 +272,12 @@ function renderVersions(){
     el.className='ver';
     el.innerHTML = `
       <div>
-        <div class="meta"><strong>${new Date(v.ts).toLocaleString()}</strong> • ${v.reason} • ${v.size} caratteri</div>
+        <div class="meta"><strong>${new Date(v.ts).toLocaleString()}</strong> • ${v.reason} • ${v.size} ${L('notes.chars','caratteri')}</div>
         <div class="muted">${escapeHtml(v.preview)}${v.preview.length===120?'…':''}</div>
       </div>
       <div class="actions">
-        <button class="btn gray" data-restore="${v.id}">Ripristina</button>
-        <button class="btn red" data-delver="${v.id}">Elimina</button>
+        <button class="btn gray" data-restore="${v.id}">${L('notes.restore','Ripristina')}</button>
+        <button class="btn red" data-delver="${v.id}">${L('common.delete','Elimina')}</button>
       </div>
     `;
     versionsBox.appendChild(el);
@@ -277,11 +292,10 @@ document.addEventListener('click', (e)=>{
     const arr = loadVersions();
     const v = arr.find(x=>x.id===id);
     if(!v) return;
-    if(!confirm('Ripristinare questa versione? Il testo corrente verrà sostituito.')) return;
-    editor.value = v.preview; // ripristiniamo il preview + poi salviamo tutto (nota: preview salva i primi 120 char; MVP)
-    // Per un ripristino completo, salveremo il testo completo nella versione (upgrade facile). Per ora MVP:
+    if(!confirm(L('notes.restore_confirm','Ripristinare questa versione? Il testo corrente verrà sostituito.'))) return;
+    editor.value = v.preview; // MVP: preview (120 char). Per full, salvare testo completo nella versione.
     doSave();
-    toast('Versione ripristinata');
+    toast(L('notes.version_restored','Versione ripristinata'));
     return;
   }
   const d = e.target.closest('[data-delver]');
@@ -289,17 +303,15 @@ document.addEventListener('click', (e)=>{
     const id = d.getAttribute('data-delver');
     const arr = loadVersions().filter(x=>x.id!==id);
     saveVersions(arr);
-    toast('Versione eliminata');
+    toast(L('notes.version_deleted','Versione eliminata'));
   }
 });
 
 $('#btnClearVersions').addEventListener('click', ()=>{
-  if(!confirm('Svuotare tutte le versioni?')) return;
+  if(!confirm(L('notes.clear_versions_confirm','Svuotare tutte le versioni?'))) return;
   saveVersions([]);
-  toast('Versioni svuotate');
+  toast(L('notes.versions_cleared','Versioni svuotate'));
 });
-
-renderVersions();
 
 /* Esporta / Importa */
 $('#btnExport').addEventListener('click', ()=>{
@@ -325,28 +337,27 @@ $('#importFile').addEventListener('change', async (e)=>{
     try{
       const obj = JSON.parse(text);
       if(obj && obj.type==='custode/notes'){ content = obj.content || ''; versions = Array.isArray(obj.versions)? obj.versions: []; }
-    }catch(_){ /* file testo semplice */ }
+    }catch(_){ /* testo semplice */ }
     editor.value = content;
     doSave();
     if(versions.length){ saveVersions(versions); }
-    toast('Note importate');
+    toast(L('notes.import_ok','Note importate'));
   }catch(err){
-    console.error(err); toast('Import fallito', true);
+    console.error(err); toast(L('notes.import_fail','Import fallito'), true);
   }finally{ e.target.value = ''; }
 });
 
-/* Presence (stub, per Socket.IO) */
+/* Presence (stub) */
 function mockPresence(){
-  // Legge eventuale lista giocatori salvata localmente dalla pagina Master (quando implementata).
   const players = loadJSON('custode.players.'+getCampId(), []);
   const box = $('#presence'); box.innerHTML='';
   if(!players.length){
-    const none = document.createElement('span'); none.className='badge'; none.textContent='Nessun giocatore collegato';
+    const none = document.createElement('span'); none.className='badge'; none.textContent=L('notes.no_players','Nessun giocatore collegato');
     box.appendChild(none); return;
   }
   players.slice(0,8).forEach(p=>{
     const pill = document.createElement('span'); pill.className='pill';
-    pill.innerHTML = `<span class="dot" title="online"></span> ${escapeHtml(p.name||'Giocatore')}`;
+    pill.innerHTML = `<span class="dot" title="online"></span> ${escapeHtml(p.name||L('notes.player','Giocatore'))}`;
     box.appendChild(pill);
   });
   if(players.length>8){
@@ -360,16 +371,15 @@ mockPresence();
 const shareModal = $('#shareModal');
 $('#btnShare').addEventListener('click', openShare);
 function openShare(){
-  // Popola elenco (stub)
   const players = loadJSON('custode.players.'+getCampId(), []);
   const wrap = $('#playersList'); wrap.innerHTML='';
-  if(!players.length){ wrap.innerHTML = '<p class="muted">Nessun giocatore disponibile al momento.</p>'; }
+  if(!players.length){ wrap.innerHTML = `<p class="muted">${L('notes.no_players','Nessun giocatore disponibile al momento.')}</p>`; }
   else{
     players.forEach(p=>{
       const id = 'p_'+p.id;
       const row = document.createElement('div');
       row.className='row';
-      row.innerHTML = `<label><input type="checkbox" id="${id}"> ${escapeHtml(p.name||'Giocatore')}</label>`;
+      row.innerHTML = `<label><input type="checkbox" id="${id}"> ${escapeHtml(p.name||L('notes.player','Giocatore'))}</label>`;
       wrap.appendChild(row);
     });
   }
@@ -378,8 +388,15 @@ function openShare(){
 function closeShare(){
   shareModal.classList.remove('open'); shareModal.setAttribute('aria-hidden','true');
 }
+document.getElementById('btnCloseShareHead').addEventListener('click', closeShare);
+document.getElementById('btnCloseShare').addEventListener('click', closeShare);
 shareModal.addEventListener('click', (e)=>{ if(e.target===shareModal) closeShare(); });
+
+/* Start */
+applyStaticTexts(); // iniziale
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyStaticTexts);
+}
 </script>
-<div id="toast" class="toast"></div>
 </body>
 </html>

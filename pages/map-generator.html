@@ -1,62 +1,77 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il Custode - Generatore di Mappe</title>
-    <style>
-        body {
-            font-family: 'Papyrus', fantasy;
-            margin: 0;
-            padding: 0;
-            color: #3e2f1c;
-            text-align: center;
-            background: url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
-        .cornice {
-            border: 40px solid transparent;
-            -webkit-border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-            border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        header {
-            background-color: rgba(75, 54, 33, 0.85);
-            color: #fff8dc;
-            padding: 20px;
-            font-size: 28px;
-            position: relative;
-        }
-        button {
-            background-color: #d2b48c;
-            border: 3px solid #4b3621;
-            padding: 10px 20px;
-            font-size: 18px;
-            font-family: 'Papyrus', fantasy;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            background-color: #a9745b;
-            color: white;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode — Generatore di Mappe</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+      background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent;
+      -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc;
+      padding:14px 20px; border-bottom:5px solid var(--legno);
+      display:flex; align-items:center; justify-content:center; gap:10px; font-size:26px;
+      /* spazio per il pulsante "Indietro" iniettato dal main */
+      padding-left:80px;
+    }
+    .container{ width:100%; max-width:1000px; margin:0 auto; padding:18px 14px 24px; text-align:left; }
+    .panel{
+      background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px;
+      box-shadow:0 4px 10px rgba(0,0,0,.12); margin-bottom:14px;
+    }
+    h2{ margin:0 0 10px; }
+    p{ margin:8px 0 0; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; font-size:16px; border-radius:10px; cursor:pointer;
+      font-family:'Papyrus', fantasy;
+    }
+    .btn:hover{ background:var(--pelle-scura); }
+  </style>
 </head>
 <body>
-    <div class="cornice">
-        <header>
-            <button class="back-btn" onclick="window.history.back()">⬅ Indietro</button>
-            🗺 Generatore di Mappe
-        </header>
-        <div class="container">
-            <h2>Crea e personalizza le tue mappe</h2>
-            <p>Qui potrai generare mappe personalizzate per la tua campagna.</p>
-        </div>
-    </div>
+<div class="cornice">
+  <header>
+    <span data-i18n="mapgen.header">🗺 Generatore di Mappe</span>
+  </header>
+
+  <div class="container">
+    <section class="panel">
+      <h2 data-i18n="mapgen.subtitle">Crea e personalizza le tue mappe</h2>
+      <p data-i18n="mapgen.desc">Qui potrai generare mappe personalizzate per la tua campagna.</p>
+    </section>
+  </div>
+</div>
+
+<!-- i18n -->
+<script src="../assets/js/i18n.js"></script>
+<script>
+  (function(){
+    function applyTitle(){
+      if (window.i18n && typeof window.i18n.t==='function') {
+        const t = window.i18n.t('mapgen.page_title') || 'Il Custode — Generatore di Mappe';
+        document.title = t;
+      }
+    }
+    if (document.readyState==='loading') {
+      document.addEventListener('DOMContentLoaded', applyTitle);
+    } else {
+      applyTitle();
+    }
+    window.addEventListener('i18n:change', applyTitle);
+  })();
+</script>
 </body>
 </html>

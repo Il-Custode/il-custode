@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Wstecz", "logout": "Wyloguj", "save": "Zapisz", "saved": "Zapisano" },
+  "home": {
+    "authTitle": "Zaloguj się lub Zarejestruj",
+    "labels": { "email": "E-mail", "password": "Hasło", "remember": "Zapamiętaj mnie na tym urządzeniu" },
+    "buttons": { "login": "Zaloguj", "signup": "Zarejestruj" },
+    "select": "Wybierz sekcję",
+    "tiles": {
+      "master": { "title": "Tryb Mistrza", "desc": "Kampanie i narzędzia." },
+      "player": { "title": "Tryb Gracza", "desc": "Połącz z sesją (MVP)." },
+      "settings": { "title": "Ustawienia", "desc": "Język i preferencje." }
+    },
+    "wizardPhrases": [
+      "Zanim wejdziesz do Sali, wpisz swoje imię na pergaminie.",
+      "Ogień płonie. Rozpoznaj swą pieczęć i usiądź przy stole.",
+      "Wpisz dane logowania: mapy nie czekają na spóźnialskich.",
+      "Powiedz kim jesteś, wskażę właściwą salę: Mistrz czy Wędrowiec?",
+      "Klucz jest prosty: słowo, formuła (twoje hasło)."
+    ]
+  },
+  "settings": { "title": "Ustawienia", "language": { "title": "Język", "choose": "Wybierz język", "apply": "Zastosuj język", "applied": "Zastosowano język" } }
+}

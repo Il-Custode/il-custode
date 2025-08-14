@@ -1,70 +1,199 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il Custode - Menu Principale</title>
-    <style>
-        body {
-            font-family: 'Papyrus', fantasy;
-            margin: 0;
-            padding: 0;
-            color: #3e2f1c;
-            text-align: center;
-            background: url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Il Custode — Home</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; --pergamena:#fff3d4; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:
+        radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
+        var(--pergamena)
+        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+      background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent;
+      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      min-height:100vh; display:flex; flex-direction:column;
+      background: linear-gradient(180deg, rgba(255,243,212,.30), rgba(255,243,212,.15));
+    }
 
-        .cornice {
-            border: 40px solid transparent;
-            -webkit-border-image: url('./assets/img/cornice-legno.png') 40 stretch;
-            border-image: url('./assets/img/cornice-legno.png') 40 stretch;
-            min-height: 100vh;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    /* ↑↑↑ Stile generale invariato ↑↑↑ */
 
-        header {
-            background-color: rgba(75, 54, 33, 0.85);
-            color: #fff8dc;
-            padding: 20px;
-            font-size: 28px;
-            border-bottom: 5px solid #4b3621;
-        }
+    /* HEADER: più spazio a sinistra per il bottone Indietro e badge spostato */
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno);
+      display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
 
-        .menu-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 40px;
-        }
+      /* prima: 80px —> ora: 140px per non far toccare il badge col back */
+      padding-left:140px; /* spazio riservato al pulsante Indietro iniettato */
+    }
+    /* stile coerente per il pulsante back iniettato da main.js */
+    .back-btn{
+      position:absolute; left:20px; top:14px;
+      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
+    }
+    .back-btn:hover{ background:#8b5e47; }
 
-        button {
-            background-color: #d2b48c;
-            border: 3px solid #4b3621;
-            padding: 15px 25px;
-            font-size: 20px;
-            font-family: 'Papyrus', fantasy;
-            cursor: pointer;
-            border-radius: 8px;
-            min-width: 200px;
-        }
+    /* BADGE EMAIL: spostato a destra e con ellissi + larghezza protetta */
+    #userBadge{
+      position:absolute;
+      left:140px;       /* prima 80px: allineato allo spazio del back */
+      top:12px;
+      color:#fff8dc; font-size:14px; opacity:.9; white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis;
+      /* lascia spazio ai bottoni a destra e al padding */
+      max-width:calc(100% - 360px);
+      text-align:left;
+    }
+    @media (max-width: 680px){
+      #userBadge{ max-width:calc(100% - 300px); font-size:13px; }
+    }
 
-        button:hover {
-            background-color: #c2a178;
-        }
-    </style>
+    .header-actions{ position:absolute; right:20px; top:10px; display:flex; gap:10px; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:0 14px;
+      border-radius:10px; font-family:'Papyrus', fantasy; cursor:pointer; font-size:16px;
+      line-height:42px; height:44px;
+    }
+    .btn:hover{ background:var(--pelle-scura); }
+    .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
+    .container{ width:100%; max-width:1080px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+
+    .card{ background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:18px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
+    .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
+    .muted{ opacity:.85; font-size:14px; }
+  </style>
 </head>
 <body>
-    <div class="cornice">
-        <header>📜 Il Custode</header>
+  <div class="cornice">
+    <header>
+      <span id="userBadge"></span>
+      <span data-i18n="home.header">Il Custode — Home</span>
+      <div class="header-actions">
+        <button id="btnLogout" class="btn red" data-i18n="common.logout" title="Logout">Logout</button>
+      </div>
+    </header>
 
-        <div class="menu-container">
-            <button onclick="window.location.href='./pages/master.html'">Modalità Master</button>
-            <button onclick="window.location.href='./pages/player.html'">Modalità Giocatore</button>
+    <div class="container">
+      <section class="card">
+        <h2 data-i18n="home.choose">Seleziona una sezione</h2>
+        <div class="grid">
+          <div class="tile">
+            <h3 data-i18n="home.master.title">🎩 Modalità Master</h3>
+            <p class="muted" data-i18n="home.master.desc">Pannello del Master (campagne, strumenti).</p>
+            <button class="btn" data-i18n="home.master.btn" onclick="location.href='pages/master.html'">Entra come Master</button>
+          </div>
+
+          <div class="tile">
+            <h3 data-i18n="home.player.title">🧝‍♂️ Modalità Giocatore</h3>
+            <p class="muted" data-i18n="home.player.desc">Connessione alla sessione (MVP).</p>
+            <button class="btn" data-i18n="home.player.btn" onclick="location.href='pages/player.html'">Entra come Giocatore</button>
+          </div>
+
+          <div class="tile">
+            <h3 data-i18n="home.settings.title">⚙️ Impostazioni</h3>
+            <p class="muted" data-i18n="home.settings.desc">Preferenze e configurazione dell’app.</p>
+            <button class="btn" data-i18n="home.settings.btn" onclick="location.href='pages/settings.html'">Apri Impostazioni</button>
+          </div>
+
+          <div class="tile">
+            <h3 data-i18n="home.hub.title">📣 Community Hub</h3>
+            <p class="muted" data-i18n="home.hub.desc">Condividi mappe, mostri, quest e idee.</p>
+            <button class="btn" data-i18n="home.hub.btn" onclick="location.href='pages/hub.html'">Apri Hub</button>
+          </div>
         </div>
+      </section>
     </div>
+  </div>
+
+  <!-- i18n -->
+  <script src="./assets/js/i18n.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const $ = (s)=>document.querySelector(s);
+    const userBadge = $('#userBadge');
+    const btnLogout = $('#btnLogout');
+
+    function tSafe(key, fb){
+      try{
+        const v = window.i18n?.t?.(key);
+        if (!v || v === key) return fb ?? '';
+        return v;
+      }catch{ return fb ?? ''; }
+    }
+
+    function applyI18n(){
+      window.i18n?.apply?.(document);
+      if (window.i18n?.t) {
+        document.title = window.i18n.t('home.page_title') || 'Il Custode — Home';
+        btnLogout.title = window.i18n.t('common.logout') || 'Logout';
+      }
+      try {
+        const lang = (window.i18n?.getLang && window.i18n.getLang()) || localStorage.getItem('custode.lang') || 'it';
+        document.documentElement.setAttribute('lang', lang);
+      } catch {}
+    }
+    document.addEventListener('i18n:change', applyI18n);
+
+    function setHeaderEmail(email){
+      const prefix = tSafe('common.connected_as','Connesso come:');
+      userBadge.textContent = email ? `${prefix} ${email}` : '';
+    }
+
+    async function guardSession(){
+      try{
+        const { data: { session } = {} } = await supabaseClient.auth.getSession();
+        if (!session){
+          try { location.replace('./index.html'); } catch { location.href = './index.html'; }
+          return;
+        }
+        const email = session.user?.email || '';
+        setHeaderEmail(email);
+      }catch{
+        try { location.replace('./index.html'); } catch { location.href = './index.html'; }
+      }
+    }
+
+    // Logout robusto: pulisce token ma preserva eventuale "ricordami"
+    async function doLogout(){
+      try{ await supabaseClient.auth.signOut(); }catch{}
+      try{
+        const keepRemember = localStorage.getItem('custode.remember.on') === '1';
+        const keepEmail    = localStorage.getItem('custode.remember.email') || '';
+        const keepPass     = localStorage.getItem('custode.remember.pass') || '';
+        const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k) keys.push(k); }
+        keys.forEach(k=>{
+          if (k.startsWith('custode.') || k.startsWith('sb-')) localStorage.removeItem(k);
+        });
+        if (keepRemember){
+          localStorage.setItem('custode.remember.on','1');
+          localStorage.setItem('custode.remember.email', keepEmail);
+          localStorage.setItem('custode.remember.pass',  keepPass);
+        }
+        sessionStorage.clear();
+      }catch{}
+      try{ location.replace('./welcome.html'); }catch{ location.href = './welcome.html'; }
+    }
+    btnLogout.addEventListener('click', doLogout);
+
+    (async function boot(){
+      applyI18n();
+      await guardSession();
+    })();
+  </script>
 </body>
 </html>

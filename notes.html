@@ -1,79 +1,106 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Il Custode - Note Condivise</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
-
-        body {
-            font-family: 'MedievalSharp', cursive;
-            background-image: url('assets/background-parchment.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            margin: 0;
-            padding: 0;
-            color: #3b2f2f;
-        }
-        header {
-            background: url('assets/header-wood.jpg') repeat-x;
-            color: #f5deb3;
-            padding: 20px;
-            text-align: center;
-            font-size: 2em;
-            border-bottom: 5px solid #3b2f2f;
-            text-shadow: 2px 2px #000;
-        }
-        textarea {
-            width: 90%;
-            height: 500px;
-            margin: 40px auto 20px auto;
-            display: block;
-            background-color: rgba(255, 248, 220, 0.9);
-            border: 3px solid #5b4636;
-            padding: 15px;
-            font-size: 18px;
-            resize: none;
-            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4);
-        }
-        button {
-            display: block;
-            margin: 20px auto 40px auto;
-            padding: 15px 30px;
-            font-size: 18px;
-            background: url('assets/button-parchment.png') no-repeat center;
-            background-size: cover;
-            color: #3b2f2f;
-            border: 3px solid #5b4636;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
-        }
-        button:hover {
-            transform: scale(1.05);
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title data-i18n="notes.page_title">Il Custode - Note Condivise</title>
+  <style>
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
+    }
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('./assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
+    }
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+      padding-left:80px; /* spazio per .back-btn iniettato dal main */
+    }
+    .container{ width:100%; max-width:1100px; margin:0 auto; padding:22px 16px 40px; text-align:left; }
+    .card{
+      background:rgba(255,248,220,.9); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:16px 0; box-shadow:0 4px 10px rgba(0,0,0,.12);
+    }
+    textarea{
+      width:100%; min-height:420px; resize:vertical;
+      background:rgba(255,255,255,.85); border:3px solid var(--legno); border-radius:12px; padding:12px;
+      font-family:ui-monospace, Consolas, monospace; font-size:16px; line-height:1.4;
+    }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px; }
+    .btn{
+      background:var(--pelle); border:3px solid var(--legno); padding:10px 14px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy; font-size:16px;
+    }
+    .btn:hover{ background:var(--pelle-scura); }
+    .muted{ font-size:13px; opacity:.85; }
+  </style>
 </head>
 <body>
-    <header>
-        ✒️ Note Condivise ✒️
-    </header>
+<div class="cornice">
+  <header>✒️ <span data-i18n="notes.title">Note Condivise</span> ✒️</header>
 
-    <textarea id="notes" placeholder="Scrivi qui le tue note..."></textarea>
-    <button onclick="saveNotes()">💾 Salva Note</button>
+  <div class="container">
+    <section class="card">
+      <textarea id="notes" data-i18n-placeholder="notes.placeholder" placeholder="Scrivi qui le note condivise…"></textarea>
+      <div class="actions">
+        <button id="btnSave" class="btn" data-i18n="notes.save">💾 Salva Note</button>
+      </div>
+      <p id="status" class="muted"></p>
+    </section>
+  </div>
+</div>
 
-    <script>
-        const { ipcRenderer } = require('electron');
+<!-- i18n -->
+<script src="./assets/js/i18n.js"></script>
+<script>
+  (function(){
+    const KEY = 'custode.root.notes';
+    const notesEl = document.getElementById('notes');
+    const statusEl = document.getElementById('status');
+    const btnSave = document.getElementById('btnSave');
 
-        function saveNotes() {
-            const text = document.getElementById('notes').value;
-            ipcRenderer.send('save-notes', text);
-        }
+    function setStatus(msg){
+      statusEl.textContent = msg || '';
+      if (msg) setTimeout(()=>{ statusEl.textContent=''; }, 1200);
+    }
 
-        ipcRenderer.on('load-notes', (event, data) => {
-            document.getElementById('notes').value = data;
-        });
-    </script>
+    function load(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        notesEl.value = raw || '';
+      }catch{}
+    }
+    function save(){
+      try{
+        localStorage.setItem(KEY, notesEl.value || '');
+        const ok = (window.i18n && window.i18n.t) ? (window.i18n.t('notes.saved') || 'Salvato') : 'Salvato';
+        setStatus(ok);
+      }catch(e){
+        setStatus('Errore salvataggio');
+      }
+    }
+
+    btnSave.addEventListener('click', save);
+    // Ctrl/Cmd+S
+    document.addEventListener('keydown', (e)=>{
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); }
+    });
+
+    // Applica i18n al volo anche su titolo finestra
+    function applyI18nExtras(){
+      if (window.i18n && window.i18n.t){
+        document.title = window.i18n.t('notes.page_title') || 'Il Custode - Note Condivise';
+        // placeholder è gestito da data-i18n-placeholder via i18n.apply()
+      }
+    }
+    window.addEventListener('i18n:change', applyI18nExtras);
+
+    // start
+    load();
+    applyI18nExtras();
+  })();
+</script>
 </body>
 </html>

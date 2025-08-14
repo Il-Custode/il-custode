@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Zpět", "logout": "Odhlásit", "save": "Uložit", "saved": "Uloženo" },
+  "home": {
+    "authTitle": "Přihlášení nebo Registrace",
+    "labels": { "email": "E-mail", "password": "Heslo", "remember": "Zapamatovat na tomto zařízení" },
+    "buttons": { "login": "Přihlásit", "signup": "Registrovat" },
+    "select": "Vyber sekci",
+    "tiles": {
+      "master": { "title": "Režim Mistra", "desc": "Kampaně a nástroje." },
+      "player": { "title": "Režim Hráče", "desc": "Připojit se k sezení (MVP)." },
+      "settings": { "title": "Nastavení", "desc": "Jazyk a předvolby." }
+    },
+    "wizardPhrases": [
+      "Než vstoupíš do Síně, zapiš své jméno na pergamen.",
+      "Oheň hoří. Poznej svou pečeť a posaď se.",
+      "Zadej své údaje: mapy na opozdilce nečekají.",
+      "Řekni, kdo jsi, a ukážu ti správný sál: Mistr nebo Poutník?",
+      "Klíč je jednoduchý: slovo, vzorec (tvoje heslo)."
+    ]
+  },
+  "settings": { "title": "Nastavení", "language": { "title": "Jazyk", "choose": "Vyber svůj jazyk", "apply": "Použít jazyk", "applied": "Jazyk použit" } }
+}

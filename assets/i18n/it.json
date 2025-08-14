@@ -1,0 +1,42 @@
+{
+  "common": {
+    "back": "Indietro",
+    "logout": "Logout",
+    "save": "Salva",
+    "saved": "Salvato"
+  },
+  "home": {
+    "authTitle": "Accedi o Registrati",
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "remember": "Ricordami su questo dispositivo"
+    },
+    "buttons": {
+      "login": "Login",
+      "signup": "Registrati"
+    },
+    "select": "Seleziona una sezione",
+    "tiles": {
+      "master": { "title": "Modalità Master", "desc": "Campagne e strumenti." },
+      "player": { "title": "Modalità Giocatore", "desc": "Connettiti a una sessione (MVP)." },
+      "settings": { "title": "Impostazioni", "desc": "Lingua e preferenze." }
+    },
+    "wizardPhrases": [
+      "Prima di entrare nel Salone, lascia il tuo nome sulla pergamena.",
+      "Il fuoco è acceso. Identifica il tuo sigillo e siediti al tavolo.",
+      "Scrivi le tue credenziali: le mappe non attendono i ritardatari.",
+      "Dimmi chi sei e ti indicherò la stanza giusta: Master o Viandante?",
+      "La chiave è semplice: una parola, una formula (la tua password)."
+    ]
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": {
+      "title": "Lingua",
+      "choose": "Scegli la tua lingua",
+      "apply": "Applica lingua",
+      "applied": "Lingua applicata"
+    }
+  }
+}

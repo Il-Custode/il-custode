@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Zurück", "logout": "Abmelden", "save": "Speichern", "saved": "Gespeichert" },
+  "home": {
+    "authTitle": "Anmelden oder Registrieren",
+    "labels": { "email": "E-Mail", "password": "Passwort", "remember": "Auf diesem Gerät merken" },
+    "buttons": { "login": "Anmelden", "signup": "Registrieren" },
+    "select": "Bereich wählen",
+    "tiles": {
+      "master": { "title": "Master-Modus", "desc": "Kampagnen und Werkzeuge." },
+      "player": { "title": "Spieler-Modus", "desc": "Mit einer Sitzung verbinden (MVP)." },
+      "settings": { "title": "Einstellungen", "desc": "Sprache und Präferenzen." }
+    },
+    "wizardPhrases": [
+      "Bevor du die Halle betrittst, hinterlasse deinen Namen auf dem Pergament.",
+      "Das Feuer brennt. Erkenne dein Siegel und nimm Platz.",
+      "Gib deine Zugangsdaten ein: Karten warten nicht auf Zuspätkommer.",
+      "Sag mir, wer du bist, und ich zeige dir den richtigen Raum: Master oder Wanderer?",
+      "Der Schlüssel ist einfach: ein Wort, eine Formel (dein Passwort)."
+    ]
+  },
+  "settings": { "title": "Einstellungen", "language": { "title": "Sprache", "choose": "Wähle deine Sprache", "apply": "Sprache anwenden", "applied": "Sprache angewendet" } }
+}

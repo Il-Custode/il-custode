@@ -13,24 +13,64 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let mainWindow;
-let connections = [];
-let masterPassword = null;
-let wss;
-
-// === FLAG aggiornamento scaricato ===
-let updateDownloaded = false;
+let connections = [];           // client connessi al server WS (lato Master)
+let masterPassword = null;      // password server WS (lato Master)
+let wss;                        // WebSocketServer
+let playerWS = null;            // connessione WS attiva (lato Player)
+let updateDownloaded = false;   // flag per auto update
 
 /* ==========================
-   Inject "Indietro" auto in ogni pagina (tranne welcome/index)
+   Inject "Back" + label i18n in ogni pagina (tranne welcome/index)
    ========================== */
 function installAutoBack(win) {
   const INJECT_BACK_JS = `(function(){
     try {
-      // Non iniettare su welcome/index
-      var p = (location.pathname || '').toLowerCase();
-      if (/(^|\\/)(welcome|index)\\.html$/.test(p)) return;
+      // --- Aggiorna uno stack minimale di navigazione per file:// ---
+      try {
+        var last = sessionStorage.getItem('custode.last') || '';
+        sessionStorage.setItem('custode.prev', last);
+        sessionStorage.setItem('custode.last', location.href);
+      } catch(e) {}
 
-      // Stili base del pulsante (una volta sola)
+      var p = (location.pathname || '').toLowerCase();
+
+      // --- Traduzioni label ---
+      function getLabelBack(){
+        try {
+          return (window.i18n && typeof window.i18n.t==='function')
+            ? (window.i18n.t('common.back') || '⬅ Indietro')
+            : '⬅ Indietro';
+        } catch(_) { return '⬅ Indietro'; }
+      }
+      function getLabelLogout(){
+        try {
+          return (window.i18n && typeof window.i18n.t==='function')
+            ? (window.i18n.t('common.logout') || 'Logout')
+            : 'Logout';
+        } catch(_) { return 'Logout'; }
+      }
+
+      // --- Back "smart": prova history, poi prev salvata, poi referrer, infine fallback a home ---
+      function goBackSmart(){
+        try {
+          if (history.length > 1) { history.back(); return; }
+        } catch(e) {}
+
+        var prev = '';
+        try { prev = sessionStorage.getItem('custode.prev') || ''; } catch(e) {}
+        if (prev && prev !== location.href) { location.href = prev; return; }
+
+        if (document.referrer && document.referrer !== location.href) { location.href = document.referrer; return; }
+
+        var home = p.includes("/pages/") ? "../index.html" : "./index.html";
+        location.href = home;
+      }
+      window.__goBackSmart = goBackSmart;
+
+      // --- Se siamo in welcome/index: non aggiungere il pulsante, ma mantieni le label comuni aggiornabili ---
+      var isHomeLike = /(\\/(welcome|index)\\.html)$/i.test(p);
+
+      // Stili del pulsante (una sola volta)
       if (!document.getElementById('auto-back-style')) {
         var st = document.createElement('style');
         st.id = 'auto-back-style';
@@ -38,46 +78,55 @@ function installAutoBack(win) {
         document.head.appendChild(st);
       }
 
-      // Funzione di ritorno "smart"
-      function goBackSmart(){
-        var hasReferrer = !!document.referrer && document.referrer !== location.href;
-        var hasHistory = window.history.length > 1;
-        if (hasReferrer || hasHistory) {
-          try { history.back(); return; } catch(e){}
-        }
-        // Fallback: torna all'index in base al path corrente
-        var home = p.includes("/pages/") ? "../index.html" : "./index.html";
-        location.href = home;
-      }
-      // Esponi per eventuale uso da altri script
-      window.__goBackSmart = goBackSmart;
-
-      // Re-wiring: qualunque .back-btn esistente userà goBackSmart()
-      document.querySelectorAll('.back-btn').forEach(function(btn){
-        btn.onclick = function(ev){ ev.preventDefault(); goBackSmart(); };
-      });
-
-      // Se NON esiste un .back-btn, lo creo e lo metto nell'header o flottante
-      if (!document.querySelector('.back-btn')) {
-        var btn = document.createElement('button');
-        btn.className = 'back-btn';
-        btn.textContent = '⬅ Indietro';
-        btn.onclick = function(ev){ ev.preventDefault(); goBackSmart(); };
-
-        var header = document.querySelector('header');
-        if (header) { header.appendChild(btn); }
-        else {
-          btn.style.position = 'fixed';
-          btn.style.left = '16px';
-          btn.style.top = '16px';
-          btn.style.zIndex = '9999';
-          document.body.appendChild(btn);
+      // Crea/ri-wira il back solo se NON siamo in welcome/index
+      if (!isHomeLike) {
+        var existing = document.querySelector('.back-btn');
+        if (existing){
+          existing.onclick = function(ev){ ev.preventDefault(); goBackSmart(); };
+          existing.textContent = getLabelBack();
+          existing.setAttribute('data-i18n','common.back');
+        } else {
+          var btn = document.createElement('button');
+          btn.className = 'back-btn';
+          btn.setAttribute('data-i18n','common.back');
+          btn.textContent = getLabelBack();
+          btn.onclick = function(ev){ ev.preventDefault(); goBackSmart(); };
+          var header = document.querySelector('header');
+          if (header) header.appendChild(btn);
+          else {
+            btn.style.position = 'fixed';
+            btn.style.left = '16px';
+            btn.style.top  = '16px';
+            btn.style.zIndex = '9999';
+            document.body.appendChild(btn);
+          }
         }
       }
-    } catch(e){ console.warn('auto-back inject error', e); }
+
+      // Aggiorna anche eventuali elementi Logout comuni
+      function updateCommonLabels(){
+        var back = document.querySelector('.back-btn');
+        if (back) back.textContent = getLabelBack();
+
+        var logoutEls = [];
+        var byId1 = document.getElementById('btnLogout');
+        var byId2 = document.getElementById('headerLogout');
+        if (byId1) logoutEls.push(byId1);
+        if (byId2) logoutEls.push(byId2);
+        try { document.querySelectorAll('[data-role="logout"]').forEach(function(el){ logoutEls.push(el); }); } catch(_){}
+
+        logoutEls.forEach(function(el){
+          el.textContent = getLabelLogout();
+          try { el.setAttribute('data-i18n','common.logout'); } catch(_){}
+        });
+      }
+
+      // Primo aggiornamento + re-apply a cambio lingua
+      updateCommonLabels();
+      window.addEventListener('i18n:change', updateCommonLabels);
+    } catch(e) { console.warn('auto-back inject error', e); }
   })();`;
 
-  // Esegui l'iniezione a OGNI caricamento pagina di questa finestra
   win.webContents.on('did-finish-load', () => {
     try { win.webContents.executeJavaScript(INJECT_BACK_JS); } catch {}
   });
@@ -97,7 +146,6 @@ function createWindowWithDefaults({ filePath, width = 1200, height = 800 } = {})
     },
   });
 
-  // Inietta il pulsante "Indietro" auto (esclude welcome/index)
   installAutoBack(win);
 
   if (filePath) {
@@ -112,25 +160,28 @@ function createWindow() {
 }
 
 /* ==========================
-   Auto Updater: installa ALLA CHIUSURA (X) senza prompt
+   Auto Updater
    ========================== */
 function setupAutoUpdater() {
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true; // chiudi l’app (X) = installa update
+  try {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('checking-for-update', () => console.log('Controllo aggiornamenti...'));
-  autoUpdater.on('update-available', (info) => console.log('Aggiornamento disponibile:', info.version));
-  autoUpdater.on('update-not-available', () => console.log('Nessun aggiornamento trovato'));
-  autoUpdater.on('error', (err) => console.error('Errore aggiornamento:', err));
-  autoUpdater.on('download-progress', (p) => console.log(`Download: ${Math.round(p.percent)}%`));
+    autoUpdater.on('checking-for-update', () => console.log('Controllo aggiornamenti...'));
+    autoUpdater.on('update-available', (info) => console.log('Aggiornamento disponibile:', info.version));
+    autoUpdater.on('update-not-available', () => console.log('Nessun aggiornamento trovato'));
+    autoUpdater.on('error', (err) => console.error('Errore aggiornamento:', err));
+    autoUpdater.on('download-progress', (p) => console.log(`Download: ${Math.round(p.percent)}%`));
 
-  autoUpdater.on('update-downloaded', (info) => {
-    updateDownloaded = true;
-    console.log('Aggiornamento scaricato:', info?.version, '— sarà installato alla chiusura dell’app.');
-    // Nessun dialog: lasciamo che si installi alla chiusura
-  });
+    autoUpdater.on('update-downloaded', (info) => {
+      updateDownloaded = true;
+      console.log('Aggiornamento scaricato:', info?.version, '— sarà installato alla chiusura dell’app.');
+    });
 
-  autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify();
+  } catch (e) {
+    console.warn('AutoUpdater non disponibile:', e?.message || e);
+  }
 }
 
 /* ==========================
@@ -139,7 +190,6 @@ function setupAutoUpdater() {
 app.whenReady().then(() => {
   app.setAppUserModelId('com.ilcustode.app');
 
-  // singola istanza (evita doppie esecuzioni durante update)
   const gotLock = app.requestSingleInstanceLock();
   if (!gotLock) {
     app.quit();
@@ -160,12 +210,10 @@ app.whenReady().then(() => {
   });
 });
 
-// Chiudi davvero l’app su Windows quando tutte le finestre sono chiuse
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// Prima di uscire: chiudi server/socket e, se necessario, installa update
 app.on('before-quit', () => {
   try {
     if (wss) {
@@ -176,10 +224,9 @@ app.on('before-quit', () => {
     }
   } catch {}
 
-  // Se l’aggiornamento è stato scaricato, forza l’installazione adesso
   if (updateDownloaded) {
     try {
-      autoUpdater.quitAndInstall(false, true); // isSilent=false, isForceRunAfter=true
+      autoUpdater.quitAndInstall(false, true);
     } catch (e) {
       console.error('quitAndInstall error:', e);
     }
@@ -187,7 +234,7 @@ app.on('before-quit', () => {
 });
 
 /* ==========================
-   CREDENZIALI (keytar)
+   Credenziali (keytar)
    ========================== */
 ipcMain.handle('cred:get', async (_event, email) => {
   if (!email) return '';
@@ -220,12 +267,18 @@ ipcMain.handle('cred:clear', async () => {
 });
 
 /* ==========================
-   WEBSOCKET / CHAT (MVP)
+   WebSocket / Chat (MVP)
    ========================== */
+// Avvia server (Master)
 ipcMain.on('start-server', (_event, password) => {
   masterPassword = password;
-  wss = new WebSocketServer({ port: 8080 });
-  console.log(`Server avviato su porta 8080 con password: ${password}`);
+  try {
+    wss = new WebSocketServer({ port: 8080 });
+    console.log(`Server avviato su porta 8080 con password: ${password}`);
+  } catch (e) {
+    console.error('Errore avvio server WS:', e);
+    return;
+  }
 
   wss.on('connection', (ws) => {
     ws.on('message', (data) => {
@@ -256,7 +309,13 @@ ipcMain.on('start-server', (_event, password) => {
   });
 });
 
-ipcMain.on('connect-server', (_event, { ip, password }) => {
+// Connetti come Player (supporta due nomi canale diversi)
+function connectToServer({ ip, password }) {
+  try {
+    playerWS?.close?.();
+  } catch {}
+  playerWS = null;
+
   const ws = new WebSocket(`ws://${ip}:8080`);
   ws.on('open', () => {
     ws.send(JSON.stringify({ type: 'auth', password }));
@@ -276,11 +335,25 @@ ipcMain.on('connect-server', (_event, { ip, password }) => {
       }
     } catch {}
   });
-  ipcMain.on('chat-message', (_e, message) => {
-    try {
-      ws.send(JSON.stringify({ type: 'chat', message }));
-    } catch {}
+  ws.on('close', () => {
+    if (playerWS === ws) playerWS = null;
   });
+  playerWS = ws;
+}
+
+ipcMain.on('connect-server', (_event, { ip, password }) => {
+  connectToServer({ ip, password });
+});
+ipcMain.on('connect-to-server', (_event, { ip, pwd }) => {
+  connectToServer({ ip, password: pwd });
+});
+
+ipcMain.on('chat-message', (_e, message) => {
+  try {
+    if (playerWS && playerWS.readyState === WebSocket.OPEN) {
+      playerWS.send(JSON.stringify({ type: 'chat', message }));
+    }
+  } catch {}
 });
 
 function broadcast(data) {
@@ -295,16 +368,16 @@ function broadcastPlayerList() {
 }
 
 /* ==========================
-   NAVIGAZIONE MULTI-PAGINA
+   Navigazione multi-pagina
    ========================== */
 ipcMain.on('open-page', (_event, page) => {
   createWindowWithDefaults({ filePath: page, width: 1000, height: 700 });
 });
 
 /* ==========================
-   CHIUSURA COMPLETA APP
+   Chiusura completa app
    ========================== */
 ipcMain.on('close-app', () => {
   BrowserWindow.getAllWindows().forEach((w) => w.destroy());
-  app.quit(); // 'before-quit' gestisce l'update se scaricato
+  app.quit();
 });

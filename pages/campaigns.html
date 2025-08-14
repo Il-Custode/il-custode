@@ -24,8 +24,7 @@
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc;
       padding:14px 20px; border-bottom:5px solid var(--legno);
       display:flex; align-items:center; justify-content:center; gap:10px; font-size:26px;
-      /* lascia spazio al pulsante "Indietro" iniettato da main.js */
-      padding-left:80px;
+      padding-left:80px; /* spazio per il bottone Indietro iniettato */
     }
     .container{ width:100%; max-width:1000px; margin:0 auto; padding:18px 14px 24px; text-align:left; }
     .panel{
@@ -48,7 +47,7 @@
 </head>
 <body>
 <div class="cornice">
-  <header>📜 Le tue campagne</header>
+  <header id="pageTitle">📜 Le tue campagne</header>
 
   <div class="container">
     <section class="panel">
@@ -59,28 +58,67 @@
   </div>
 </div>
 
+<!-- i18n -->
+<script src="../assets/js/i18n.js"></script>
 <script>
+  // Helper traduzioni con fallback
+  function tt(key, fallback){
+    try{
+      const v = window.i18n && typeof window.i18n.t==='function' ? window.i18n.t(key) : null;
+      return (v && v !== key) ? v : fallback;
+    }catch{ return fallback; }
+  }
+  function curLocale(){
+    try{
+      const l = window.i18n && typeof window.i18n.getLang==='function' ? window.i18n.getLang() : navigator.language || 'it';
+      if (l.startsWith('pt')) return 'pt-BR';
+      if (l.startsWith('zh')) return 'zh-Hans';
+      return l;
+    }catch{ return 'it'; }
+  }
+
   const LS_KEY_CAMPS = 'custode.master.campaigns';
   function loadCamps(){ try{ return JSON.parse(localStorage.getItem(LS_KEY_CAMPS) || '[]'); }catch{ return []; } }
 
+  const pageTitle = document.getElementById('pageTitle');
+  const hint     = document.getElementById('hint');
   const campList = document.getElementById('campList');
   const emptyMsg = document.getElementById('emptyMsg');
 
+  function applyStaticTexts(){
+    document.title = tt('campaigns.page_title', 'Il Custode — Le tue campagne');
+    pageTitle.textContent = tt('campaigns.title', '📜 Le tue campagne');
+    hint.textContent      = tt('campaigns.hint', 'Qui vedi l’elenco delle campagne create dal pannello Master.');
+    emptyMsg.textContent  = tt('campaigns.empty', 'Nessuna campagna trovata. Torna alla Modalità Master e creane una nuova.');
+  }
+
   function render(){
+    applyStaticTexts();
+
     const arr = loadCamps();
     campList.innerHTML = '';
     if(!arr.length){ emptyMsg.style.display=''; return; }
     emptyMsg.style.display='none';
+
+    const tagShared     = tt('campaigns.tag_shared', 'Condivisa');
+    const tagToShare    = tt('campaigns.tag_to_share', 'Da condividere');
+    const openDetailsTx = tt('campaigns.open_details', 'Apri dettagli');
+    const createdLabel  = tt('campaigns.created_label', 'creata il');
+
+    const locale = curLocale();
+
     arr.sort((a,b)=>b.createdAt - a.createdAt).forEach(c=>{
       const li = document.createElement('li');
+
       const left = document.createElement('div');
-      const tag = c.shared ? '<span class="tag">Condivisa</span>' : '<span class="tag">Da condividere</span>';
-      left.innerHTML = `<strong>${c.name}</strong> ${tag}<br><span class="muted">creata il ${new Date(c.createdAt).toLocaleString()}</span>`;
+      const tag = c.shared ? `<span class="tag">${tagShared}</span>` : `<span class="tag">${tagToShare}</span>`;
+      const date = new Date(c.createdAt).toLocaleString(locale);
+      left.innerHTML = `<strong>${c.name}</strong> ${tag}<br><span class="muted">${createdLabel} ${date}</span>`;
 
       const right = document.createElement('div');
       const openBtn = document.createElement('button');
-      openBtn.textContent = 'Apri dettagli';
-      openBtn.onclick = ()=> alert('Dettagli campagna: qui in seguito metteremo pagina dedicata (DM tools, mappe della campagna, ecc.).');
+      openBtn.textContent = openDetailsTx;
+      openBtn.onclick = ()=> alert(tt('campaigns.details_soon', 'Dettagli campagna: pagina dedicata in arrivo (mappe, strumenti, ecc.).'));
 
       right.appendChild(openBtn);
       li.appendChild(left); li.appendChild(right);
@@ -89,6 +127,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', render);
+  window.addEventListener('i18n:change', render);
 </script>
 </body>
 </html>

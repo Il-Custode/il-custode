@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Geri", "logout": "Çıkış", "save": "Kaydet", "saved": "Kaydedildi" },
+  "home": {
+    "authTitle": "Giriş yap veya Kaydol",
+    "labels": { "email": "E-posta", "password": "Parola", "remember": "Bu cihazda hatırla" },
+    "buttons": { "login": "Giriş", "signup": "Kaydol" },
+    "select": "Bir bölüm seç",
+    "tiles": {
+      "master": { "title": "Usta Modu", "desc": "Kampanyalar ve araçlar." },
+      "player": { "title": "Oyuncu Modu", "desc": "Bir oturuma bağlan (MVP)." },
+      "settings": { "title": "Ayarlar", "desc": "Dil ve tercihleri." }
+    },
+    "wizardPhrases": [
+      "Salona girmeden önce adını parşömene yaz.",
+      "Ateş yanıyor. Mührünü tanı ve masaya otur.",
+      "Kimlik bilgilerini gir: haritalar geç kalanları beklemez.",
+      "Kimsin söyle, doğru odayı göstereyim: Usta mı Gezgin mi?",
+      "Anahtar basit: bir kelime, bir formül (parolan)."
+    ]
+  },
+  "settings": { "title": "Ayarlar", "language": { "title": "Dil", "choose": "Dilini seç", "apply": "Dili uygula", "applied": "Dil uygulandı" } }
+}

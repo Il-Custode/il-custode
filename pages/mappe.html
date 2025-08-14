@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Il Custode - Mappe</title>
+  <title data-i18n="maps.page_title">Il Custode — Mappe</title>
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
     *{ box-sizing:border-box }
@@ -18,12 +18,9 @@
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
       border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+      /* spazio per il back-button iniettato da main.js */
+      padding-left:80px;
     }
-    .back-btn{
-      position:absolute; left:20px; top:14px;
-      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
-    }
-    .back-btn:hover{ background:#8b5e47; }
     .container{ width:100%; max-width:1200px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
 
     .row{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
@@ -43,21 +40,19 @@
     }
     .btn:hover{ background:var(--pelle-scura); }
     input[type="file"]{ display:none; }
+    .btn.red{ background:#c67a6b; color:#fff; }
+    .btn.red:hover{ background:#b16556; }
+    .btn.gray{ background:#ddd4c6; }
 
     .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; }
     .tile{
       background:rgba(255,255,255,.7); border:3px solid var(--legno); border-radius:12px; overflow:hidden; display:flex; flex-direction:column;
     }
-    .thumb{
-      aspect-ratio: 16/10; width:100%; object-fit:cover; background:#fff;
-    }
+    .thumb{ aspect-ratio: 16/10; width:100%; object-fit:cover; background:#fff; }
     .tile-body{ padding:10px; display:flex; flex-direction:column; gap:6px; }
     .name{ font-weight:bold; word-break:break-word; }
     .muted{ font-size:12px; opacity:.85; }
     .actions{ display:flex; gap:8px; flex-wrap:wrap; }
-    .btn.red{ background:#c67a6b; color:#fff; }
-    .btn.red:hover{ background:#b16556; }
-    .btn.gray{ background:#ddd4c6; }
 
     /* Modal viewer */
     .modal{
@@ -83,29 +78,25 @@
 </head>
 <body>
 <div class="cornice">
-  <header>
-    <!-- Torna al Master -->
-    <button class="back-btn" onclick="location.href='master.html'">⬅ Indietro</button>
-    🗺 Mappe
-  </header>
+  <header>🗺 <span data-i18n="maps.header">Mappe</span></header>
 
   <div class="container">
     <!-- Importazione -->
     <section class="card">
-      <h2>Importa le tue mappe</h2>
+      <h2 data-i18n="maps.import.title">Importa le tue mappe</h2>
       <div class="uploader">
         <div class="drop" id="dropZone">
-          <p><strong>Trascina qui</strong> le immagini delle tue mappe</p>
-          <p class="muted">Formati consigliati: JPG, PNG, WEBP (anche GIF/ JPEG).</p>
-          <label class="btn" for="fileInput">Scegli file…</label>
+          <p><strong data-i18n="maps.import.drag_here_strong">Trascina qui</strong> <span data-i18n="maps.import.drag_here_rest">le immagini delle tue mappe</span></p>
+          <p class="muted" data-i18n="maps.import.formats">Formati consigliati: JPG, PNG, WEBP (anche GIF/JPEG).</p>
+          <label class="btn" for="fileInput" data-i18n="maps.import.choose_files">Scegli file…</label>
           <input id="fileInput" type="file" accept="image/*" multiple />
         </div>
         <div>
-          <h3>Consigli</h3>
+          <h3 data-i18n="maps.tips.title">Consigli</h3>
           <ul style="margin:0 0 0 18px; padding:0; line-height:1.4;">
-            <li>Rinomina le mappe dopo l’import per tenerle ordinate.</li>
-            <li>Click su <em>Visualizza</em> per aprire l’anteprima a schermo.</li>
-            <li>Puoi fare <em>backup</em> e <em>ripristino</em> dell’archivio mappe.</li>
+            <li data-i18n="maps.tips.tip1">Rinomina le mappe dopo l’import per tenerle ordinate.</li>
+            <li data-i18n="maps.tips.tip2">Click su <em>Visualizza</em> per aprire l’anteprima a schermo.</li>
+            <li data-i18n="maps.tips.tip3">Puoi fare <em>backup</em> e <em>ripristino</em> dell’archivio mappe.</li>
           </ul>
         </div>
       </div>
@@ -114,16 +105,16 @@
     <!-- Elenco -->
     <section class="card">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-        <h2>Le tue mappe</h2>
+        <h2 data-i18n="maps.list.title">Le tue mappe</h2>
         <div class="actions">
-          <button class="btn gray" onclick="exportMaps()">Esporta (backup)</button>
-          <label class="btn gray" for="importBackup">Importa backup</label>
+          <button class="btn gray" id="btnExport" data-i18n="maps.list.export">Esporta (backup)</button>
+          <label class="btn gray" for="importBackup" data-i18n="maps.list.import">Importa backup</label>
           <input id="importBackup" type="file" accept="application/json"/>
-          <button class="btn red" onclick="clearAll()" title="Rimuove tutte le mappe salvate">Cancella tutto</button>
+          <button class="btn red" id="btnClear" title="Rimuove tutte le mappe salvate" data-i18n="maps.list.clear_all">Cancella tutto</button>
         </div>
       </div>
       <div id="grid" class="grid" aria-live="polite"></div>
-      <p id="emptyState" class="muted" style="display:none; margin-top:10px;">Nessuna mappa salvata.</p>
+      <p id="emptyState" class="muted" style="display:none; margin-top:10px;" data-i18n="maps.list.empty">Nessuna mappa salvata.</p>
     </section>
   </div>
 </div>
@@ -132,11 +123,11 @@
 <div id="viewer" class="modal" aria-hidden="true">
   <div class="modal-card">
     <div class="modal-head">
-      <div id="viewerTitle">Mappa</div>
+      <div id="viewerTitle" data-i18n="maps.viewer.title">Mappa</div>
       <div class="actions">
-        <button class="btn gray" id="btnRename">Rinomina</button>
-        <button class="btn red" id="btnDelete">Elimina</button>
-        <button class="btn" onclick="closeViewer()">Chiudi</button>
+        <button class="btn gray" id="btnRename" data-i18n="maps.viewer.rename">Rinomina</button>
+        <button class="btn red" id="btnDelete" data-i18n="maps.viewer.delete">Elimina</button>
+        <button class="btn" id="btnClose" data-i18n="maps.viewer.close">Chiudi</button>
       </div>
     </div>
     <div class="modal-body">
@@ -150,9 +141,12 @@
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- i18n -->
+<script src="../assets/js/i18n.js"></script>
 <script>
 /* ========= UTIL ========= */
 const $ = (s)=>document.querySelector(s);
+function T(key, fallback){ try{ const v = window.i18n?.t?.(key); return (v && v!==key) ? v : fallback; }catch{ return fallback; } }
 function toast(msg, isError=false){
   const t = $('#toast'); if(!t) return;
   t.className = 'toast' + (isError ? ' error' : '');
@@ -177,14 +171,14 @@ function render(){
     const card = document.createElement('div');
     card.className='tile';
     card.innerHTML = `
-      <img class="thumb" src="${m.dataUrl}" alt="${m.name}">
+      <img class="thumb" src="${m.dataUrl}" alt="${escapeHtml(m.name || T('maps.default.untitled','Senza nome'))}">
       <div class="tile-body">
-        <div class="name">${m.name || 'Senza nome'}</div>
+        <div class="name">${escapeHtml(m.name || T('maps.default.untitled','Senza nome'))}</div>
         <div class="muted">${m.w||'?'}×${m.h||'?'} | ${new Date(m.addedAt).toLocaleString()}</div>
         <div class="actions">
-          <button class="btn" data-view="${m.id}">Visualizza</button>
-          <button class="btn gray" data-rename="${m.id}">Rinomina</button>
-          <button class="btn red" data-del="${m.id}">Elimina</button>
+          <button class="btn" data-view="${m.id}">${T('maps.card.view','Visualizza')}</button>
+          <button class="btn gray" data-rename="${m.id}">${T('maps.card.rename','Rinomina')}</button>
+          <button class="btn red" data-del="${m.id}">${T('maps.card.delete','Elimina')}</button>
         </div>
       </div>
     `;
@@ -200,7 +194,7 @@ drop.addEventListener('dragleave', ()=> drop.classList.remove('drag'));
 drop.addEventListener('drop', (e)=>{
   e.preventDefault(); drop.classList.remove('drag');
   const files = Array.from(e.dataTransfer.files || []).filter(f=>f.type.startsWith('image/'));
-  if(!files.length){ toast('Nessuna immagine riconosciuta', true); return; }
+  if(!files.length){ toast(T('maps.toast.no_images','Nessuna immagine riconosciuta'), true); return; }
   importFiles(files);
 });
 fileInput.addEventListener('change', (e)=>{
@@ -219,11 +213,11 @@ async function importFiles(files){
       maps.push({ id: uid(), name: f.name.replace(/\.(png|jpg|jpeg|webp|gif)$/i,''),
                   dataUrl, w: width, h: height, addedAt: Date.now() });
     }catch(err){
-      console.error(err); toast('Errore su: '+f.name, true);
+      console.error(err); toast(T('maps.toast.error_on','Errore su: ') + f.name, true);
     }
   }
   saveMaps(maps);
-  toast('Mappe importate');
+  toast(T('maps.toast.imported','Mappe importate'));
 }
 function readAsDataURL(file){
   return new Promise((res, rej)=>{
@@ -250,22 +244,22 @@ document.addEventListener('click', (e)=>{
 function renameMap(id){
   const maps = loadMaps();
   const m = maps.find(x=>x.id===id); if(!m) return;
-  const nv = prompt('Nuovo nome mappa:', m.name || '');
+  const nv = prompt(T('maps.prompts.rename','Nuovo nome mappa:'), m.name || '');
   if(nv===null) return;
-  m.name = (nv || 'Senza nome').trim();
+  m.name = (nv || T('maps.default.untitled','Senza nome')).trim();
   saveMaps(maps);
-  toast('Rinominata');
+  toast(T('maps.toast.renamed','Rinominata'));
 }
 function deleteMap(id){
-  if(!confirm('Eliminare questa mappa?')) return;
+  if(!confirm(T('maps.prompts.delete_one','Eliminare questa mappa?'))) return;
   const maps = loadMaps().filter(x=>x.id!==id);
   saveMaps(maps);
-  toast('Eliminata');
+  toast(T('maps.toast.deleted','Eliminata'));
 }
 function clearAll(){
-  if(!confirm('Eliminare TUTTE le mappe?')) return;
+  if(!confirm(T('maps.prompts.delete_all','Eliminare TUTTE le mappe?'))) return;
   saveMaps([]);
-  toast('Archivio mappe svuotato');
+  toast(T('maps.toast.cleared','Archivio mappe svuotato'));
 }
 
 /* ========= BACKUP ========= */
@@ -278,6 +272,8 @@ function exportMaps(){
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
 }
+$('#btnExport').addEventListener('click', exportMaps);
+
 $('#importBackup').addEventListener('change', async (e)=>{
   const f = e.target.files && e.target.files[0]; if(!f) return;
   try{
@@ -285,9 +281,9 @@ $('#importBackup').addEventListener('change', async (e)=>{
     const arr = JSON.parse(text);
     if(!Array.isArray(arr)) throw new Error('Formato non valido');
     saveMaps(arr);
-    toast('Backup importato');
+    toast(T('maps.toast.backup_imported','Backup importato'));
   }catch(err){
-    console.error(err); toast('Backup non valido', true);
+    console.error(err); toast(T('maps.toast.backup_invalid','Backup non valido'), true);
   }finally{
     e.target.value = '';
   }
@@ -298,7 +294,7 @@ let currentId = null;
 function openViewer(id){
   const m = loadMaps().find(x=>x.id===id); if(!m) return;
   currentId = id;
-  $('#viewerTitle').textContent = m.name || 'Mappa';
+  $('#viewerTitle').textContent = m.name || T('maps.viewer.title','Mappa');
   $('#viewerImg').src = m.dataUrl;
   $('#viewerInfo').textContent = `${m.w||'?'}×${m.h||'?'} — ${new Date(m.addedAt).toLocaleString()}`;
   $('#viewer').classList.add('open'); $('#viewer').setAttribute('aria-hidden','false');
@@ -319,9 +315,14 @@ $('#btnDelete').addEventListener('click', ()=>{
   deleteMap(currentId);
   closeViewer();
 });
+$('#btnClose').addEventListener('click', closeViewer);
 
 /* ========= INIT ========= */
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 render();
+
+/* Riadatta i testi quando cambia la lingua */
+window.addEventListener('i18n:change', ()=>{ render(); });
 </script>
 </body>
 </html>

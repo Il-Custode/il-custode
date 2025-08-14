@@ -1,97 +1,217 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Il Custode - Impostazioni</title>
   <style>
-    body {
-      font-family: 'Papyrus', fantasy;
-      margin: 0;
-      padding: 0;
-      color: #3e2f1c;
-      text-align: center;
-      background: url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
-      background-size: cover;
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family: system-ui, "Segoe UI", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      margin:0; padding:0; color:var(--inchiostro); text-align:center;
+      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
     }
-    .cornice {
-      border: 40px solid transparent;
-      -webkit-border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-      border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-      padding: 0;
-      min-height: 100vh;
-      box-sizing: border-box;
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
     }
-    header {
-      background-color: rgba(75, 54, 33, 0.85);
-      color: #fff8dc;
-      padding: 20px;
-      font-size: 28px;
-      border-bottom: 5px solid #4b3621;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
+    header{
+      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
+      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
     }
-    header img { height: 40px; vertical-align: middle; }
 
-    .container { padding: 20px; text-align: left; max-width: 1000px; margin: 0 auto; }
-
-    button {
-      background-color: #d2b48c;
-      border: 3px solid #4b3621;
-      padding: 10px 20px;
-      font-size: 18px;
-      font-family: 'Papyrus', fantasy;
-      cursor: pointer;
-      margin: 10px;
-      border-radius: 8px;
-    }
-    button:hover { background-color: #c2a178; }
-
-    /* Back button: NIENTE onclick. Lo gestisce l'iniezione in main.js */
+    /* Stile del back button iniettato da main.js */
     .back-btn{
-      position: absolute;
-      left: 20px;
-      top: 14px;
-      background-color: #a9745b;
-      color: #fff;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 8px;
+      position:absolute; left:20px; top:14px;
+      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
     }
     .back-btn:hover{ background:#8b5e47; }
 
-    .card{
-      background: rgba(255,248,220,.90);
-      border: 3px solid #4b3621;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 18px 0;
-      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    .container{ width:100%; max-width:760px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
+    .card{ background:rgba(255,248,220,.9); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:16px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
+    label{ display:block; font-weight:bold; margin:6px 0 8px; }
+
+    .card select,
+    .card .primary-btn{
+      width:100%;
+      padding:10px;
+      border:2px solid var(--legno);
+      border-radius:8px;
+      font-size:16px;
+      background:#fffdf3;
+      font-family:inherit;
     }
+    .primary-btn{
+      background:var(--pelle);
+      border:3px solid var(--legno);
+      cursor:pointer;
+    }
+    .primary-btn:hover{ background:var(--pelle-scura); }
+    .muted{ font-size:13px; opacity:.85; }
   </style>
 </head>
 <body>
   <div class="cornice">
     <header>
-      <!-- Il comportamento verrà gestito dall’iniezione auto di "goBackSmart" in main.js -->
-      <button class="back-btn">⬅ Indietro</button>
-      <img src="../assets/img/decor-sx.png" alt="Decorazione sinistra">
-      ⚙️ Impostazioni
-      <img src="../assets/img/decor-dx.png" alt="Decorazione destra">
+      <!-- Nessun back hardcoded: lo inietta main.js (installAutoBack) -->
+      <span data-i18n="settings.title">Impostazioni</span>
     </header>
 
     <div class="container">
-      <h2>Impostazioni</h2>
-      <div class="card">
-        <p>Configura le opzioni dell'applicazione.</p>
-        <!-- Qui aggiungeremo le vere impostazioni in seguito -->
-      </div>
+      <section class="card">
+        <h2 data-i18n="settings.language.title">Lingua</h2>
+        <label for="langSel" data-i18n="settings.language.choose">Scegli la tua lingua</label>
+        <select id="langSel">
+          <option value="it">Italiano</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="pt-BR">Português (Brasil)</option>
+          <option value="ja">日本語</option>
+          <option value="zh-Hans">简体中文</option>
+          <option value="ar">العربية</option>
+          <option value="ru">Русский</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ko">한국어</option>
+          <option value="tr">Türkçe</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="pl">Polski</option>
+          <option value="nl">Nederlands</option>
+          <option value="cs">Čeština</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+        <div style="height:8px;"></div>
+        <button id="applyBtn" class="primary-btn" data-i18n="settings.language.apply">Applica lingua</button>
+        <p class="muted" id="statusMsg"></p>
+      </section>
     </div>
   </div>
+
+  <!-- Carichiamo la libreria globale -->
+  <script defer src="../assets/js/i18n.js"></script>
+
+  <!-- Fallback i18n integrato per questa pagina -->
+  <script>
+    // Dizionario minimo per questa pagina (fallback se manca window.i18n)
+    const FALLBACK_I18N = {
+      'it': {'settings.title':'Impostazioni','settings.language.title':'Lingua','settings.language.choose':'Scegli la tua lingua','settings.language.apply':'Applica lingua','settings.language.applied':'Lingua applicata'},
+      'en': {'settings.title':'Settings','settings.language.title':'Language','settings.language.choose':'Choose your language','settings.language.apply':'Apply language','settings.language.applied':'Language applied'},
+      'de': {'settings.title':'Einstellungen','settings.language.title':'Sprache','settings.language.choose':'Wähle deine Sprache','settings.language.apply':'Sprache anwenden','settings.language.applied':'Sprache angewendet'},
+      'fr': {'settings.title':'Paramètres','settings.language.title':'Langue','settings.language.choose':'Choisissez votre langue','settings.language.apply':'Appliquer la langue','settings.language.applied':'Langue appliquée'},
+      'es': {'settings.title':'Configuración','settings.language.title':'Idioma','settings.language.choose':'Elige tu idioma','settings.language.apply':'Aplicar idioma','settings.language.applied':'Idioma aplicado'},
+      'pt-BR': {'settings.title':'Configurações','settings.language.title':'Idioma','settings.language.choose':'Escolha seu idioma','settings.language.apply':'Aplicar idioma','settings.language.applied':'Idioma aplicado'},
+      'ja': {'settings.title':'設定','settings.language.title':'言語','settings.language.choose':'言語を選択','settings.language.apply':'言語を適用','settings.language.applied':'言語を適用しました'},
+      'zh-Hans': {'settings.title':'设置','settings.language.title':'语言','settings.language.choose':'选择你的语言','settings.language.apply':'应用语言','settings.language.applied':'语言已应用'},
+      'ar': {'settings.title':'الإعدادات','settings.language.title':'اللغة','settings.language.choose':'اختر لغتك','settings.language.apply':'تطبيق اللغة','settings.language.applied':'تم تطبيق اللغة'},
+      'ru': {'settings.title':'Настройки','settings.language.title':'Язык','settings.language.choose':'Выберите язык','settings.language.apply':'Применить язык','settings.language.applied':'Язык применён'},
+      'hi': {'settings.title':'सेटिंग्स','settings.language.title':'भाषा','settings.language.choose':'अपनी भाषा चुनें','settings.language.apply':'भाषा लागू करें','settings.language.applied':'भाषा लागू की गई'},
+      'ko': {'settings.title':'설정','settings.language.title':'언어','settings.language.choose':'언어를 선택하세요','settings.language.apply':'언어 적용','settings.language.applied':'언어가 적용되었습니다'},
+      'tr': {'settings.title':'Ayarlar','settings.language.title':'Dil','settings.language.choose':'Dilini seç','settings.language.apply':'Dili uygula','settings.language.applied':'Dil uygulandı'},
+      'id': {'settings.title':'Pengaturan','settings.language.title':'Bahasa','settings.language.choose':'Pilih bahasamu','settings.language.apply':'Terapkan bahasa','settings.language.applied':'Bahasa diterapkan'},
+      'pl': {'settings.title':'Ustawienia','settings.language.title':'Język','settings.language.choose':'Wybierz swój język','settings.language.apply':'Zastosuj język','settings.language.applied':'Język zastosowano'},
+      'nl': {'settings.title':'Instellingen','settings.language.title':'Taal','settings.language.choose':'Kies je taal','settings.language.apply':'Taal toepassen','settings.language.applied':'Taal toegepast'},
+      'cs': {'settings.title':'Nastavení','settings.language.title':'Jazyk','settings.language.choose':'Vyberte svůj jazyk','settings.language.apply':'Použít jazyk','settings.language.applied':'Jazyk použit'},
+      'vi': {'settings.title':'Cài đặt','settings.language.title':'Ngôn ngữ','settings.language.choose':'Chọn ngôn ngữ của bạn','settings.language.apply':'Áp dụng ngôn ngữ','settings.language.applied':'Đã áp dụng ngôn ngữ'}
+    };
+
+    // Applica traduzioni data-i18n usando un dizionario flat { 'a.b.c': 'Testo' }
+    function applyTexts(root, dict){
+      root.querySelectorAll('[data-i18n]').forEach(el=>{
+        const key = el.getAttribute('data-i18n');
+        if (dict && dict[key]) el.textContent = dict[key];
+      });
+    }
+
+    // Fallback globale i18n se manca la libreria esterna
+    (function ensureI18n(){
+      if (!window.i18n) {
+        window.i18n = {
+          _lang: localStorage.getItem('custode.lang') || 'it',
+          getLang(){ return this._lang; },
+          async setLang(l){
+            this._lang = l || 'it';
+            localStorage.setItem('custode.lang', this._lang);
+            // emettiamo lo stesso evento usato dalla libreria principale
+            document.dispatchEvent(new Event('i18n:change'));
+          },
+          t(key){
+            const dict = FALLBACK_I18N[this._lang] || FALLBACK_I18N['en'];
+            return (dict && dict[key]) || key;
+          },
+          apply(root){
+            const dict = FALLBACK_I18N[this._lang] || FALLBACK_I18N['en'];
+            applyTexts(root || document, dict);
+          }
+        };
+      }
+    })();
+
+    // Funzione globale per applicare la lingua
+    async function applyLang(){
+      const sel = document.getElementById('langSel');
+      const status = document.getElementById('statusMsg');
+      const lang = sel.value;
+
+      // salva subito (utile anche in fallback)
+      localStorage.setItem('custode.lang', lang);
+      status.textContent = '...';
+
+      try{
+        if (window.i18n && typeof window.i18n.setLang === 'function') {
+          await window.i18n.setLang(lang);
+          // La pagina si aggiorna anche via i18n:change, ma applichiamo subito
+          if (typeof window.i18n.apply === 'function') window.i18n.apply(document);
+          // Titolo finestra
+          try { document.title = `Il Custode — ${window.i18n.t('settings.title') || 'Impostazioni'}`; } catch {}
+          // Messaggio conferma localizzato
+          status.textContent = window.i18n.t('settings.language.applied') || 'Lingua applicata';
+          setTimeout(()=> status.textContent = '', 900);
+        } else {
+          // Fallback estremo: ricarica
+          location.reload();
+        }
+      } catch(e){
+        location.reload();
+      }
+    }
+
+    // Init pagina
+    (function init(){
+      const start = ()=>{
+        // Applica traduzioni iniziali
+        window.i18n?.apply?.(document);
+        try {
+          document.title = `Il Custode — ${window.i18n.t('settings.title') || 'Impostazioni'}`;
+        } catch {}
+
+        // Imposta selezione lingua alla corrente
+        const sel = document.getElementById('langSel');
+        const current = (window.i18n && window.i18n.getLang && window.i18n.getLang())
+                        || localStorage.getItem('custode.lang') || 'it';
+        sel.value = current;
+        try { document.documentElement.setAttribute('lang', current); } catch {}
+
+        // Bind applica lingua (oltre all'Enter)
+        document.getElementById('applyBtn').addEventListener('click', applyLang);
+        document.addEventListener('keydown', (e)=>{ if(e.key==='Enter') applyLang(); });
+
+        // Quando cambia lingua altrove, questa pagina si aggiorna automaticamente
+        document.addEventListener('i18n:change', ()=>{
+          try {
+            const lang = (window.i18n?.getLang && window.i18n.getLang()) || localStorage.getItem('custode.lang') || 'it';
+            sel.value = lang;
+            document.documentElement.setAttribute('lang', lang);
+          } catch {}
+          window.i18n?.apply?.(document);
+          try { document.title = `Il Custode — ${window.i18n.t('settings.title') || 'Impostazioni'}`; } catch {}
+        });
+      };
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+      else start();
+    })();
+  </script>
 </body>
 </html>

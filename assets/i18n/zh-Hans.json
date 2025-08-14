@@ -1,0 +1,22 @@
+{
+  "common": { "back": "返回", "logout": "退出登录", "save": "保存", "saved": "已保存" },
+  "home": {
+    "authTitle": "登录或注册",
+    "labels": { "email": "邮箱", "password": "密码", "remember": "在此设备上记住我" },
+    "buttons": { "login": "登录", "signup": "注册" },
+    "select": "选择一个部分",
+    "tiles": {
+      "master": { "title": "主持模式", "desc": "战役与工具。" },
+      "player": { "title": "玩家模式", "desc": "连接到会话（MVP）。" },
+      "settings": { "title": "设置", "desc": "语言与偏好。" }
+    },
+    "wizardPhrases": [
+      "进入大厅前，请在羊皮纸上留下你的名字。",
+      "火已点燃。确认你的印记并入座。",
+      "输入你的凭据：地图不会等待迟到者。",
+      "告诉我你是谁，我将指引你：主持还是旅者？",
+      "钥匙很简单：一个词，一道式（你的密码）。"
+    ]
+  },
+  "settings": { "title": "设置", "language": { "title": "语言", "choose": "选择你的语言", "apply": "应用语言", "applied": "语言已应用" } }
+}

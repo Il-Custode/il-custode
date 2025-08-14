@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Kembali", "logout": "Keluar", "save": "Simpan", "saved": "Tersimpan" },
+  "home": {
+    "authTitle": "Masuk atau Daftar",
+    "labels": { "email": "Email", "password": "Kata sandi", "remember": "Ingat saya di perangkat ini" },
+    "buttons": { "login": "Masuk", "signup": "Daftar" },
+    "select": "Pilih bagian",
+    "tiles": {
+      "master": { "title": "Mode Master", "desc": "Kampanye dan alat." },
+      "player": { "title": "Mode Pemain", "desc": "Terhubung ke sesi (MVP)." },
+      "settings": { "title": "Pengaturan", "desc": "Bahasa dan preferensi." }
+    },
+    "wizardPhrases": [
+      "Sebelum masuk Aula, tulislah namamu di perkamen.",
+      "Api telah menyala. Kenali segelmu dan duduklah.",
+      "Masukkan kredensialmu: peta tidak menunggu yang terlambat.",
+      "Katakan siapa dirimu, akan kutunjukkan ruangan yang tepat: Master atau Pengelana?",
+      "Kuncinya sederhana: sebuah kata, sebuah rumus (kata sandimu)."
+    ]
+  },
+  "settings": { "title": "Pengaturan", "language": { "title": "Bahasa", "choose": "Pilih bahasamu", "apply": "Terapkan bahasa", "applied": "Bahasa diterapkan" } }
+}

@@ -1,0 +1,22 @@
+{
+  "common": { "back": "Retour", "logout": "Déconnexion", "save": "Enregistrer", "saved": "Enregistré" },
+  "home": {
+    "authTitle": "Se connecter ou S’inscrire",
+    "labels": { "email": "E-mail", "password": "Mot de passe", "remember": "Se souvenir de moi sur cet appareil" },
+    "buttons": { "login": "Connexion", "signup": "Inscription" },
+    "select": "Choisis une section",
+    "tiles": {
+      "master": { "title": "Mode Maître", "desc": "Campagnes et outils." },
+      "player": { "title": "Mode Joueur", "desc": "Se connecter à une session (MVP)." },
+      "settings": { "title": "Paramètres", "desc": "Langue et préférences." }
+    },
+    "wizardPhrases": [
+      "Avant d’entrer dans la Salle, écris ton nom sur le parchemin.",
+      "Le feu est allumé. Identifie ton sceau et assieds-toi à la table.",
+      "Saisis tes identifiants : les cartes n’attendent pas les retardataires.",
+      "Dis-moi qui tu es et je t’indiquerai la bonne salle : Maître ou Voyageur ?",
+      "La clé est simple : un mot, une formule (ton mot de passe)."
+    ]
+  },
+  "settings": { "title": "Paramètres", "language": { "title": "Langue", "choose": "Choisis ta langue", "apply": "Appliquer la langue", "applied": "Langue appliquée" } }
+}

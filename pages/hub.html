@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Il Custode - Community Hub</title>
+  <title data-i18n="hub.title">Il Custode - Community Hub</title>
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
     *{ box-sizing:border-box }
@@ -18,12 +18,14 @@
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
       border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
+      padding-left:80px; /* spazio per il back */
     }
     .back-btn{
       position:absolute; left:20px; top:14px;
       background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
     }
     .back-btn:hover{ background:#8b5e47; }
+
     .container{ width:100%; max-width:1200px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
 
     .row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; }
@@ -42,7 +44,7 @@
       width:100%; font-family:'Papyrus', fantasy; border:2px solid var(--legno); border-radius:8px; padding:8px; background:rgba(255,255,255,.85);
     }
     textarea{ min-height:100px; resize:vertical; }
-    .chip{ display:inline-block; padding:2px 8px; border-radius:999px; border:2px solid var(--legno); background:rgba(255,255,255,.85); font-size:12px; }
+    .chip{ display:inline-block; padding:2px 8px; border-radius:999px; border:2px solid var(--legno); background:rgba(255,255,255,.85); font-size:12px; text-transform:capitalize; }
     .actions{ display:flex; gap:8px; flex-wrap:wrap; }
 
     .toast{ position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000; }
@@ -52,8 +54,8 @@
 <body>
 <div class="cornice">
   <header>
-    <button class="back-btn" onclick="history.back()">⬅ Indietro</button>
-    📣 Community Hub
+    <button class="back-btn" type="button" data-i18n="common.back">⬅ Indietro</button>
+    <span data-i18n="hub.header">📣 Community Hub</span>
   </header>
 
   <div class="container">
@@ -61,99 +63,138 @@
     <section class="card">
       <div class="row">
         <div style="flex:1 1 260px">
-          <label for="q">Cerca</label>
-          <input id="q" placeholder="titolo o testo..."/>
+          <label for="q" data-i18n="hub.filter.search_label">Cerca</label>
+          <input id="q" data-i18n-placeholder="hub.filter.search_ph" placeholder="titolo o testo..."/>
         </div>
         <div>
-          <label for="cat">Categoria</label>
+          <label for="cat" data-i18n="hub.filter.category_label">Categoria</label>
           <select id="cat">
-            <option value="">Tutte</option>
-            <option value="mappe">Mappe</option>
-            <option value="mostri">Mostri</option>
-            <option value="quest">Quest</option>
-            <option value="regole">Regole</option>
-            <option value="altro">Altro</option>
+            <option value="" data-i18n="hub.cat.all">Tutte</option>
+            <option value="mappe" data-i18n="hub.cat.mappe">Mappe</option>
+            <option value="mostri" data-i18n="hub.cat.mostri">Mostri</option>
+            <option value="quest" data-i18n="hub.cat.quest">Quest</option>
+            <option value="regole" data-i18n="hub.cat.regole">Regole</option>
+            <option value="altro" data-i18n="hub.cat.altro">Altro</option>
           </select>
         </div>
         <div class="actions">
-          <button class="btn" id="btnRefresh">Aggiorna</button>
+          <button class="btn" id="btnRefresh" data-i18n="hub.filter.refresh">Aggiorna</button>
         </div>
       </div>
     </section>
 
     <!-- Nuovo post (solo loggato) -->
     <section class="card" id="newPostCard" style="display:none;">
-      <h3>Nuovo post</h3>
+      <h3 data-i18n="hub.new.title">Nuovo post</h3>
       <div class="row">
         <div style="flex:1 1 260px">
-          <label for="title">Titolo</label>
-          <input id="title" placeholder="Es. Mappa catacombe livello 2"/>
+          <label for="title" data-i18n="hub.new.field_title">Titolo</label>
+          <input id="title" data-i18n-placeholder="hub.new.field_title_ph" placeholder="Es. Mappa catacombe livello 2"/>
         </div>
         <div>
-          <label for="category">Categoria</label>
+          <label for="category" data-i18n="hub.new.field_category">Categoria</label>
           <select id="category">
-            <option value="mappe">Mappe</option>
-            <option value="mostri">Mostri</option>
-            <option value="quest">Quest</option>
-            <option value="regole">Regole</option>
-            <option value="altro">Altro</option>
+            <option value="mappe"  data-i18n="hub.cat.mappe">Mappe</option>
+            <option value="mostri" data-i18n="hub.cat.mostri">Mostri</option>
+            <option value="quest"  data-i18n="hub.cat.quest">Quest</option>
+            <option value="regole" data-i18n="hub.cat.regole">Regole</option>
+            <option value="altro"  data-i18n="hub.cat.altro">Altro</option>
           </select>
         </div>
       </div>
       <div style="margin-top:10px;">
-        <label for="body">Descrizione</label>
-        <textarea id="body" placeholder="Dettagli, consigli, come usarla..."></textarea>
+        <label for="body" data-i18n="hub.new.field_body">Descrizione</label>
+        <textarea id="body" data-i18n-placeholder="hub.new.field_body_ph" placeholder="Dettagli, consigli, come usarla..."></textarea>
       </div>
       <div style="margin-top:10px;">
-        <label class="btn" for="asset">Allega immagine…</label>
+        <label class="btn" for="asset" data-i18n="hub.new.attach">Allega immagine…</label>
         <input id="asset" type="file" accept="image/*" style="display:none;"/>
         <span class="muted" id="assetName">—</span>
       </div>
       <div class="actions" style="margin-top:10px;">
-        <button class="btn" id="btnPublish">Pubblica</button>
+        <button class="btn" id="btnPublish" data-i18n="hub.new.publish">Pubblica</button>
       </div>
-      <p class="muted" id="postHint" style="margin-top:10px;"></p>
+      <p class="muted" id="postHint"></p>
     </section>
 
     <!-- Lista -->
     <section class="card">
-      <h3>Post recenti</h3>
+      <h3 data-i18n="hub.list.title">Post recenti</h3>
       <div id="grid" class="grid"></div>
-      <p id="empty" class="muted" style="display:none; margin-top:8px;">Nessun post trovato.</p>
+      <p id="empty" class="muted" style="display:none; margin-top:8px;" data-i18n="hub.list.empty">Nessun post trovato.</p>
     </section>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
+<!-- i18n -->
+<script src="../assets/js/i18n.js"></script>
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Usa le stesse costanti dell'index
+  /* =========================
+     BACK: prima prova a tornare davvero al menu,
+     altrimenti fallback al menu.
+     ========================= */
+  function cameFromMenu(){
+    try{
+      const ref = document.referrer || '';
+      if (!ref) return false;
+      const url = new URL(ref, location.href);
+      return url.pathname.endsWith('/menu.html');
+    }catch{ return false; }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const back = document.querySelector('.back-btn');
+    if (!back) return;
+
+    back.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Se referrer è il menu, torna esattamente indietro (una sola pagina).
+      if (cameFromMenu() && history.length > 1) {
+        history.back();
+        return;
+      }
+
+      // Fallback: vai al menu (percorso relativo da /pages/)
+      try { location.replace('../menu.html'); } catch { location.href = '../menu.html'; }
+    });
+  });
+
+  // ====== Supabase / Hub ======
   const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const $ = (s)=>document.querySelector(s);
-  const grid = $('#grid'); const empty = $('#empty');
-  const newPostCard = $('#newPostCard');
-  const postHint = $('#postHint');
-  const assetInput = $('#asset'); const assetName = $('#assetName');
+  const grid = $('#grid'), empty = $('#empty');
+  const newPostCard = $('#newPostCard'), postHint = $('#postHint');
+  const assetInput = $('#asset'), assetName = $('#assetName');
 
+  function t(key, fallback){ try{ return (window.i18n && window.i18n.t) ? window.i18n.t(key) : (fallback||key); }catch{ return fallback||key; } }
   function toast(msg, err=false){
-    const t = document.querySelector('#toast');
-    t.textContent = msg;
-    t.className = 'toast' + (err ? ' error' : '');
-    t.style.display = 'block';
-    setTimeout(()=> t.style.display='none', 1600);
+    const tEl = $('#toast');
+    tEl.textContent = msg;
+    tEl.className = 'toast' + (err ? ' error' : '');
+    tEl.style.display = 'block';
+    setTimeout(()=> tEl.style.display='none', 1600);
   }
 
-  assetInput.addEventListener('change', ()=>{
-    assetName.textContent = assetInput.files?.[0]?.name || '—';
-  });
+  assetInput.addEventListener('change', ()=>{ assetName.textContent = assetInput.files?.[0]?.name || '—'; });
 
-  async function getSession(){
-    const { data } = await supabase.auth.getSession();
-    return data?.session || null;
+  async function getSession(){ const { data } = await supabase.auth.getSession(); return data?.session || null; }
+
+  function catLabel(code){
+    switch(code){
+      case 'mappe':  return t('hub.cat.mappe','Mappe');
+      case 'mostri': return t('hub.cat.mostri','Mostri');
+      case 'quest':  return t('hub.cat.quest','Quest');
+      case 'regole': return t('hub.cat.regole','Regole');
+      default:       return t('hub.cat.altro','Altro');
+    }
   }
 
   async function loadPosts(){
@@ -164,7 +205,7 @@
     if (cat) query = query.eq('category', cat);
 
     const { data, error } = await query;
-    if (error) { console.error(error); toast('Errore caricamento', true); return; }
+    if (error) { console.error(error); toast(t('hub.toast.load_error','Errore caricamento'), true); return; }
 
     let list = data || [];
     if (q) {
@@ -174,7 +215,6 @@
         (p.body || '').toLowerCase().includes(ql)
       );
     }
-
     render(list);
   }
 
@@ -186,14 +226,19 @@
     list.forEach(p=>{
       const card = document.createElement('div');
       card.className = 'tile';
+      const title = escapeHtml(p.title||t('hub.card.no_title','Senza titolo'));
+      const catTxt = catLabel(p.category||'altro');
+      const body   = (p.body||'');
+      const bodySafe = escapeHtml(body);
+      const bodyCut  = bodySafe.length>180 ? (bodySafe.slice(0,180)+'…') : bodySafe;
       card.innerHTML = `
-        ${p.asset_url ? `<img class="thumb" src="${p.asset_url}" alt="${escapeHtml(p.title||'Post')}">` : ''}
+        ${p.asset_url ? `<img class="thumb" src="${p.asset_url}" alt="${title}">` : ''}
         <div class="tile-body">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-            <strong>${escapeHtml(p.title||'Senza titolo')}</strong>
-            <span class="chip">${escapeHtml(p.category||'altro')}</span>
+            <strong>${title}</strong>
+            <span class="chip">${catTxt}</span>
           </div>
-          ${p.body ? `<div class="muted">${escapeHtml(p.body).slice(0,180)}${p.body.length>180?'…':''}</div>` : ''}
+          ${body ? `<div class="muted">${bodyCut}</div>` : ''}
           <div class="actions" style="margin-top:6px;">
             <button class="btn" data-like="${p.id}">👍 ${p.likes_count||0}</button>
           </div>
@@ -209,12 +254,12 @@
     if (likeBtn){
       const postId = likeBtn.getAttribute('data-like');
       const session = await getSession();
-      if (!session){ toast('Serve il login per mettere Mi piace', true); return; }
+      if (!session){ toast(t('hub.toast.like_need_login','Serve il login per mettere Mi piace'), true); return; }
       const uid = session.user.id;
 
       const { error: likeErr } = await supabase.from('hub_likes').insert({ user_id: uid, post_id: postId });
       if (likeErr && !String(likeErr.message||'').toLowerCase().includes('duplicate')) {
-        console.error(likeErr); toast('Errore like', true); return;
+        console.error(likeErr); toast(t('hub.toast.like_error','Errore like'), true); return;
       }
       await loadPosts();
     }
@@ -223,21 +268,21 @@
   function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
   // Pubblica
-  $('#btnPublish').addEventListener('click', async ()=>{
+  document.getElementById('btnPublish').addEventListener('click', async ()=>{
     const session = await getSession();
-    if (!session){ toast('Devi essere autenticato per pubblicare', true); return; }
+    if (!session){ toast(t('hub.toast.publish_need_login','Devi essere autenticato per pubblicare'), true); return; }
 
-    const title = ($('#title').value||'').trim();
-    const category = $('#category').value || 'altro';
-    const body = ($('#body').value||'').trim();
-    if (!title){ toast('Titolo obbligatorio', true); return; }
+    const title = (document.getElementById('title').value||'').trim();
+    const category = document.getElementById('category').value || 'altro';
+    const body = (document.getElementById('body').value||'').trim();
+    if (!title){ toast(t('hub.toast.title_required','Titolo obbligatorio'), true); return; }
 
     let asset_url = null;
     const file = assetInput.files?.[0];
     if (file){
       const path = `${session.user.id}/${Date.now()}_${file.name}`;
       const up = await supabase.storage.from('hub-assets').upload(path, file, { upsert: false });
-      if (up.error){ console.error(up.error); toast('Upload fallito', true); return; }
+      if (up.error){ console.error(up.error); toast(t('hub.toast.upload_failed','Upload fallito'), true); return; }
       const pub = supabase.storage.from('hub-assets').getPublicUrl(path);
       asset_url = pub.data.publicUrl;
     }
@@ -245,10 +290,10 @@
     const { error } = await supabase.from('hub_posts').insert({
       author: session.user.id, title, category, body, asset_url
     });
-    if (error){ console.error(error); toast('Errore pubblicazione', true); return; }
+    if (error){ console.error(error); toast(t('hub.toast.publish_error','Errore pubblicazione'), true); return; }
 
-    $('#title').value=''; $('#body').value=''; assetInput.value=''; assetName.textContent='—'; $('#category').value='mappe';
-    toast('Pubblicato!');
+    document.getElementById('title').value=''; document.getElementById('body').value=''; assetInput.value=''; assetName.textContent='—'; document.getElementById('category').value='mappe';
+    toast(t('hub.toast.published','Pubblicato!'));
     await loadPosts();
   });
 
@@ -257,15 +302,25 @@
     const session = await getSession();
     if (session){
       newPostCard.style.display = '';
-      postHint.textContent = `Pubblicherai come: ${session.user.email || session.user.id}`;
+      const who = session.user.email || session.user.id;
+      postHint.textContent = t('hub.new.hint_user','Pubblicherai come: ') + who;
     } else {
       newPostCard.style.display = 'none';
-      postHint.textContent = 'Accedi dalla Home per pubblicare o mettere "Mi piace".';
+      postHint.textContent = t('hub.new.hint_login','Accedi dalla Home per pubblicare o mettere "Mi piace".');
     }
+
+    if (window.i18n && window.i18n.apply) window.i18n.apply(document);
+
     await loadPosts();
-    $('#btnRefresh').addEventListener('click', loadPosts);
-    $('#q').addEventListener('input', ()=>{ clearTimeout(window.__t); window.__t=setTimeout(loadPosts, 300); });
-    $('#cat').addEventListener('change', loadPosts);
+
+    document.getElementById('btnRefresh').addEventListener('click', loadPosts);
+    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__t); window.__t=setTimeout(loadPosts, 300); });
+    document.getElementById('cat').addEventListener('change', loadPosts);
+
+    window.addEventListener('i18n:change', ()=>{ 
+      if (window.i18n && window.i18n.apply) window.i18n.apply(document);
+      loadPosts();
+    });
   })();
 </script>
 </body>
