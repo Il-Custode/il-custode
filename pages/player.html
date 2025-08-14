@@ -3,124 +3,209 @@
 <head>
   <meta charset="UTF-8">
   <title>Giocatore — Il Custode</title>
-  <link rel="stylesheet" href="../styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    .app-header {
-      display: flex;
-      align-items: center;
-      background-color: #5c3b2e;
-      color: white;
-      padding: 10px;
+    :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
+    *{ box-sizing:border-box }
+    body{
+      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro);
+      text-align:center;
+      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
     }
-    .back-btn {
-      background-color: #a9745b;
-      color: white;
-      font-size: 16px;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 15px;
+    .cornice{
+      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
     }
-    .back-btn:hover {
-      background-color: #8b5e47;
+
+    /* HEADER a griglia: [btn] [titolo centrato] [spazio] */
+    .app-header{
+      display:grid; grid-template-columns:120px 1fr 120px;
+      align-items:center;
+      background:rgba(75,54,33,.85); color:#fff8dc;
+      padding:12px 16px; font-size:24px; border-bottom:5px solid var(--legno);
+      position:relative;
     }
-    .app-header h2 {
-      flex: 1;
-      margin: 0;
+    /* Annulla lo stile "absolute" iniettato globalmente */
+    .app-header .back-btn{
+      position:static !important;   /* niente top/left */
+      justify-self:start;
+      background:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer;
+      padding:8px 12px; border-radius:8px;
     }
+    .app-header .back-btn:hover{ background:#8b5e47; }
+    .app-header h2{
+      grid-column:2; margin:0; text-align:center; pointer-events:none;
+    }
+
+    .content{ width:100%; max-width:900px; margin:0 auto; padding:16px; text-align:left; }
+    .panel{ background:rgba(255,248,220,.9); border:3px solid var(--legno); border-radius:12px; padding:14px; margin:14px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
+    .grid{ display:grid; gap:10px; grid-template-columns:1fr; }
+    @media(min-width:760px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    label{ font-weight:bold; margin:6px 0 2px; }
+    input{
+      width:100%; padding:10px; border:2px solid var(--legno); border-radius:8px; font-size:16px; font-family:'Papyrus', fantasy; background:#fffdf3;
+    }
+    button{ background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy; }
+    button:hover{ background:var(--pelle-scura); }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    #chatLog{ height:280px; overflow:auto; border:2px dashed var(--legno); border-radius:10px; padding:8px; background:rgba(255,255,255,.7); }
+    .status{ font-size:14px; opacity:.9; }
   </style>
 </head>
 <body>
-  <header class="app-header">
-    <button class="back-btn" onclick="window.history.back()">⬅ Indietro</button>
-    <h2>Giocatore — Il Custode</h2>
-  </header>
+  <div class="cornice">
+    <header class="app-header">
+      <button class="back-btn">⬅ Indietro</button>
+      <h2>Giocatore — Il Custode</h2>
+      <!-- colonna 3 rimane vuota come “spacer” -->
+    </header>
 
-  <main class="content">
-    <section class="panel">
-      <h3>Connessione</h3>
-      <div id="connInfo"></div>
-      <div id="connStatus" class="status"></div>
-    </section>
+    <main class="content">
+      <!-- FORM CONNESSIONE (mostrato se manca il profilo) -->
+      <section id="setupCard" class="panel" style="display:none;">
+        <h3>Connetti al tavolo</h3>
+        <div class="grid">
+          <div>
+            <label for="host">Host / IP</label>
+            <input id="host" placeholder="es. 192.168.1.50 o localhost">
+          </div>
+          <div>
+            <label for="port">Porta</label>
+            <input id="port" type="number" placeholder="8080" value="8080">
+          </div>
+          <div>
+            <label for="campaignId">ID Campagna</label>
+            <input id="campaignId" placeholder="es. default">
+          </div>
+          <div>
+            <label for="name">Il tuo nome</label>
+            <input id="name" placeholder="es. Giocatore-1">
+          </div>
+          <div style="grid-column:1 / -1;">
+            <label for="password">Password Master</label>
+            <input id="password" type="password" placeholder="fornita dal Master">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button id="saveProfile" type="button">Salva profilo</button>
+          <button id="connectNow" type="button">Connetti</button>
+          <button id="clearProfile" type="button" style="margin-left:auto;">Cancella profilo</button>
+        </div>
+        <p id="setupStatus" class="status"></p>
+      </section>
 
-    <section class="panel">
-      <h3>Chat</h3>
-      <div id="chatLog" style="height:240px; overflow:auto;"></div>
-      <div class="row">
-        <input id="chatMsg" placeholder="Scrivi un messaggio..." />
-        <button id="sendChat">Invia</button>
-      </div>
-    </section>
-  </main>
+      <!-- INFO CONNESSIONE + CHAT (mostrato quando c'è il profilo) -->
+      <section id="connCard" class="panel" style="display:none;">
+        <h3>Connessione</h3>
+        <div id="connInfo" class="status"></div>
+        <div id="connStatus" class="status"></div>
+      </section>
 
-  <!-- Socket.IO client locale (no internet) -->
-  <script src="../node_modules/socket.io-client/dist/socket.io.min.js"></script>
+      <section id="chatCard" class="panel" style="display:none;">
+        <h3>Chat</h3>
+        <div id="chatLog"></div>
+        <div class="row" style="margin-top:8px;">
+          <input id="chatMsg" type="text" placeholder="Scrivi un messaggio..." />
+          <button id="sendChat" type="button">Invia</button>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
+    // ===== Utilities =====
     const $ = (s)=>document.querySelector(s);
-    const io = window.io;
-    let socket;
+    const LS_KEY = 'custode.lastConnection';
+    function loadProfile(){ try{ const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; }catch{ return null; } }
+    function saveProfile(p){ localStorage.setItem(LS_KEY, JSON.stringify(p)); }
+    function clearProfile(){ localStorage.removeItem(LS_KEY); }
 
-    function loadLast() {
-      try {
-        const raw = localStorage.getItem('custode.lastConnection');
-        return raw ? JSON.parse(raw) : null;
-      } catch (e) {
-        return null;
-      }
-    }
+    function showSetup(){ $('#setupCard').style.display=''; $('#connCard').style.display='none'; $('#chatCard').style.display='none'; }
+    function showChat(){ $('#setupCard').style.display='none'; $('#connCard').style.display=''; $('#chatCard').style.display=''; }
 
-    function appendLog(from, text) {
-      const box = $('#chatLog');
-      const line = document.createElement('div');
+    // ===== WebSocket =====
+    let ws = null;
+    function appendLog(from, text){
+      const box = $('#chatLog'); const div = document.createElement('div');
       const time = new Date().toLocaleTimeString();
-      line.textContent = `[${time}] ${from}: ${text}`;
-      box.appendChild(line);
-      box.scrollTop = box.scrollHeight;
+      div.textContent = `[${time}] ${from}: ${text}`;
+      box.appendChild(div); box.scrollTop = box.scrollHeight;
     }
 
-    async function connect() {
-      const last = loadLast();
-      if (!last) {
-        $('#connStatus').textContent = 'Nessun profilo salvato. Torna alla Home e premi "Connetti" prima.';
-        return;
-      }
+    function connect(){
+      const last = loadProfile();
+      if(!last){ showSetup(); $('#setupStatus').textContent='Compila i dati e premi "Connetti".'; return; }
 
-      $('#connInfo').textContent = `Campagna: ${last.campaignId} | Nome: ${last.name} | ${last.host}:${last.port}`;
+      showChat();
+      const host = last.host || 'localhost';
+      const port = last.port || 8080;
+      const url  = `ws://${host}:${port}`;
+      const name = last.name || 'Giocatore';
+      const password = last.password || '';
+      const campaignId = last.campaignId || 'default';
 
-      socket = io(`ws://${last.host}:${last.port}`, {
-        auth: {
-          token: last.password || '',
-          campaignId: last.campaignId || 'default',
-          role: 'player',
-          name: last.name || 'Giocatore'
+      $('#connInfo').textContent = `Campagna: ${campaignId} | Nome: ${name} | ${host}:${port}`;
+      $('#connStatus').textContent = 'Connessione in corso…';
+
+      try{ ws = new WebSocket(url); }
+      catch(e){ $('#connStatus').textContent = 'Errore apertura socket.'; return; }
+
+      ws.addEventListener('open', ()=>{
+        $('#connStatus').textContent = 'Connesso. Autenticazione…';
+        ws.send(JSON.stringify({ type:'auth', password }));
+      });
+      ws.addEventListener('message', (ev)=>{
+        let msg; try{ msg = JSON.parse(ev.data); }catch{ return; }
+        if (msg.type === 'auth'){
+          if (msg.success){ $('#connStatus').textContent='Autenticato.'; appendLog('Sistema', `Benvenuto ${name}!`); }
+          else { $('#connStatus').textContent='Autenticazione fallita.'; try{ ws.close(); }catch{} }
+          return;
         }
+        if (msg.type === 'chat'){ appendLog('Tavolo', msg.message || ''); }
       });
-
-      socket.on('connect', () => { $('#connStatus').textContent = 'Connesso.'; });
-      socket.on('disconnect', () => { $('#connStatus').textContent = 'Disconnesso. Riprovo...'; });
-      socket.on('connect_error', (e) => { $('#connStatus').textContent = `Errore: ${e.message}`; });
-
-      socket.on('auth:error', (e) => { $('#connStatus').textContent = `Autenticazione fallita: ${e && e.message ? e.message : 'Errore'}`; });
-      socket.on('auth:ok', () => { $('#connStatus').textContent = 'Autenticato.'; });
-
-      socket.on('chat:new', (pkt) => {
-        appendLog(pkt.from && pkt.from.name ? pkt.from.name : 'Sconosciuto', pkt.text || '');
-      });
-
-      $('#sendChat').addEventListener('click', () => {
-        const txt = ($('#chatMsg').value || '').trim();
-        if (!txt) return;
-        socket.emit('chat:send', txt);
-        $('#chatMsg').value = '';
-      });
-      $('#chatMsg').addEventListener('keydown', (e)=>{
-        if (e.key === 'Enter') $('#sendChat').click();
-      });
+      ws.addEventListener('close', ()=>{ $('#connStatus').textContent = 'Disconnesso.'; });
+      ws.addEventListener('error', ()=>{ $('#connStatus').textContent = 'Errore di connessione.'; });
     }
 
-    connect();
+    document.addEventListener('DOMContentLoaded', ()=>{
+      loadProfile() ? showChat() : showSetup();
+      connect();
+
+      $('#saveProfile').addEventListener('click', ()=>{
+        const p = {
+          host: ($('#host').value||'').trim(),
+          port: parseInt($('#port').value||'8080',10)||8080,
+          campaignId: ($('#campaignId').value||'').trim()||'default',
+          name: ($('#name').value||'').trim()||'Giocatore',
+          password: ($('#password').value||'').trim()
+        };
+        if(!p.host || !p.password){ $('#setupStatus').textContent='Host e Password sono obbligatori.'; return; }
+        saveProfile(p); $('#setupStatus').textContent='Profilo salvato.';
+      });
+
+      $('#connectNow').addEventListener('click', ()=>{
+        const p = {
+          host: ($('#host').value||'').trim(),
+          port: parseInt($('#port').value||'8080',10)||8080,
+          campaignId: ($('#campaignId').value||'').trim()||'default',
+          name: ($('#name').value||'').trim()||'Giocatore',
+          password: ($('#password').value||'').trim()
+        };
+        if(p.host && p.password) saveProfile(p);
+        connect();
+      });
+
+      $('#clearProfile').addEventListener('click', ()=>{
+        clearProfile(); $('#setupStatus').textContent='Profilo rimosso.'; showSetup();
+      });
+
+      $('#sendChat').addEventListener('click', ()=>{
+        const txt = ($('#chatMsg').value||'').trim(); if(!txt) return;
+        if(!ws || ws.readyState !== WebSocket.OPEN){ appendLog('Sistema','Non connesso al server.'); return; }
+        try{ ws.send(JSON.stringify({ type:'chat', message: txt })); appendLog('Tu', txt); $('#chatMsg').value=''; }catch{}
+      });
+      $('#chatMsg').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#sendChat').click(); });
+    });
   </script>
 </body>
 </html>

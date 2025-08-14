@@ -1,74 +1,97 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Il Custode - Impostazioni</title>
-    <style>
-        body {
-            font-family: 'Papyrus', fantasy;
-            margin: 0;
-            padding: 0;
-            color: #3e2f1c;
-            text-align: center;
-            background: url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
-        .cornice {
-            border: 40px solid transparent;
-            -webkit-border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-            border-image: url('../assets/img/cornice-legno.png') 40 stretch;
-            padding: 0;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        header {
-            background-color: rgba(75, 54, 33, 0.85);
-            color: #fff8dc;
-            padding: 20px;
-            font-size: 28px;
-            border-bottom: 5px solid #4b3621;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        header img { height: 40px; vertical-align: middle; }
-        .container { padding: 20px; }
-        button {
-            background-color: #d2b48c;
-            border: 3px solid #4b3621;
-            padding: 10px 20px;
-            font-size: 18px;
-            font-family: 'Papyrus', fantasy;
-            cursor: pointer;
-            margin: 10px;
-            border-radius: 8px;
-        }
-        button:hover { background-color: #c2a178; }
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            background-color: #a9745b;
-            color: white;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Custode - Impostazioni</title>
+  <style>
+    body {
+      font-family: 'Papyrus', fantasy;
+      margin: 0;
+      padding: 0;
+      color: #3e2f1c;
+      text-align: center;
+      background: url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .cornice {
+      border: 40px solid transparent;
+      -webkit-border-image: url('../assets/img/cornice-legno.png') 40 stretch;
+      border-image: url('../assets/img/cornice-legno.png') 40 stretch;
+      padding: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    header {
+      background-color: rgba(75, 54, 33, 0.85);
+      color: #fff8dc;
+      padding: 20px;
+      font-size: 28px;
+      border-bottom: 5px solid #4b3621;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    header img { height: 40px; vertical-align: middle; }
+
+    .container { padding: 20px; text-align: left; max-width: 1000px; margin: 0 auto; }
+
+    button {
+      background-color: #d2b48c;
+      border: 3px solid #4b3621;
+      padding: 10px 20px;
+      font-size: 18px;
+      font-family: 'Papyrus', fantasy;
+      cursor: pointer;
+      margin: 10px;
+      border-radius: 8px;
+    }
+    button:hover { background-color: #c2a178; }
+
+    /* Back button: NIENTE onclick. Lo gestisce l'iniezione in main.js */
+    .back-btn{
+      position: absolute;
+      left: 20px;
+      top: 14px;
+      background-color: #a9745b;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .back-btn:hover{ background:#8b5e47; }
+
+    .card{
+      background: rgba(255,248,220,.90);
+      border: 3px solid #4b3621;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 18px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    }
+  </style>
 </head>
 <body>
-    <div class="cornice">
-        <header>
-            <button class="back-btn" onclick="window.location.href='master.html'">⬅ Indietro</button>
-            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="Decorazione sinistra">
-            ⚙️ Impostazioni
-            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="Decorazione destra">
-        </header>
-        <div class="container">
-            <h2>Impostazioni</h2>
-            <p>Configura le opzioni dell'applicazione.</p>
-        </div>
+  <div class="cornice">
+    <header>
+      <!-- Il comportamento verrà gestito dall’iniezione auto di "goBackSmart" in main.js -->
+      <button class="back-btn">⬅ Indietro</button>
+      <img src="../assets/img/decor-sx.png" alt="Decorazione sinistra">
+      ⚙️ Impostazioni
+      <img src="../assets/img/decor-dx.png" alt="Decorazione destra">
+    </header>
+
+    <div class="container">
+      <h2>Impostazioni</h2>
+      <div class="card">
+        <p>Configura le opzioni dell'applicazione.</p>
+        <!-- Qui aggiungeremo le vere impostazioni in seguito -->
+      </div>
     </div>
+  </div>
 </body>
 </html>
