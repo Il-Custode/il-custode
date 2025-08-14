@@ -59,14 +59,18 @@
       padding:12px 16px; font-size:24px; border-bottom:5px solid var(--legno);
       position:relative;
     }
-    /* Disattiva l'absolute per eventuale stile back globale */
-    .app-header .back-btn{
+    /* Nostro bottone locale (classe diversa dai globali) */
+    .app-header .back-btn-local{
       position:static !important;
       justify-self:start;
       background:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer;
       padding:8px 12px; border-radius:8px;
     }
-    .app-header .back-btn:hover{ background:#8b5e47; }
+    .app-header .back-btn-local:hover{ background:#8b5e47; }
+
+    /* Se per caso un .back-btn globale finisce dentro l'header, nascondilo */
+    .app-header .back-btn{ display:none !important; }
+
     .app-header h2{
       grid-column:2; margin:0; text-align:center; pointer-events:none;
     }
@@ -89,7 +93,8 @@
 <body>
   <div class="cornice">
     <header class="app-header">
-      <button class="back-btn" id="btnBack">⬅ Indietro</button>
+      <!-- Classe locale per evitare handler e stili globali -->
+      <button class="back-btn-local" id="btnBack">⬅ Indietro</button>
       <h2>Giocatore — Il Custode</h2>
       <!-- colonna 3 rimane vuota come “spacer” -->
     </header>
@@ -147,19 +152,91 @@
   </div>
 
   <script>
-    // ===== BACK: una pagina indietro o menu =====
-    (function(){
-      const back = document.getElementById('btnBack');
-      function goBack(){
-        try{
-          if (history.length > 1) { history.back(); return; }
-        }catch{}
-        location.href = '../menu.html';
+    /* ===== Elimina eventuali bottoni "globali" duplicati ===== */
+    function nukeForeignBackButtons() {
+      try{
+        document.querySelectorAll('.back-btn').forEach(el => {
+          if (!el.classList.contains('back-btn-local')) el.remove();
+        });
+      }catch{}
+    }
+    // Osserva in caso venissero iniettati dopo
+    const __backObserver = new MutationObserver((muts)=>{
+      for (const m of muts){
+        m.addedNodes && m.addedNodes.forEach(n=>{
+          if (n.nodeType===1 && n.matches && n.matches('.back-btn') && !n.classList.contains('back-btn-local')){
+            try{ n.remove(); }catch{}
+          }
+        });
       }
-      back?.addEventListener('click', (e)=>{ e.preventDefault(); goBack(); });
+    });
+    document.addEventListener('DOMContentLoaded', ()=>{
+      nukeForeignBackButtons();
+      try{ __backObserver.observe(document.documentElement, { childList:true, subtree:true }); }catch{}
+    });
+
+    /* ========== SMART BACK (come Hub) ========== */
+    (function trackNav(){
+      try{
+        const here = location.pathname + location.search + location.hash;
+        const last = sessionStorage.getItem('custode.last') || '';
+        if (last && last !== here) sessionStorage.setItem('custode.prev', last);
+        sessionStorage.setItem('custode.last', here);
+      }catch{}
     })();
 
-    // ===== Utilities =====
+    function sameOrigin(urlStr){
+      try{ return new URL(urlStr, location.href).origin === location.origin; }catch{ return false; }
+    }
+
+    function goBackSmart(){
+      let didNavigate = false;
+      const before = location.href;
+
+      const timer = setTimeout(()=>{
+        if (didNavigate) return;
+        try{
+          const here = location.pathname + location.search + location.hash;
+          const prev = sessionStorage.getItem('custode.prev');
+          if (prev && prev !== here){ location.href = prev; return; }
+        }catch{}
+        if (document.referrer && sameOrigin(document.referrer) && document.referrer !== before){
+          location.href = document.referrer; return;
+        }
+        location.href = '../menu.html';
+      }, 350);
+
+      try{
+        if (history.length > 1){
+          history.back();
+          window.addEventListener('popstate', ()=>{ didNavigate = true; clearTimeout(timer); }, { once:true });
+        } else {
+          clearTimeout(timer);
+          const here = location.pathname + location.search + location.hash;
+          const prev = sessionStorage.getItem('custode.prev');
+          if (prev && prev !== here){ location.href = prev; return; }
+          if (document.referrer && sameOrigin(document.referrer) && document.referrer !== here){
+            location.href = document.referrer; return;
+          }
+          location.href = '../menu.html';
+        }
+      }catch{
+        clearTimeout(timer);
+        location.href = '../menu.html';
+      }
+    }
+
+    // Pulisci eventuali listener preesistenti e lega SOLO il nostro
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('btnBack');
+      if (btn){
+        const clean = btn.cloneNode(true);
+        btn.replaceWith(clean);
+        clean.addEventListener('click', (e)=>{ e.preventDefault(); goBackSmart(); });
+      }
+    });
+
+    /* ===== Utilities ===== */
     const $ = (s)=>document.querySelector(s);
     const LS_KEY = 'custode.lastConnection';
     function loadProfile(){ try{ const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; }catch{ return null; } }
@@ -169,7 +246,7 @@
     function showSetup(){ $('#setupCard').style.display=''; $('#connCard').style.display='none'; $('#chatCard').style.display='none'; }
     function showChat(){ $('#setupCard').style.display='none'; $('#connCard').style.display=''; $('#chatCard').style.display=''; }
 
-    // ===== WebSocket =====
+    /* ===== WebSocket ===== */
     let ws = null;
     function appendLog(from, text){
       const box = $('#chatLog'); const div = document.createElement('div');

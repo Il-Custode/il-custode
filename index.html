@@ -7,6 +7,7 @@
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; --pergamena:#fff3d4; }
     *{ box-sizing:border-box }
+    html, body { scroll-behavior:auto; } /* evita smooth scroll involontario */
     body{
       font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro);
       background:
@@ -84,6 +85,11 @@
     label.chk input{ width:18px; height:18px; }
     .muted{ opacity:.85; font-size:14px; }
   </style>
+
+  <!-- Evita ripristino automatico dello scroll da parte del browser -->
+  <script>
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch {}
+  </script>
 </head>
 <body>
 <div class="cornice">
@@ -109,7 +115,8 @@
       <!-- FORM: abilita Enter/NumpadEnter + Tab naturale -->
       <form id="loginForm" autocomplete="on">
         <div class="row">
-          <input id="homeEmail" name="email" type="email" placeholder="Email" data-i18n-placeholder="home.login.email" autofocus />
+          <!-- RIMOSSO autofocus: gestito da JS con preventScroll -->
+          <input id="homeEmail" name="email" type="email" placeholder="Email" data-i18n-placeholder="home.login.email" />
           <input id="homePass"  name="password" type="password" placeholder="Password" data-i18n-placeholder="home.login.password" />
         </div>
 
@@ -217,7 +224,7 @@
     }catch{ return false; }
   }
 
-  // === Submit form: Enter/NumpadEnter o click su Entra ===
+  // === Submit form ===
   loginForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email=(homeEmail.value||'').trim(), pass=(homePass.value||'').trim();
@@ -243,8 +250,16 @@
 
   // Avvio
   (async function boot(){
+    // sempre in top all'apertura
+    try { window.scrollTo(0,0); } catch {}
+
     applyI18n();
     loadRemembered();
+
+    // Focus al campo email SENZA scroll
+    try { homeEmail.focus({ preventScroll: true }); }
+    catch { try { homeEmail.focus(); } catch {} }
+
     const already = await redirectIfLogged(); // se già loggato vai subito alla pagina 3
     if (!already) loginPanel.style.display = '';
   })();

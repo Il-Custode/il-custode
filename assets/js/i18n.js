@@ -61,6 +61,26 @@
             registered:"Registrato! Controlla l’email e poi accedi.",
             ok:"Login riuscito."
           }
+        },
+        master:{
+          title:"🎩 Modalità Master",
+          desc:"Pannello del Master (campagne, strumenti).",
+          btn:"Entra come Master"
+        },
+        player:{
+          title:"🧝‍♂️ Modalità Giocatore",
+          desc:"Connessione alla sessione (MVP).",
+          btn:"Entra come Giocatore"
+        },
+        settings:{
+          title:"⚙️ Impostazioni",
+          desc:"Preferenze e configurazione dell’app.",
+          btn:"Apri Impostazioni"
+        },
+        hub:{
+          title:"📣 Community Hub",
+          desc:"Condividi mappe, mostri, quest e idee.",
+          btn:"Apri Hub"
         }
       },
       settings:{
@@ -107,6 +127,26 @@
             registered:"Registered! Check your email, then sign in.",
             ok:"Signed in."
           }
+        },
+        master:{
+          title:"🎩 Master Mode",
+          desc:"Master panel (campaigns, tools).",
+          btn:"Enter as Master"
+        },
+        player:{
+          title:"🧝‍♂️ Player Mode",
+          desc:"Connect to a session (MVP).",
+          btn:"Enter as Player"
+        },
+        settings:{
+          title:"⚙️ Settings",
+          desc:"App preferences and configuration.",
+          btn:"Open Settings"
+        },
+        hub:{
+          title:"📣 Community Hub",
+          desc:"Share maps, monsters, quests and ideas.",
+          btn:"Open Hub"
         }
       },
       settings:{
@@ -153,7 +193,11 @@
             registered:"Registriert! Prüfe deine E-Mail und melde dich an.",
             ok:"Angemeldet."
           }
-        }
+        },
+        master:{ title:"🎩 Spielleiter-Modus", desc:"Panel für den Spielleiter (Kampagnen, Tools).", btn:"Als Spielleiter eintreten" },
+        player:{ title:"🧝‍♂️ Spieler-Modus",    desc:"Mit einer Sitzung verbinden (MVP).",          btn:"Als Spieler eintreten" },
+        settings:{ title:"⚙️ Einstellungen",   desc:"App-Einstellungen und Konfiguration.",        btn:"Einstellungen öffnen" },
+        hub:{ title:"📣 Community-Hub",        desc:"Karten, Monster, Quests und Ideen teilen.",    btn:"Hub öffnen" }
       },
       settings:{ title:"Einstellungen", language:{ title:"Sprache", choose:"Sprache wählen", apply:"Sprache anwenden", applied:"Sprache angewendet" } }
     },
@@ -196,7 +240,11 @@
             registered:"Inscrit ! Vérifie ton e-mail, puis connecte-toi.",
             ok:"Connecté."
           }
-        }
+        },
+        master:{ title:"🎩 Mode MJ",            desc:"Panneau du Maître du Jeu (campagnes, outils).", btn:"Entrer comme MJ" },
+        player:{ title:"🧝‍♂️ Mode Joueur",      desc:"Se connecter à une session (MVP).",             btn:"Entrer comme Joueur" },
+        settings:{ title:"⚙️ Paramètres",       desc:"Préférences et configuration de l’app.",        btn:"Ouvrir Paramètres" },
+        hub:{ title:"📣 Hub Communauté",        desc:"Partage de cartes, monstres, quêtes et idées.", btn:"Ouvrir le Hub" }
       },
       settings:{ title:"Paramètres", language:{ title:"Langue", choose:"Choisis ta langue", apply:"Appliquer", applied:"Langue appliquée" } }
     },
@@ -239,7 +287,11 @@
             registered:"¡Registrado! Revisa tu correo y luego inicia sesión.",
             ok:"Sesión iniciada."
           }
-        }
+        },
+        master:{ title:"🎩 Modo Máster",       desc:"Panel del Máster (campañas, herramientas).", btn:"Entrar como Máster" },
+        player:{ title:"🧝‍♂️ Modo Jugador",     desc:"Conectarse a una sesión (MVP).",             btn:"Entrar como Jugador" },
+        settings:{ title:"⚙️ Configuración",    desc:"Preferencias y configuración de la app.",    btn:"Abrir Configuración" },
+        hub:{ title:"📣 Centro de la comunidad",desc:"Comparte mapas, monstruos, misiones e ideas.",btn:"Abrir Hub" }
       },
       settings:{ title:"Configuración", language:{ title:"Idioma", choose:"Elige tu idioma", apply:"Aplicar idioma", applied:"Idioma aplicado" } }
     },
@@ -282,7 +334,11 @@
             registered:"Cadastrado! Verifique o e-mail e depois entre.",
             ok:"Conectado."
           }
-        }
+        },
+        master:{ title:"🎩 Modo Mestre",    desc:"Painel do Mestre (campanhas, ferramentas).", btn:"Entrar como Mestre" },
+        player:{ title:"🧝‍♂️ Modo Jogador", desc:"Conectar a uma sessão (MVP).",              btn:"Entrar como Jogador" },
+        settings:{ title:"⚙️ Configurações",desc:"Preferências e configuração do app.",       btn:"Abrir Configurações" },
+        hub:{ title:"📣 Hub da Comunidade", desc:"Compartilhe mapas, monstros, quests e ideias.", btn:"Abrir Hub" }
       },
       settings:{ title:"Configurações", language:{ title:"Idioma", choose:"Escolha seu idioma", apply:"Aplicar idioma", applied:"Idioma aplicado" } }
     },
@@ -325,7 +381,11 @@
             registered:"登録完了！メール確認後にサインイン。",
             ok:"サインインしました。"
           }
-        }
+        },
+        master:{ title:"🎩 ゲームマスターモード", desc:"GM用パネル（キャンペーン、ツール）。", btn:"マスターとして入る" },
+        player:{ title:"🧝‍♂️ プレイヤーモード",    desc:"セッションに接続（MVP）。",             btn:"プレイヤーとして入る" },
+        settings:{ title:"⚙️ 設定",               desc:"アプリの設定と構成。",                   btn:"設定を開く" },
+        hub:{ title:"📣 コミュニティハブ",         desc:"マップ・モンスター・クエスト・アイデアを共有。", btn:"ハブを開く" }
       },
       settings:{ title:"設定", language:{ title:"言語", choose:"言語を選択", apply:"言語を適用", applied:"適用しました" } }
     },
@@ -368,7 +428,11 @@
             registered:"已注册！请查收邮箱后登录。",
             ok:"已登录。"
           }
-        }
+        },
+        master:{ title:"🎩 主持人模式", desc:"主持人面板（战役、工具）。", btn:"以主持人身份进入" },
+        player:{ title:"🧝‍♂️ 玩家模式",  desc:"连接至会话（MVP）。",       btn:"以玩家身份进入" },
+        settings:{ title:"⚙️ 设置",      desc:"应用偏好与配置。",          btn:"打开设置" },
+        hub:{ title:"📣 社区中心",       desc:"分享地图、怪物、任务与创意。", btn:"打开社区" }
       },
       settings:{ title:"设置", language:{ title:"语言", choose:"选择你的语言", apply:"应用语言", applied:"已应用" } }
     },
@@ -411,7 +475,11 @@
             registered:"تم التسجيل! افحص بريدك ثم سجّل الدخول.",
             ok:"تم الدخول."
           }
-        }
+        },
+        master:{ title:"🎩 وضع المدير",   desc:"لوحة المدير (الحملات والأدوات).", btn:"الدخول كمدير" },
+        player:{ title:"🧝‍♂️ وضع اللاعب", desc:"الاتصال بجلسة (MVP).",          btn:"الدخول كلاعب" },
+        settings:{ title:"⚙️ الإعدادات",  desc:"تفضيلات التطبيق وإعداده.",      btn:"فتح الإعدادات" },
+        hub:{ title:"📣 مركز المجتمع",    desc:"شارك الخرائط والوحوش والمهام والأفكار.", btn:"فتح المركز" }
       },
       settings:{ title:"الإعدادات", language:{ title:"اللغة", choose:"اختر لغتك", apply:"تطبيق اللغة", applied:"تم التطبيق" } }
     },
@@ -454,7 +522,11 @@
             registered:"Зарегистрировано! Проверьте почту и войдите.",
             ok:"Выполнен вход."
           }
-        }
+        },
+        master:{ title:"🎩 Режим Мастера",  desc:"Панель Мастера (кампании, инструменты).", btn:"Войти как Мастер" },
+        player:{ title:"🧝‍♂️ Режим Игрока",  desc:"Подключиться к сессии (MVP).",            btn:"Войти как Игрок" },
+        settings:{ title:"⚙️ Настройки",     desc:"Параметры и конфигурация приложения.",    btn:"Открыть настройки" },
+        hub:{ title:"📣 Центр сообщества",   desc:"Делитесь картами, монстрами, квестами и идеями.", btn:"Открыть хаб" }
       },
       settings:{ title:"Настройки", language:{ title:"Язык", choose:"Выберите язык", apply:"Применить", applied:"Применено" } }
     },
@@ -497,7 +569,11 @@
             registered:"पंजीकृत! ईमेल जाँचें, फिर साइन इन करें।",
             ok:"साइन इन हो गया।"
           }
-        }
+        },
+        master:{ title:"🎩 मास्टर मोड",   desc:"मास्टर पैनल (कैंपेन, टूल्स)।",     btn:"मास्टर के रूप में प्रवेश" },
+        player:{ title:"🧝‍♂️ खिलाड़ी मोड", desc:"सेशन से कनेक्ट करें (MVP)।",        btn:"खिलाड़ी के रूप में प्रवेश" },
+        settings:{ title:"⚙️ सेटिंग्स",    desc:"ऐप प्राथमिकताएँ और कॉन्फ़िगरेशन।", btn:"सेटिंग्स खोलें" },
+        hub:{ title:"📣 समुदाय हब",        desc:"मानचित्र, राक्षस, क्वेस्ट और आइडिया साझा करें।", btn:"हब खोलें" }
       },
       settings:{ title:"सेटिंग्स", language:{ title:"भाषा", choose:"अपनी भाषा चुनें", apply:"भाषा लागू करें", applied:"लागू किया गया" } }
     },
@@ -540,7 +616,11 @@
             registered:"가입 완료! 이메일 확인 후 로그인하세요.",
             ok:"로그인되었습니다."
           }
-        }
+        },
+        master:{ title:"🎩 마스터 모드",   desc:"마스터 패널(캠페인, 도구).",     btn:"마스터로 입장" },
+        player:{ title:"🧝‍♂️ 플레이어 모드", desc:"세션에 연결(MVP).",            btn:"플레이어로 입장" },
+        settings:{ title:"⚙️ 설정",        desc:"앱 환경설정 및 구성.",           btn:"설정 열기" },
+        hub:{ title:"📣 커뮤니티 허브",     desc:"지도, 몬스터, 퀘스트, 아이디어 공유.", btn:"허브 열기" }
       },
       settings:{ title:"설정", language:{ title:"언어", choose:"언어 선택", apply:"언어 적용", applied:"적용됨" } }
     },
@@ -583,7 +663,11 @@
             registered:"Kayıt tamam! E-postanı kontrol edip giriş yap.",
             ok:"Giriş başarılı."
           }
-        }
+        },
+        master:{ title:"🎩 Usta Modu",       desc:"Usta paneli (kampanyalar, araçlar).", btn:"Usta olarak gir" },
+        player:{ title:"🧝‍♂️ Oyuncu Modu",    desc:"Bir oturuma bağlan (MVP).",          btn:"Oyuncu olarak gir" },
+        settings:{ title:"⚙️ Ayarlar",       desc:"Uygulama tercihleri ve yapılandırma.", btn:"Ayarları aç" },
+        hub:{ title:"📣 Topluluk Merkezi",    desc:"Haritalar, canavarlar, görevler ve fikirleri paylaş.", btn:"Merkezi aç" }
       },
       settings:{ title:"Ayarlar", language:{ title:"Dil", choose:"Dilini seç", apply:"Dili uygula", applied:"Uygulandı" } }
     },
@@ -626,7 +710,11 @@
             registered:"Terdaftar! Cek email lalu masuk.",
             ok:"Berhasil masuk."
           }
-        }
+        },
+        master:{ title:"🎩 Mode Master",    desc:"Panel Master (kampanye, alat).",         btn:"Masuk sebagai Master" },
+        player:{ title:"🧝‍♂️ Mode Pemain",  desc:"Terhubung ke sesi (MVP).",               btn:"Masuk sebagai Pemain" },
+        settings:{ title:"⚙️ Pengaturan",    desc:"Preferensi & konfigurasi aplikasi.",     btn:"Buka Pengaturan" },
+        hub:{ title:"📣 Pusat Komunitas",    desc:"Bagikan peta, monster, quest, dan ide.", btn:"Buka Hub" }
       },
       settings:{ title:"Pengaturan", language:{ title:"Bahasa", choose:"Pilih bahasamu", apply:"Terapkan bahasa", applied:"Bahasa diterapkan" } }
     },
@@ -669,7 +757,11 @@
             registered:"Zarejestrowano! Sprawdź e-mail i zaloguj się.",
             ok:"Zalogowano."
           }
-        }
+        },
+        master:{ title:"🎩 Tryb Mistrza Gry", desc:"Panel MG (kampanie, narzędzia).", btn:"Wejdź jako Mistrz Gry" },
+        player:{ title:"🧝‍♂️ Tryb Gracza",    desc:"Połącz z sesją (MVP).",             btn:"Wejdź jako Gracz" },
+        settings:{ title:"⚙️ Ustawienia",     desc:"Preferencje i konfiguracja aplikacji.", btn:"Otwórz Ustawienia" },
+        hub:{ title:"📣 Centrum społeczności",desc:"Udostępniaj mapy, potwory, zadania i pomysły.", btn:"Otwórz Hub" }
       },
       settings:{ title:"Ustawienia", language:{ title:"Język", choose:"Wybierz język", apply:"Zastosuj język", applied:"Zastosowano" } }
     },
@@ -712,7 +804,11 @@
             registered:"Geregistreerd! Controleer je e-mail en meld je aan.",
             ok:"Aangemeld."
           }
-        }
+        },
+        master:{ title:"🎩 Spelleider-modus", desc:"Paneel voor de spelleider (campagnes, tools).", btn:"Binnen als Spelleider" },
+        player:{ title:"🧝‍♂️ Spelersmodus",   desc:"Verbind met een sessie (MVP).",               btn:"Binnen als Speler" },
+        settings:{ title:"⚙️ Instellingen",   desc:"App-voorkeuren en configuratie.",             btn:"Instellingen openen" },
+        hub:{ title:"📣 Communityhub",        desc:"Deel kaarten, monsters, quests en ideeën.",   btn:"Hub openen" }
       },
       settings:{ title:"Instellingen", language:{ title:"Taal", choose:"Kies je taal", apply:"Taal toepassen", applied:"Toegepast" } }
     },
@@ -755,7 +851,11 @@
             registered:"Zaregistrováno! Zkontroluj e-mail a přihlas se.",
             ok:"Přihlášeno."
           }
-        }
+        },
+        master:{ title:"🎩 Režim Pána jeskyně", desc:"Panel PJ (kampaně, nástroje).", btn:"Vstoupit jako PJ" },
+        player:{ title:"🧝‍♂️ Režim Hráče",      desc:"Připojit se k sezení (MVP).",  btn:"Vstoupit jako Hráč" },
+        settings:{ title:"⚙️ Nastavení",        desc:"Předvolby a konfigurace aplikace.", btn:"Otevřít Nastavení" },
+        hub:{ title:"📣 Komunitní centrum",     desc:"Sdílej mapy, nestvůry, questy a nápady.",    btn:"Otevřít Hub" }
       },
       settings:{ title:"Nastavení", language:{ title:"Jazyk", choose:"Vyber svůj jazyk", apply:"Použít jazyk", applied:"Použito" } }
     },
@@ -798,7 +898,11 @@
             registered:"Đã đăng ký! Kiểm tra email rồi đăng nhập.",
             ok:"Đã đăng nhập."
           }
-        }
+        },
+        master:{ title:"🎩 Chế độ Quản trò", desc:"Bảng điều khiển GM (chiến dịch, công cụ).", btn:"Vào với tư cách Quản trò" },
+        player:{ title:"🧝‍♂️ Chế độ Người chơi", desc:"Kết nối phiên chơi (MVP).",                 btn:"Vào với tư cách Người chơi" },
+        settings:{ title:"⚙️ Cài đặt",       desc:"Tùy chọn và cấu hình ứng dụng.",               btn:"Mở Cài đặt" },
+        hub:{ title:"📣 Trung tâm Cộng đồng", desc:"Chia sẻ bản đồ, quái vật, nhiệm vụ và ý tưởng.", btn:"Mở Hub" }
       },
       settings:{ title:"Cài đặt", language:{ title:"Ngôn ngữ", choose:"Chọn ngôn ngữ", apply:"Áp dụng ngôn ngữ", applied:"Đã áp dụng" } }
     }
