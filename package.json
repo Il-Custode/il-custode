@@ -1,6 +1,6 @@
 {
   "name": "il-custode-pc",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Applicazione fantasy per Master e Giocatori (D&D) con login Supabase, mappe e strumenti.",
   "main": "main.js",
   "type": "module",
