@@ -1,4 +1,4 @@
-// main.js (ESM)
+// main.js (ESM) — X chiude davvero tutta l'app
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,13 +17,15 @@ let connections = [];
 let masterPassword = null;
 let wss;
 
-// Helper per creare finestre con il preload "combinato" che inietta il pulsante Chiudi
+// <<< NEW: flag che impedisce comportamenti strani durante la chiusura
+let quitting = false;
+
+// Helper per creare finestre con il preload "combinato" (tuo)
 function createWindowWithDefaults({ filePath, width = 1200, height = 800 } = {}) {
   const win = new BrowserWindow({
     width,
     height,
     webPreferences: {
-      // 👇 usiamo un preload che carica sia le tue API (preload.js) sia il pulsante globale
       preload: path.join(__dirname, 'preload-combined.js'),
       contextIsolation: true,
       nodeIntegration: false
@@ -65,14 +67,39 @@ app.whenReady().then(() => {
   app.setAppUserModelId('com.ilcustode.app');
   createWindow();
   setupAutoUpdater();
+
+  // Su mac, se l’app è già aperta e non stiamo chiudendo, ricrea la finestra
   app.on('activate', () => {
+    if (quitting) return;
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// Se chiudi tutte le finestre su Windows, termina l’app
+/* =======================
+   X CHIUDE DAVVERO L'APP
+   ======================= */
+// Qualsiasi finestra venga creata: se si clicca la X, chiudi tutta l’app (anche su macOS)
+app.on('browser-window-created', (_evt, win) => {
+  win.on('close', () => {
+    if (!quitting) {
+      quitting = true;
+      // chiudi server e connessioni prima di uscire
+      try { wss?.close(); } catch {}
+      app.quit();
+    }
+  });
+});
+
+// Quando tutte le finestre risultano chiuse, termina comunque l’app su tutti i sistemi
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  // niente condizione su macOS: vogliamo chiudere davvero
+  app.quit();
+});
+
+// Segnala che stiamo chiudendo (evita riaperture involontarie)
+app.on('before-quit', () => {
+  quitting = true;
+  try { wss?.close(); } catch {}
 });
 
 /* ============ CREDENZIALI (keytar) ============ */
@@ -181,13 +208,16 @@ function broadcastPlayerList() {
 
 /* ============ NAVIGAZIONE MULTI-PAGINA ============ */
 ipcMain.on('open-page', (_event, page) => {
-  const win = createWindowWithDefaults({ filePath: page, width: 1000, height: 700 });
+  createWindowWithDefaults({ filePath: page, width: 1000, height: 700 });
 });
 
-/* ============ CHIUSURA COMPLETA APP ============ */
-/* riceve la richiesta dal pulsante globale (in preload-combined.js) e chiude TUTTO */
+/* ============ CHIUSURA COMPLETA APP (via bottone, se lo usi ancora) ============ */
 ipcMain.on('close-app', () => {
+  quitting = true;
+  try { wss?.close(); } catch {}
   // Chiudi tutte le finestre e termina l'app
-  BrowserWindow.getAllWindows().forEach(w => w.destroy());
+  BrowserWindow.getAllWindows().forEach(w => {
+    try { w.destroy(); } catch {}
+  });
   app.quit();
 });
