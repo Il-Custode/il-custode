@@ -130,13 +130,13 @@
     .remember{
       display:inline-flex;
       align-items:center;
-      gap:4px;                 /* vicino al quadratino */
+      gap:4px;
       font-size:14px;
       line-height:1;
       cursor:pointer;
       user-select:none;
-      align-self:end;          /* si allinea alla baseline su desktop */
-      height:44px;             /* stessa altezza riga */
+      align-self:end;
+      height:44px;
     }
     .remember input[type="checkbox"]{
       appearance:none; -webkit-appearance:none;
@@ -156,7 +156,6 @@
       outline:3px solid #b19a6b; outline-offset:2px;
     }
     .remember span{ margin:0; padding:0; }
-    /* =============================================== */
   </style>
 </head>
 <body>
@@ -205,7 +204,7 @@
             <button id="btnSignup" class="btn" type="button">Registrati</button>
           </div>
 
-          <!-- Ricordami (separato: non alza la cella Password) -->
+          <!-- Ricordami -->
           <label class="remember" for="remember">
             <input type="checkbox" id="remember"/>
             <span>Ricordami su questo dispositivo</span>
@@ -277,20 +276,27 @@
   const fraseEl = $('#frase');
   const imgMago = $('#imgMago');
   const fumetto = $('#fumetto');
+  const heroEl = document.querySelector('.hero');
 
   function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+  // <<< NEW: mostra/nasconde la sezione con il mago
+  function hideHero(){ if (heroEl) heroEl.style.display = 'none'; }
+  function showHero(){ if (heroEl) heroEl.style.display = ''; }
 
   function showHome(email){
     authCard.style.display='none';
     homeCard.style.display='';
     btnLogout.style.display='';
     userBadge.textContent = email ? 'Connesso: '+email : '';
+    hideHero(); // <<< nasconde il mago dopo login/sessione attiva
   }
   function showAuth(){
     authCard.style.display='';
     homeCard.style.display='none';
     btnLogout.style.display='none';
     userBadge.textContent='';
+    showHero(); // <<< ri-mostra il mago quando non autenticato
   }
 
   async function refreshSession(){
