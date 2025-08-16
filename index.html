@@ -4,22 +4,29 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Il Custode — Home</title>
+
+  <!-- Collega lo stile globale valido per tutte le pagine in root -->
+  <link rel="stylesheet" href="assets/style.css">
+
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; --pergamena:#fff3d4; }
     *{ box-sizing:border-box }
     html, body { scroll-behavior:auto; } /* evita smooth scroll involontario */
+
+    /* Manteniamo il layout specifico di questa pagina.
+       Sfondo/cornice sono già nel CSS globale, ma lasciamo questi come rinforzo coerente. */
     body{
       font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro);
       background:
         radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
         var(--pergamena)
-        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+        url('assets/sfondo-pergamena-decor.svg') no-repeat center center fixed;
       background-size:cover; text-align:center;
     }
     .cornice{
       border:40px solid transparent;
-      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      -webkit-border-image:url('assets/cornice-legno.svg') 40 stretch;
+      border-image:url('assets/cornice-legno.svg') 40 stretch;
       min-height:100vh; display:flex; flex-direction:column;
       background: linear-gradient(180deg, rgba(255,243,212,.30), rgba(255,243,212,.15));
     }
@@ -87,9 +94,12 @@
   </style>
 
   <!-- Evita ripristino automatico dello scroll da parte del browser -->
-  <script>
-    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch {}
-  </script>
+  <script>try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch {}</script>
+
+  <!-- i18n e Config Supabase (env) PRIMA del singleton -->
+  <script defer src="assets/js/i18n.js"></script>
+  <script defer src="assets/js/env.supabase.js"></script>
+  <script defer src="assets/js/supabase-singleton.js"></script>
 </head>
 <body>
 <div class="cornice">
@@ -100,7 +110,7 @@
   <div class="container">
     <section class="hero" aria-label="Presentazione">
       <div class="mago">
-        <img id="imgMago" src="./assets/img/mago.png" alt="Il Custode"/>
+        <img id="imgMago" src="assets/img/mago.png" alt="Il Custode"/>
       </div>
       <div id="fumetto" class="fumetto" role="complementary" aria-live="polite">
         <h2 class="titolo" data-i18n="home.wizard_title">Il Custode ti osserva</h2>
@@ -109,13 +119,11 @@
     </section>
 
     <!-- SOLO LOGIN (pagina 2) -->
-    <section id="loginPanel" class="card" aria-label="Login">
+    <section id="loginPanel" class="card" aria-label="Login" style="display:none">
       <h2 data-i18n="home.login.title">Accedi</h2>
 
-      <!-- FORM: abilita Enter/NumpadEnter + Tab naturale -->
       <form id="loginForm" autocomplete="on">
         <div class="row">
-          <!-- RIMOSSO autofocus: gestito da JS con preventScroll -->
           <input id="homeEmail" name="email" type="email" placeholder="Email" data-i18n-placeholder="home.login.email" />
           <input id="homePass"  name="password" type="password" placeholder="Password" data-i18n-placeholder="home.login.password" />
         </div>
@@ -138,17 +146,7 @@
   </div>
 </div>
 
-<!-- i18n PRIMA del codice che lo usa -->
-<script src="./assets/js/i18n.js"></script>
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // === Supabase config ===
-  const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // === UI refs ===
   const $ = (s)=>document.querySelector(s);
   const fraseEl    = $('#frase');
   const imgMago    = $('#imgMago');
@@ -161,31 +159,23 @@
   const homeSignUp = $('#homeSignUp');
   const homeStatus = $('#homeStatus');
 
-  // Animazioni
   document.addEventListener('DOMContentLoaded', ()=>{
     requestAnimationFrame(()=> imgMago.classList.add('img-in'));
     setTimeout(()=> fumetto.classList.add('fumetto-in'), 1200);
   });
 
-  // i18n
   function applyI18n(){
     window.i18n?.apply?.(document);
     try {
       const lang = (window.i18n?.getLang && window.i18n.getLang()) || localStorage.getItem('custode.lang') || 'it';
       document.documentElement.setAttribute('lang', lang);
     } catch {}
-    if (window.i18n?.t) {
-      document.title = window.i18n.t('home.page_title') || 'Il Custode — Home';
-    }
+    if (window.i18n?.t) document.title = window.i18n.t('home.page_title') || 'Il Custode — Home';
     if (window.i18n?.pick) fraseEl.textContent = window.i18n.pick('home.greetings') || '';
   }
   document.addEventListener('i18n:change', applyI18n);
 
-  // === Ricordami: email + password ===
-  const LS_REMEMBER_ON   = 'custode.remember.on';
-  const LS_REMEMBER_MAIL = 'custode.remember.email';
-  const LS_REMEMBER_PASS = 'custode.remember.pass';
-
+  const LS_REMEMBER_ON='custode.remember.on', LS_REMEMBER_MAIL='custode.remember.email', LS_REMEMBER_PASS='custode.remember.pass';
   function loadRemembered(){
     try{
       const on = localStorage.getItem(LS_REMEMBER_ON) === '1';
@@ -200,8 +190,8 @@
     try{
       if (rememberMe.checked){
         localStorage.setItem(LS_REMEMBER_ON,'1');
-        localStorage.setItem(LS_REMEMBER_MAIL, (homeEmail.value||'').trim());
-        localStorage.setItem(LS_REMEMBER_PASS,  homePass.value||'');
+        localStorage.setItem(LS_REMEMBER_MAIL,(homeEmail.value||'').trim());
+        localStorage.setItem(LS_REMEMBER_PASS, homePass.value||'');
       } else {
         localStorage.removeItem(LS_REMEMBER_ON);
         localStorage.removeItem(LS_REMEMBER_MAIL);
@@ -210,21 +200,26 @@
     }catch{}
   }
 
-  // Redirect helper verso pagina 3 (menu)
-  function goMenu(){
-    try{ location.replace('./menu.html'); }catch{ location.href='./menu.html'; }
+  function goMenu(){ try{ location.replace('./menu.html'); }catch{ location.href='./menu.html'; } }
+
+  async function waitForSupabase(timeoutMs=8000){
+    const t0 = Date.now();
+    while (!window.supabaseClient){
+      await new Promise(r=>setTimeout(r,50));
+      if (Date.now()-t0 > timeoutMs) throw new Error('Supabase non inizializzato');
+    }
+    return window.supabaseClient;
   }
 
-  // Stato sessione
+  let supabaseClient;
   async function redirectIfLogged(){
     try{
-      const { data: { session } = {} } = await supabaseClient.auth.getSession();
-      if (session) { goMenu(); return true; }
+      const { data:{ session } = {} } = await supabaseClient.auth.getSession();
+      if (session){ goMenu(); return true; }
       return false;
     }catch{ return false; }
   }
 
-  // === Submit form ===
   loginForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email=(homeEmail.value||'').trim(), pass=(homePass.value||'').trim();
@@ -237,7 +232,6 @@
     goMenu();
   });
 
-  // Signup separato (click)
   homeSignUp.addEventListener('click', async ()=>{
     const email=(homeEmail.value||'').trim(), pass=(homePass.value||'').trim();
     if(!email||!pass){ homeStatus.textContent = (window.i18n?.t?.('home.login.status.fill_both') || ''); return; }
@@ -248,19 +242,16 @@
     homeStatus.textContent = (window.i18n?.t?.('home.login.status.registered') || '');
   });
 
-  // Avvio
   (async function boot(){
-    // sempre in top all'apertura
     try { window.scrollTo(0,0); } catch {}
-
     applyI18n();
     loadRemembered();
+    try { homeEmail.focus({ preventScroll:true }); } catch { try { homeEmail.focus(); } catch {} }
 
-    // Focus al campo email SENZA scroll
-    try { homeEmail.focus({ preventScroll: true }); }
-    catch { try { homeEmail.focus(); } catch {} }
+    try { supabaseClient = await waitForSupabase(); }
+    catch { homeStatus.textContent = 'Errore: Supabase non disponibile.'; return; }
 
-    const already = await redirectIfLogged(); // se già loggato vai subito alla pagina 3
+    const already = await redirectIfLogged();
     if (!already) loginPanel.style.display = '';
   })();
 </script>

@@ -1,54 +1,48 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Il Custode — Home</title>
+
+  <!-- Stile globale (cornice + pergamena per tutte le pagine in root) -->
+  <link rel="stylesheet" href="assets/style.css">
+
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; --pergamena:#fff3d4; }
     *{ box-sizing:border-box }
+
+    /* Sfondo/cornice sono nel CSS globale; qui manteniamo solo il layout della pagina */
     body{
       font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
       background:
         radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
         var(--pergamena)
-        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed;
+        url('assets/sfondo-pergamena-decor.svg') no-repeat center center fixed;
       background-size:cover;
     }
     .cornice{
       border:40px solid transparent;
-      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      -webkit-border-image:url('assets/cornice-legno.svg') 40 stretch;
+      border-image:url('assets/cornice-legno.svg') 40 stretch;
       min-height:100vh; display:flex; flex-direction:column;
       background: linear-gradient(180deg, rgba(255,243,212,.30), rgba(255,243,212,.15));
     }
 
-    /* ↑↑↑ Stile generale invariato ↑↑↑ */
-
-    /* HEADER: più spazio a sinistra per il bottone Indietro e badge spostato */
+    /* HEADER */
     header{
       position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
       border-bottom:5px solid var(--legno);
       display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
-
-      /* prima: 80px —> ora: 140px per non far toccare il badge col back */
-      padding-left:140px; /* spazio riservato al pulsante Indietro iniettato */
+      padding-left:140px; /* spazio per eventuale back button auto-iniettato */
     }
-    /* stile coerente per il pulsante back iniettato da main.js */
-    .back-btn{
-      position:absolute; left:20px; top:14px;
-      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
-    }
-    .back-btn:hover{ background:#8b5e47; }
 
-    /* BADGE EMAIL: spostato a destra e con ellissi + larghezza protetta */
     #userBadge{
       position:absolute;
-      left:140px;       /* prima 80px: allineato allo spazio del back */
+      left:140px;
       top:12px;
       color:#fff8dc; font-size:14px; opacity:.9; white-space:nowrap;
       overflow:hidden; text-overflow:ellipsis;
-      /* lascia spazio ai bottoni a destra e al padding */
       max-width:calc(100% - 360px);
       text-align:left;
     }
@@ -64,14 +58,19 @@
     }
     .btn:hover{ background:var(--pelle-scura); }
     .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
-    .container{ width:100%; max-width:1080px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
 
+    .container{ width:100%; max-width:1080px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
     .card{ background:rgba(255,248,220,.92); border:3px solid var(--legno); border-radius:12px; padding:16px; margin:18px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
     .grid{ display:grid; grid-template-columns:1fr; gap:14px; }
     @media(min-width:720px){ .grid{ grid-template-columns:repeat(2,1fr); } }
     .tile{ padding:18px; text-align:center; background:rgba(255,255,255,.65); border:3px solid var(--legno); border-radius:12px; }
     .muted{ opacity:.85; font-size:14px; }
   </style>
+
+  <!-- i18n e singleton Supabase (ordine: i18n -> env -> singleton) -->
+  <script defer src="assets/js/i18n.js"></script>
+  <script defer src="assets/js/env.supabase.js"></script>
+  <script defer src="assets/js/supabase-singleton.js"></script>
 </head>
 <body>
   <div class="cornice">
@@ -115,14 +114,17 @@
     </div>
   </div>
 
-  <!-- i18n -->
-  <script src="./assets/js/i18n.js"></script>
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Helper: attendi il client dal singleton
+    async function waitForSupabase(timeoutMs=8000){
+      const t0=Date.now();
+      while(!window.supabaseClient){
+        await new Promise(r=>setTimeout(r,50));
+        if(Date.now()-t0>timeoutMs) throw new Error('Supabase non inizializzato');
+      }
+      return window.supabaseClient;
+    }
+    let supabaseClient;
 
     const $ = (s)=>document.querySelector(s);
     const userBadge = $('#userBadge');
@@ -168,7 +170,7 @@
       }
     }
 
-    // Logout robusto: pulisce token ma preserva eventuale "ricordami"
+    // Logout: pulisce token ma preserva eventuale "ricordami"
     async function doLogout(){
       try{ await supabaseClient.auth.signOut(); }catch{}
       try{
@@ -186,12 +188,18 @@
         }
         sessionStorage.clear();
       }catch{}
-      try{ location.replace('./welcome.html'); }catch{ location.href = './welcome.html'; }
+      try{ location.replace('./index.html'); }catch{ location.href = './index.html'; }
     }
     btnLogout.addEventListener('click', doLogout);
 
     (async function boot(){
       applyI18n();
+      try{
+        supabaseClient = await waitForSupabase();
+      }catch(e){
+        console.error(e);
+        return;
+      }
       await guardSession();
     })();
   </script>

@@ -1,38 +1,43 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title data-i18n="hub.title">Il Custode - Community Hub</title>
+
+  <!-- Stile globale: sfondo pergamena + cornice -->
+  <link rel="stylesheet" href="../assets/style.css"/>
+
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --pelle-scura:#c2a178; --inchiostro:#3e2f1c; }
     *{ box-sizing:border-box }
-    body{
-      font-family:'Papyrus', fantasy; margin:0; padding:0; color:var(--inchiostro); text-align:center;
-      background:url('../assets/img/sfondo-pergamena-decor.jpg') no-repeat center center fixed; background-size:cover;
-    }
-    .cornice{
-      border:40px solid transparent; -webkit-border-image:url('../assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('../assets/img/cornice-legno.png') 40 stretch; min-height:100vh; display:flex; flex-direction:column;
-    }
+
     header{
-      position:relative; background-color:rgba(75,54,33,.85); color:#fff8dc; padding:16px 20px;
-      border-bottom:5px solid var(--legno); display:flex; align-items:center; justify-content:center; gap:10px; font-size:28px;
-      padding-left:80px; /* spazio per il back */
+      position:relative;
+      background-color:rgba(75,54,33,.85);
+      color:#fff8dc;
+      padding:16px 20px;
+      border-bottom:5px solid var(--legno);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-size:28px;
+      padding-left:140px; /* spazio per back manuale */
     }
-    .back-btn{
-      position:absolute; left:20px; top:14px;
-      background-color:#a9745b; color:#fff; font-size:16px; border:none; cursor:pointer; padding:8px 12px; border-radius:8px;
+
+    /* Back manuale: classe unica per evitare listener globali su ".back-btn" */
+    .btn-back{
+      position:absolute; left:20px; top:14px; z-index:10001;
+      background:#f5e6c5 url('../assets/pulsante-pergamena.svg') no-repeat center/cover;
+      color:#fff8dc; border:none; border-radius:12px;
+      padding:10px 18px; font-family:'Garamond', serif; font-size:16px; font-weight:600;
+      box-shadow:3px 3px 6px rgba(0,0,0,.35);
+      display:inline-flex; align-items:center; gap:8px; cursor:pointer;
     }
-    .back-btn:hover{ background:#8b5e47; }
+    .btn-back:hover{ filter:brightness(.96); }
+    .btn-back:active{ transform:translateY(1px); }
 
     .container{ width:100%; max-width:1200px; margin:0 auto; padding:24px 16px 40px; text-align:left; }
-
     .row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px; }
     .card{ background:rgba(255,248,220,.88); border:3px solid var(--legno); border-radius:14px; padding:16px; margin:14px 0; box-shadow:0 4px 10px rgba(0,0,0,.12); }
-    .btn{ background:var(--pelle); border:3px solid var(--legno); padding:8px 12px; border-radius:10px; cursor:pointer; font-family:'Papyrus', fantasy; }
-    .btn:hover{ background:var(--pelle-scura); }
-    .btn.red{ background:#c67a6b; color:#fff; } .btn.red:hover{ background:#b16556; }
 
     .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
     .tile{ background:rgba(255,255,255,.7); border:3px solid var(--legno); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
@@ -50,11 +55,15 @@
     .toast{ position:fixed; right:16px; bottom:16px; background:#2d7a36; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 6px 16px rgba(0,0,0,.25); display:none; z-index:1000; }
     .toast.error{ background:#b23b3b; }
   </style>
+
+  <!-- i18n + Supabase -->
+  <script defer src="../assets/js/i18n.js"></script>
+  <script defer src="../assets/js/env.supabase.js"></script>
+  <script defer src="../assets/js/supabase-singleton.js"></script>
 </head>
 <body>
-<div class="cornice">
   <header>
-    <button class="back-btn" type="button" data-i18n="common.back">⬅ Indietro</button>
+    <button id="hubBack" class="btn-back" type="button" data-i18n="common.back">← Indietro</button>
     <span data-i18n="hub.header">📣 Community Hub</span>
   </header>
 
@@ -69,12 +78,12 @@
         <div>
           <label for="cat" data-i18n="hub.filter.category_label">Categoria</label>
           <select id="cat">
-            <option value="" data-i18n="hub.cat.all">Tutte</option>
-            <option value="mappe" data-i18n="hub.cat.mappe">Mappe</option>
+            <option value=""       data-i18n="hub.cat.all">Tutte</option>
+            <option value="mappe"  data-i18n="hub.cat.mappe">Mappe</option>
             <option value="mostri" data-i18n="hub.cat.mostri">Mostri</option>
-            <option value="quest" data-i18n="hub.cat.quest">Quest</option>
+            <option value="quest"  data-i18n="hub.cat.quest">Quest</option>
             <option value="regole" data-i18n="hub.cat.regole">Regole</option>
-            <option value="altro" data-i18n="hub.cat.altro">Altro</option>
+            <option value="altro"  data-i18n="hub.cat.altro">Altro</option>
           </select>
         </div>
         <div class="actions">
@@ -124,136 +133,187 @@
       <p id="empty" class="muted" style="display:none; margin-top:8px;" data-i18n="hub.list.empty">Nessun post trovato.</p>
     </section>
   </div>
-</div>
 
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
-<!-- i18n -->
-<script src="../assets/js/i18n.js"></script>
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  /* =========================
-     BACK: prima prova a tornare davvero al menu,
-     altrimenti fallback al menu.
-     ========================= */
-  function cameFromMenu(){
-    try{
-      const ref = document.referrer || '';
-      if (!ref) return false;
-      const url = new URL(ref, location.href);
-      return url.pathname.endsWith('/menu.html');
-    }catch{ return false; }
-  }
+  <script>
+    /* ===== Dizionario locale HUB per le lingue richieste ===== */
+    const HUB_I18N = {
+      "it":{ "hub.page_title":"Il Custode - Community Hub","hub.title":"Il Custode - Community Hub","hub.header":"📣 Community Hub","common.back":"← Indietro","hub.filter.search_label":"Cerca","hub.filter.search_ph":"titolo o testo...","hub.filter.category_label":"Categoria","hub.filter.refresh":"Aggiorna","hub.cat.all":"Tutte","hub.cat.mappe":"Mappe","hub.cat.mostri":"Mostri","hub.cat.quest":"Quest","hub.cat.regole":"Regole","hub.cat.altro":"Altro","hub.new.title":"Nuovo post","hub.new.field_title":"Titolo","hub.new.field_title_ph":"Es. Mappa catacombe livello 2","hub.new.field_category":"Categoria","hub.new.field_body":"Descrizione","hub.new.field_body_ph":"Dettagli, consigli, come usarla...","hub.new.attach":"Allega immagine…","hub.new.publish":"Pubblica","hub.new.hint_user":"Pubblicherai come: ","hub.new.hint_login":"Accedi dalla Home per pubblicare o mettere \"Mi piace\".","hub.list.title":"Post recenti","hub.list.empty":"Nessun post trovato.","hub.toast.load_error":"Errore caricamento","hub.toast.like_need_login":"Serve il login per mettere Mi piace","hub.toast.like_error":"Errore like","hub.toast.title_required":"Titolo obbligatorio","hub.toast.upload_failed":"Upload fallito","hub.toast.publish_error":"Errore pubblicazione","hub.toast.published":"Pubblicato!","hub.card.no_title":"Senza titolo" },
+      "en":{ "hub.page_title":"Il Custode - Community Hub","hub.title":"Il Custode - Community Hub","hub.header":"📣 Community Hub","common.back":"← Back","hub.filter.search_label":"Search","hub.filter.search_ph":"title or text...","hub.filter.category_label":"Category","hub.filter.refresh":"Refresh","hub.cat.all":"All","hub.cat.mappe":"Maps","hub.cat.mostri":"Monsters","hub.cat.quest":"Quests","hub.cat.regole":"Rules","hub.cat.altro":"Other","hub.new.title":"New post","hub.new.field_title":"Title","hub.new.field_title_ph":"e.g. Catacombs map level 2","hub.new.field_category":"Category","hub.new.field_body":"Description","hub.new.field_body_ph":"Details, tips, how to use it...","hub.new.attach":"Attach image…","hub.new.publish":"Publish","hub.new.hint_user":"You will post as: ","hub.new.hint_login":"Log in from Home to publish or like.","hub.list.title":"Recent posts","hub.list.empty":"No posts found.","hub.toast.load_error":"Load error","hub.toast.like_need_login":"Login required to like","hub.toast.like_error":"Like error","hub.toast.title_required":"Title is required","hub.toast.upload_failed":"Upload failed","hub.toast.publish_error":"Publish error","hub.toast.published":"Published!","hub.card.no_title":"Untitled" },
+      "es":{ "hub.page_title":"Il Custode - Centro de la Comunidad","hub.title":"Il Custode - Centro de la Comunidad","hub.header":"📣 Centro de la Comunidad","common.back":"← Atrás","hub.filter.search_label":"Buscar","hub.filter.search_ph":"título o texto...","hub.filter.category_label":"Categoría","hub.filter.refresh":"Actualizar","hub.cat.all":"Todas","hub.cat.mappe":"Mapas","hub.cat.mostri":"Monstruos","hub.cat.quest":"Misiones","hub.cat.regole":"Reglas","hub.cat.altro":"Otros","hub.new.title":"Nueva publicación","hub.new.field_title":"Título","hub.new.field_title_ph":"Ej. Mapa de catacumbas nivel 2","hub.new.field_category":"Categoría","hub.new.field_body":"Descripción","hub.new.field_body_ph":"Detalles, consejos, cómo usarla...","hub.new.attach":"Adjuntar imagen…","hub.new.publish":"Publicar","hub.new.hint_user":"Publicarás como: ","hub.new.hint_login":"Inicia sesión desde Inicio para publicar o dar Me gusta.","hub.list.title":"Publicaciones recientes","hub.list.empty":"No se encontraron publicaciones.","hub.toast.load_error":"Error de carga","hub.toast.like_need_login":"Se requiere inicio de sesión para dar Me gusta","hub.toast.like_error":"Error al dar Me gusta","hub.toast.title_required":"El título es obligatorio","hub.toast.upload_failed":"Error de carga","hub.toast.publish_error":"Error al publicar","hub.toast.published":"¡Publicado!","hub.card.no_title":"Sin título" },
+      "fr":{ "hub.page_title":"Il Custode - Centre de la communauté","hub.title":"Il Custode - Centre de la communauté","hub.header":"📣 Centre de la communauté","common.back":"← Retour","hub.filter.search_label":"Rechercher","hub.filter.search_ph":"titre ou texte...","hub.filter.category_label":"Catégorie","hub.filter.refresh":"Actualiser","hub.cat.all":"Toutes","hub.cat.mappe":"Cartes","hub.cat.mostri":"Monstres","hub.cat.quest":"Quêtes","hub.cat.regole":"Règles","hub.cat.altro":"Autre","hub.new.title":"Nouvelle publication","hub.new.field_title":"Titre","hub.new.field_title_ph":"Ex. Carte des catacombes niveau 2","hub.new.field_category":"Catégorie","hub.new.field_body":"Description","hub.new.field_body_ph":"Détails, conseils, utilisation...","hub.new.attach":"Joindre une image…","hub.new.publish":"Publier","hub.new.hint_user":"Vous publierez en tant que : ","hub.new.hint_login":"Connectez-vous depuis l’accueil pour publier ou aimer.","hub.list.title":"Publications récentes","hub.list.empty":"Aucune publication trouvée.","hub.toast.load_error":"Erreur de chargement","hub.toast.like_need_login":"Connexion requise pour aimer","hub.toast.like_error":"Erreur d’appréciation","hub.toast.title_required":"Le titre est requis","hub.toast.upload_failed":"Échec du téléversement","hub.toast.publish_error":"Erreur de publication","hub.toast.published":"Publié !","hub.card.no_title":"Sans titre" },
+      "de":{ "hub.page_title":"Il Custode - Community-Hub","hub.title":"Il Custode - Community-Hub","hub.header":"📣 Community-Hub","common.back":"← Zurück","hub.filter.search_label":"Suche","hub.filter.search_ph":"Titel oder Text...","hub.filter.category_label":"Kategorie","hub.filter.refresh":"Aktualisieren","hub.cat.all":"Alle","hub.cat.mappe":"Karten","hub.cat.mostri":"Monster","hub.cat.quest":"Quests","hub.cat.regole":"Regeln","hub.cat.altro":"Sonstiges","hub.new.title":"Neuer Beitrag","hub.new.field_title":"Titel","hub.new.field_title_ph":"Z. B. Katakombenkarte Stufe 2","hub.new.field_category":"Kategorie","hub.new.field_body":"Beschreibung","hub.new.field_body_ph":"Details, Tipps, Verwendung...","hub.new.attach":"Bild anhängen…","hub.new.publish":"Veröffentlichen","hub.new.hint_user":"Du postest als: ","hub.new.hint_login":"Zum Posten oder Liken auf der Startseite anmelden.","hub.list.title":"Neueste Beiträge","hub.list.empty":"Keine Beiträge gefunden.","hub.toast.load_error":"Ladefehler","hub.toast.like_need_login":"Zum Liken ist eine Anmeldung erforderlich","hub.toast.like_error":"Like-Fehler","hub.toast.title_required":"Titel ist erforderlich","hub.toast.upload_failed":"Upload fehlgeschlagen","hub.toast.publish_error":"Veröffentlichungsfehler","hub.toast.published":"Veröffentlicht!","hub.card.no_title":"Ohne Titel" },
+      "pt-br":{ "hub.page_title":"Il Custode - Hub da Comunidade","hub.title":"Il Custode - Hub da Comunidade","hub.header":"📣 Hub da Comunidade","common.back":"← Voltar","hub.filter.search_label":"Pesquisar","hub.filter.search_ph":"título ou texto...","hub.filter.category_label":"Categoria","hub.filter.refresh":"Atualizar","hub.cat.all":"Todas","hub.cat.mappe":"Mapas","hub.cat.mostri":"Monstros","hub.cat.quest":"Missões","hub.cat.regole":"Regras","hub.cat.altro":"Outros","hub.new.title":"Nova publicação","hub.new.field_title":"Título","hub.new.field_title_ph":"Ex.: Mapa das catacumbas nível 2","hub.new.field_category":"Categoria","hub.new.field_body":"Descrição","hub.new.field_body_ph":"Detalhes, dicas, como usar...","hub.new.attach":"Anexar imagem…","hub.new.publish":"Publicar","hub.new.hint_user":"Você publicará como: ","hub.new.hint_login":"Faça login na Home para publicar ou curtir.","hub.list.title":"Publicações recentes","hub.list.empty":"Nenhuma publicação encontrada.","hub.toast.load_error":"Erro de carregamento","hub.toast.like_need_login":"É necessário login para curtir","hub.toast.like_error":"Erro ao curtir","hub.toast.title_required":"Título obrigatório","hub.toast.upload_failed":"Falha no upload","hub.toast.publish_error":"Erro ao publicar","hub.toast.published":"Publicado!","hub.card.no_title":"Sem título" },
+      "pl":{ "hub.page_title":"Il Custode - Centrum społeczności","hub.title":"Il Custode - Centrum społeczności","hub.header":"📣 Centrum społeczności","common.back":"← Wstecz","hub.filter.search_label":"Szukaj","hub.filter.search_ph":"tytuł lub tekst...","hub.filter.category_label":"Kategoria","hub.filter.refresh":"Odśwież","hub.cat.all":"Wszystkie","hub.cat.mappe":"Mapy","hub.cat.mostri":"Potwory","hub.cat.quest":"Zadania","hub.cat.regole":"Zasady","hub.cat.altro":"Inne","hub.new.title":"Nowy post","hub.new.field_title":"Tytuł","hub.new.field_title_ph":"Np. mapa katakumb poziom 2","hub.new.field_category":"Kategoria","hub.new.field_body":"Opis","hub.new.field_body_ph":"Szczegóły, porady, jak używać...","hub.new.attach":"Dołącz obraz…","hub.new.publish":"Opublikuj","hub.new.hint_user":"Opublikujesz jako: ","hub.new.hint_login":"Zaloguj się ze Strony głównej, aby publikować lub lajkować.","hub.list.title":"Najnowsze posty","hub.list.empty":"Nie znaleziono postów.","hub.toast.load_error":"Błąd wczytywania","hub.toast.like_need_login":"Do polubienia wymagane jest logowanie","hub.toast.like_error":"Błąd polubienia","hub.toast.title_required":"Tytuł jest wymagany","hub.toast.upload_failed":"Błąd przesyłania","hub.toast.publish_error":"Błąd publikacji","hub.toast.published":"Opublikowano!","hub.card.no_title":"Bez tytułu" },
+      "nl":{ "hub.page_title":"Il Custode - Communityhub","hub.title":"Il Custode - Communityhub","hub.header":"📣 Communityhub","common.back":"← Terug","hub.filter.search_label":"Zoeken","hub.filter.search_ph":"titel of tekst...","hub.filter.category_label":"Categorie","hub.filter.refresh":"Vernieuwen","hub.cat.all":"Alle","hub.cat.mappe":"Kaarten","hub.cat.mostri":"Monsters","hub.cat.quest":"Quests","hub.cat.regole":"Regels","hub.cat.altro":"Overig","hub.new.title":"Nieuw bericht","hub.new.field_title":"Titel","hub.new.field_title_ph":"Bijv. Catacombenkaart niveau 2","hub.new.field_category":"Categorie","hub.new.field_body":"Beschrijving","hub.new.field_body_ph":"Details, tips, hoe te gebruiken...","hub.new.attach":"Afbeelding toevoegen…","hub.new.publish":"Publiceren","hub.new.hint_user":"Je plaatst als: ","hub.new.hint_login":"Log in via Home om te plaatsen of te liken.","hub.list.title":"Recente berichten","hub.list.empty":"Geen berichten gevonden.","hub.toast.load_error":"Laadfout","hub.toast.like_need_login":"Inloggen vereist om te liken","hub.toast.like_error":"Fout bij liken","hub.toast.title_required":"Titel is verplicht","hub.toast.upload_failed":"Upload mislukt","hub.toast.publish_error":"Publicatiefout","hub.toast.published":"Gepubliceerd!","hub.card.no_title":"Zonder titel" },
+      "cs":{ "hub.page_title":"Il Custode - Komunitní centrum","hub.title":"Il Custode - Komunitní centrum","hub.header":"📣 Komunitní centrum","common.back":"← Zpět","hub.filter.search_label":"Hledat","hub.filter.search_ph":"název nebo text...","hub.filter.category_label":"Kategorie","hub.filter.refresh":"Obnovit","hub.cat.all":"Vše","hub.cat.mappe":"Mapy","hub.cat.mostri":"Příšery","hub.cat.quest":"Úkoly","hub.cat.regole":"Pravidla","hub.cat.altro":"Ostatní","hub.new.title":"Nový příspěvek","hub.new.field_title":"Název","hub.new.field_title_ph":"Např. mapa katakomb úroveň 2","hub.new.field_category":"Kategorie","hub.new.field_body":"Popis","hub.new.field_body_ph":"Detaily, tipy, jak použít...","hub.new.attach":"Přiložit obrázek…","hub.new.publish":"Publikovat","hub.new.hint_user":"Zveřejníte jako: ","hub.new.hint_login":"Pro publikování nebo lajkování se přihlaste z Domů.","hub.list.title":"Nedávné příspěvky","hub.list.empty":"Nebyly nalezeny žádné příspěvky.","hub.toast.load_error":"Chyba načítání","hub.toast.like_need_login":"Pro lajkování je vyžadováno přihlášení","hub.toast.like_error":"Chyba lajku","hub.toast.title_required":"Název je povinný","hub.toast.upload_failed":"Nahrávání se nezdařilo","hub.toast.publish_error":"Chyba publikování","hub.toast.published":"Zveřejněno!","hub.card.no_title":"Bez názvu" },
+      "hi":{ "hub.page_title":"Il Custode - कम्युनिटी हब","hub.title":"Il Custode - कम्युनिटी हब","hub.header":"📣 कम्युनिटी हब","common.back":"← पीछे","hub.filter.search_label":"खोजें","hub.filter.search_ph":"शीर्षक या पाठ...","hub.filter.category_label":"श्रेणी","hub.filter.refresh":"रीफ़्रेश","hub.cat.all":"सभी","hub.cat.mappe":"मानचित्र","hub.cat.mostri":"राक्षस","hub.cat.quest":"क्वेस्ट","hub.cat.regole":"नियम","hub.cat.altro":"अन्य","hub.new.title":"नया पोस्ट","hub.new.field_title":"शीर्षक","hub.new.field_title_ph":"उदा. कैटाकॉम्ब मानचित्र स्तर 2","hub.new.field_category":"श्रेणी","hub.new.field_body":"विवरण","hub.new.field_body_ph":"विवरण, सुझाव, उपयोग कैसे करें...","hub.new.attach":"चित्र जोड़ें…","hub.new.publish":"प्रकाशित करें","hub.new.hint_user":"आप इस रूप में पोस्ट करेंगे: ","hub.new.hint_login":"प्रकाशित या पसंद करने के लिए होम से लॉगिन करें।","hub.list.title":"हाल की पोस्टें","hub.list.empty":"कोई पोस्ट नहीं मिली।","hub.toast.load_error":"लोड त्रुटि","hub.toast.like_need_login":"पसंद करने के लिए लॉगिन आवश्यक","hub.toast.like_error":"पसंद त्रुटि","hub.toast.title_required":"शीर्षक आवश्यक है","hub.toast.upload_failed":"अपलोड विफल","hub.toast.publish_error":"प्रकाशन त्रुटि","hub.toast.published":"प्रकाशित!","hub.card.no_title":"शीर्षकहीन" },
+      "id":{ "hub.page_title":"Il Custode - Pusat Komunitas","hub.title":"Il Custode - Pusat Komunitas","hub.header":"📣 Pusat Komunitas","common.back":"← Kembali","hub.filter.search_label":"Cari","hub.filter.search_ph":"judul atau teks...","hub.filter.category_label":"Kategori","hub.filter.refresh":"Muat ulang","hub.cat.all":"Semua","hub.cat.mappe":"Peta","hub.cat.mostri":"Monster","hub.cat.quest":"Misi","hub.cat.regole":"Aturan","hub.cat.altro":"Lainnya","hub.new.title":"Posting baru","hub.new.field_title":"Judul","hub.new.field_title_ph":"Mis. Peta katakomba level 2","hub.new.field_category":"Kategori","hub.new.field_body":"Deskripsi","hub.new.field_body_ph":"Detail, tips, cara pakai...","hub.new.attach":"Lampirkan gambar…","hub.new.publish":"Terbitkan","hub.new.hint_user":"Anda akan memposting sebagai: ","hub.new.hint_login":"Login dari Beranda untuk memposting atau menyukai.","hub.list.title":"Posting terbaru","hub.list.empty":"Tidak ada posting.","hub.toast.load_error":"Kesalahan memuat","hub.toast.like_need_login":"Perlu login untuk menyukai","hub.toast.like_error":"Kesalahan suka","hub.toast.title_required":"Judul wajib","hub.toast.upload_failed":"Unggahan gagal","hub.toast.publish_error":"Kesalahan penerbitan","hub.toast.published":"Diterbitkan!","hub.card.no_title":"Tanpa judul" },
+      "ja":{ "hub.page_title":"Il Custode - コミュニティハブ","hub.title":"Il Custode - コミュニティハブ","hub.header":"📣 コミュニティハブ","common.back":"← 戻る","hub.filter.search_label":"検索","hub.filter.search_ph":"タイトルまたはテキスト...","hub.filter.category_label":"カテゴリ","hub.filter.refresh":"更新","hub.cat.all":"すべて","hub.cat.mappe":"マップ","hub.cat.mostri":"モンスター","hub.cat.quest":"クエスト","hub.cat.regole":"ルール","hub.cat.altro":"その他","hub.new.title":"新規投稿","hub.new.field_title":"タイトル","hub.new.field_title_ph":"例：カタコンベマップ レベル2","hub.new.field_category":"カテゴリ","hub.new.field_body":"説明","hub.new.field_body_ph":"詳細、ヒント、使い方…","hub.new.attach":"画像を添付…","hub.new.publish":"公開","hub.new.hint_user":"次のユーザーとして投稿します：","hub.new.hint_login":"投稿やいいねにはホームからログインしてください。","hub.list.title":"新着投稿","hub.list.empty":"投稿が見つかりません。","hub.toast.load_error":"読み込みエラー","hub.toast.like_need_login":"いいねにはログインが必要です","hub.toast.like_error":"いいねエラー","hub.toast.title_required":"タイトルは必須です","hub.toast.upload_failed":"アップロードに失敗しました","hub.toast.publish_error":"公開エラー","hub.toast.published":"公開しました！","hub.card.no_title":"無題" },
+      "ko":{ "hub.page_title":"Il Custode - 커뮤니티 허브","hub.title":"Il Custode - 커뮤니티 허브","hub.header":"📣 커뮤니티 허브","common.back":"← 뒤로","hub.filter.search_label":"검색","hub.filter.search_ph":"제목 또는 텍스트...","hub.filter.category_label":"카테고리","hub.filter.refresh":"새로고침","hub.cat.all":"전체","hub.cat.mappe":"지도","hub.cat.mostri":"몬스터","hub.cat.quest":"퀘스트","hub.cat.regole":"규칙","hub.cat.altro":"기타","hub.new.title":"새 게시물","hub.new.field_title":"제목","hub.new.field_title_ph":"예: 지하묘지 지도 2단계","hub.new.field_category":"카테고리","hub.new.field_body":"설명","hub.new.field_body_ph":"세부 정보, 팁, 사용 방법...","hub.new.attach":"이미지 첨부…","hub.new.publish":"게시","hub.new.hint_user":"다음 사용자로 게시합니다: ","hub.new.hint_login":"게시 또는 좋아요를 하려면 홈에서 로그인하세요.","hub.list.title":"최근 게시물","hub.list.empty":"게시물이 없습니다.","hub.toast.load_error":"로딩 오류","hub.toast.like_need_login":"좋아요는 로그인 필요","hub.toast.like_error":"좋아요 오류","hub.toast.title_required":"제목은 필수입니다","hub.toast.upload_failed":"업로드 실패","hub.toast.publish_error":"게시 오류","hub.toast.published":"게시됨!","hub.card.no_title":"제목 없음" },
+      "ru":{ "hub.page_title":"Il Custode - Сообщество","hub.title":"Il Custode - Сообщество","hub.header":"📣 Сообщество","common.back":"← Назад","hub.filter.search_label":"Поиск","hub.filter.search_ph":"название или текст...","hub.filter.category_label":"Категория","hub.filter.refresh":"Обновить","hub.cat.all":"Все","hub.cat.mappe":"Карты","hub.cat.mostri":"Монстры","hub.cat.quest":"Квесты","hub.cat.regole":"Правила","hub.cat.altro":"Другое","hub.new.title":"Новая запись","hub.new.field_title":"Заголовок","hub.new.field_title_ph":"Напр. карта катакомб, уровень 2","hub.new.field_category":"Категория","hub.new.field_body":"Описание","hub.new.field_body_ph":"Подробности, советы, как использовать...","hub.new.attach":"Прикрепить изображение…","hub.new.publish":"Опубликовать","hub.new.hint_user":"Вы публикуете как: ","hub.new.hint_login":"Войдите с Главной, чтобы публиковать или ставить лайки.","hub.list.title":"Недавние записи","hub.list.empty":"Записей не найдено.","hub.toast.load_error":"Ошибка загрузки","hub.toast.like_need_login":"Для лайка необходимо войти","hub.toast.like_error":"Ошибка лайка","hub.toast.title_required":"Требуется заголовок","hub.toast.upload_failed":"Ошибка загрузки файла","hub.toast.publish_error":"Ошибка публикации","hub.toast.published":"Опубликовано!","hub.card.no_title":"Без названия" },
+      "tr":{ "hub.page_title":"Il Custode - Topluluk Merkezi","hub.title":"Il Custode - Topluluk Merkezi","hub.header":"📣 Topluluk Merkezi","common.back":"← Geri","hub.filter.search_label":"Ara","hub.filter.search_ph":"başlık veya metin...","hub.filter.category_label":"Kategori","hub.filter.refresh":"Yenile","hub.cat.all":"Tümü","hub.cat.mappe":"Haritalar","hub.cat.mostri":"Canavarlar","hub.cat.quest":"Görevler","hub.cat.regole":"Kurallar","hub.cat.altro":"Diğer","hub.new.title":"Yeni gönderi","hub.new.field_title":"Başlık","hub.new.field_title_ph":"Örn. Yeraltı mezarları haritası seviye 2","hub.new.field_category":"Kategori","hub.new.field_body":"Açıklama","hub.new.field_body_ph":"Ayrıntılar, ipuçları, nasıl kullanılır...","hub.new.attach":"Görüntü ekle…","hub.new.publish":"Yayınla","hub.new.hint_user":"Şu kullanıcı olarak paylaşacaksın: ","hub.new.hint_login":"Yayınlamak veya beğenmek için Ana Sayfadan giriş yap.","hub.list.title":"Son gönderiler","hub.list.empty":"Gönderi bulunamadı.","hub.toast.load_error":"Yükleme hatası","hub.toast.like_need_login":"Beğenmek için giriş gerekli","hub.toast.like_error":"Beğeni hatası","hub.toast.title_required":"Başlık zorunlu","hub.toast.upload_failed":"Yükleme başarısız","hub.toast.publish_error":"Yayınlama hatası","hub.toast.published":"Yayınlandı!","hub.card.no_title":"Başlıksız" },
+      "vi":{ "hub.page_title":"Il Custode - Trung tâm Cộng đồng","hub.title":"Il Custode - Trung tâm Cộng đồng","hub.header":"📣 Trung tâm Cộng đồng","common.back":"← Quay lại","hub.filter.search_label":"Tìm kiếm","hub.filter.search_ph":"tiêu đề hoặc văn bản...","hub.filter.category_label":"Danh mục","hub.filter.refresh":"Làm mới","hub.cat.all":"Tất cả","hub.cat.mappe":"Bản đồ","hub.cat.mostri":"Quái vật","hub.cat.quest":"Nhiệm vụ","hub.cat.regole":"Luật","hub.cat.altro":"Khác","hub.new.title":"Đăng mới","hub.new.field_title":"Tiêu đề","hub.new.field_title_ph":"VD: Bản đồ hầm mộ cấp 2","hub.new.field_category":"Danh mục","hub.new.field_body":"Mô tả","hub.new.field_body_ph":"Chi tiết, mẹo, cách sử dụng...","hub.new.attach":"Đính kèm hình…","hub.new.publish":"Đăng","hub.new.hint_user":"Bạn sẽ đăng với tư cách: ","hub.new.hint_login":"Đăng nhập từ Trang chủ để đăng hoặc thích.","hub.list.title":"Bài viết gần đây","hub.list.empty":"Không tìm thấy bài nào.","hub.toast.load_error":"Lỗi tải","hub.toast.like_need_login":"Cần đăng nhập để thích","hub.toast.like_error":"Lỗi thích","hub.toast.title_required":"Tiêu đề là bắt buộc","hub.toast.upload_failed":"Tải lên thất bại","hub.toast.publish_error":"Lỗi đăng","hub.toast.published":"Đã đăng!","hub.card.no_title":"Không tiêu đề" },
+      "zh-hans":{ "hub.page_title":"Il Custode - 社区中心","hub.title":"Il Custode - 社区中心","hub.header":"📣 社区中心","common.back":"← 返回","hub.filter.search_label":"搜索","hub.filter.search_ph":"标题或文本...","hub.filter.category_label":"类别","hub.filter.refresh":"刷新","hub.cat.all":"全部","hub.cat.mappe":"地图","hub.cat.mostri":"怪物","hub.cat.quest":"任务","hub.cat.regole":"规则","hub.cat.altro":"其它","hub.new.title":"新帖子","hub.new.field_title":"标题","hub.new.field_title_ph":"例如：地窟地图 第2层","hub.new.field_category":"类别","hub.new.field_body":"描述","hub.new.field_body_ph":"细节、提示、如何使用…","hub.new.attach":"附加图片…","hub.new.publish":"发布","hub.new.hint_user":"将以以下身份发布：","hub.new.hint_login":"请在首页登录后才能发布或点赞。","hub.list.title":"最新帖子","hub.list.empty":"未找到帖子。","hub.toast.load_error":"加载错误","hub.toast.like_need_login":"点赞需要登录","hub.toast.like_error":"点赞出错","hub.toast.title_required":"标题为必填项","hub.toast.upload_failed":"上传失败","hub.toast.publish_error":"发布出错","hub.toast.published":"已发布！","hub.card.no_title":"无标题" },
+      "ar":{ "hub.page_title":"Il Custode - مركز المجتمع","hub.title":"Il Custode - مركز المجتمع","hub.header":"📣 مركز المجتمع","common.back":"← رجوع","hub.filter.search_label":"بحث","hub.filter.search_ph":"عنوان أو نص...","hub.filter.category_label":"الفئة","hub.filter.refresh":"تحديث","hub.cat.all":"الكل","hub.cat.mappe":"خرائط","hub.cat.mostri":"وحوش","hub.cat.quest":"مهام","hub.cat.regole":"قواعد","hub.cat.altro":"أخرى","hub.new.title":"منشور جديد","hub.new.field_title":"العنوان","hub.new.field_title_ph":"مثال: خريطة السراديب المستوى 2","hub.new.field_category":"الفئة","hub.new.field_body":"الوصف","hub.new.field_body_ph":"تفاصيل ونصائح وكيفية الاستخدام...","hub.new.attach":"إرفاق صورة…","hub.new.publish":"نشر","hub.new.hint_user":"ستُنشر باسم: ","hub.new.hint_login":"سجّل الدخول من الصفحة الرئيسية للنشر أو الإعجاب.","hub.list.title":"أحدث المنشورات","hub.list.empty":"لا توجد منشورات.","hub.toast.load_error":"خطأ في التحميل","hub.toast.like_need_login":"يلزم تسجيل الدخول للإعجاب","hub.toast.like_error":"خطأ في الإعجاب","hub.toast.title_required":"العنوان مطلوب","hub.toast.upload_failed":"فشل الرفع","hub.toast.publish_error":"خطأ في النشر","hub.toast.published":"تم النشر!","hub.card.no_title":"بدون عنوان" }
+    };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const back = document.querySelector('.back-btn');
-    if (!back) return;
+    /* t() con fallback: i18n globale -> locale HUB -> EN */
+    function t(key, fb){
+      try{
+        const viaGlobal = window.i18n?.t?.(key);
+        if (viaGlobal && viaGlobal !== key) return viaGlobal;
+      }catch{}
+      const rawLang = (window.i18n?.getLang?.() || localStorage.getItem('custode.lang') || 'it').toLowerCase();
+      const lang = (rawLang === 'pt-br' ? 'pt-br' : rawLang === 'zh-hans' ? 'zh-hans' : rawLang);
+      const dict = HUB_I18N[lang] || HUB_I18N['en'];
+      return (dict && dict[key]) || fb || key;
+    }
 
-    back.addEventListener('click', (e) => {
-      e.preventDefault();
+    /* Applica testi e placeholder anche se mancano nel dizionario globale */
+    function applyHubLocalI18n(){
+      const ttl = t('hub.page_title') || t('hub.title');
+      if (ttl) document.title = ttl;
 
-      // Se referrer è il menu, torna esattamente indietro (una sola pagina).
-      if (cameFromMenu() && history.length > 1) {
-        history.back();
-        return;
+      document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const k = el.getAttribute('data-i18n'); const v = t(k);
+        if (v) el.textContent = v;
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+        const k = el.getAttribute('data-i18n-placeholder'); const v = t(k);
+        if (v) el.setAttribute('placeholder', v);
+      });
+
+      // RTL per arabo
+      try{
+        const rawLang = (window.i18n?.getLang?.() || localStorage.getItem('custode.lang') || 'it').toLowerCase();
+        document.documentElement.setAttribute('dir', rawLang.startsWith('ar') ? 'rtl' : 'ltr');
+      }catch{}
+    }
+
+    /* ===== i18n ===== */
+    function applyI18n(){
+      try{ window.i18n?.apply?.(document); }catch{}
+      try{
+        const lang = window.i18n?.getLang?.() || localStorage.getItem('custode.lang') || 'it';
+        document.documentElement.setAttribute('lang', lang);
+      }catch{}
+      applyHubLocalI18n();
+    }
+    window.addEventListener('i18n:change', ()=>{ applyI18n(); loadPosts(); });
+
+    /* ===== Back letterale: una sola pagina indietro, senza fallback ===== */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const back = document.getElementById('hubBack');
+      if (back){
+        back.addEventListener('click', (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          history.go(-1); // letteralmente una pagina indietro
+        }, { capture:true });
       }
-
-      // Fallback: vai al menu (percorso relativo da /pages/)
-      try { location.replace('../menu.html'); } catch { location.href = '../menu.html'; }
     });
-  });
 
-  // ====== Supabase / Hub ======
-  const SUPABASE_URL = 'https://djxxfzhvnejogcijpbtu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeHhmemh2bmVqb2djaWpwYnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5ODkzNDEsImV4cCI6MjA3MDU2NTM0MX0.h3OJPo--ovVCYsPmX4g2LUVsK9npecTeAgr5u4by_-k';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const $ = (s)=>document.querySelector(s);
-  const grid = $('#grid'), empty = $('#empty');
-  const newPostCard = $('#newPostCard'), postHint = $('#postHint');
-  const assetInput = $('#asset'), assetName = $('#assetName');
-
-  function t(key, fallback){ try{ return (window.i18n && window.i18n.t) ? window.i18n.t(key) : (fallback||key); }catch{ return fallback||key; } }
-  function toast(msg, err=false){
-    const tEl = $('#toast');
-    tEl.textContent = msg;
-    tEl.className = 'toast' + (err ? ' error' : '');
-    tEl.style.display = 'block';
-    setTimeout(()=> tEl.style.display='none', 1600);
-  }
-
-  assetInput.addEventListener('change', ()=>{ assetName.textContent = assetInput.files?.[0]?.name || '—'; });
-
-  async function getSession(){ const { data } = await supabase.auth.getSession(); return data?.session || null; }
-
-  function catLabel(code){
-    switch(code){
-      case 'mappe':  return t('hub.cat.mappe','Mappe');
-      case 'mostri': return t('hub.cat.mostri','Mostri');
-      case 'quest':  return t('hub.cat.quest','Quest');
-      case 'regole': return t('hub.cat.regole','Regole');
-      default:       return t('hub.cat.altro','Altro');
+    /* ===== Supabase ===== */
+    async function waitForSupabase(timeoutMs=8000){
+      const t0 = Date.now();
+      while (!window.supabaseClient){
+        await new Promise(r=>setTimeout(r,50));
+        if (Date.now()-t0 > timeoutMs) throw new Error('Supabase non inizializzato');
+      }
+      return window.supabaseClient;
     }
-  }
+    async function getSession(s){ const { data } = await s.auth.getSession(); return data?.session || null; }
 
-  async function loadPosts(){
-    const q = ($('#q').value || '').trim();
-    const cat = $('#cat').value || '';
+    /* ===== UI & dati ===== */
+    const $ = (s)=>document.querySelector(s);
+    const grid = $('#grid'), empty = $('#empty');
+    const newPostCard = $('#newPostCard'), postHint = $('#postHint');
 
-    let query = supabase.from('hub_posts').select('*').order('created_at', { ascending: false }).limit(60);
-    if (cat) query = query.eq('category', cat);
-
-    const { data, error } = await query;
-    if (error) { console.error(error); toast(t('hub.toast.load_error','Errore caricamento'), true); return; }
-
-    let list = data || [];
-    if (q) {
-      const ql = q.toLowerCase();
-      list = list.filter(p =>
-        (p.title || '').toLowerCase().includes(ql) ||
-        (p.body || '').toLowerCase().includes(ql)
-      );
+    function toast(msg, err=false){
+      const tEl = document.getElementById('toast');
+      tEl.textContent = msg;
+      tEl.className = 'toast' + (err ? ' error' : '');
+      tEl.style.display = 'block';
+      setTimeout(()=> tEl.style.display='none', 1600);
     }
-    render(list);
-  }
 
-  function render(list){
-    grid.innerHTML = '';
-    if (!list.length){ empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function catLabel(code){
+      switch(code){
+        case 'mappe':  return t('hub.cat.mappe','Mappe');
+        case 'mostri': return t('hub.cat.mostri','Mostri');
+        case 'quest':  return t('hub.cat.quest','Quest');
+        case 'regole': return t('hub.cat.regole','Regole');
+        default:       return t('hub.cat.altro','Altro');
+      }
+    }
 
-    list.forEach(p=>{
-      const card = document.createElement('div');
-      card.className = 'tile';
-      const title = escapeHtml(p.title||t('hub.card.no_title','Senza titolo'));
-      const catTxt = catLabel(p.category||'altro');
-      const body   = (p.body||'');
-      const bodySafe = escapeHtml(body);
-      const bodyCut  = bodySafe.length>180 ? (bodySafe.slice(0,180)+'…') : bodySafe;
-      card.innerHTML = `
-        ${p.asset_url ? `<img class="thumb" src="${p.asset_url}" alt="${title}">` : ''}
-        <div class="tile-body">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-            <strong>${title}</strong>
-            <span class="chip">${catTxt}</span>
+    async function loadPosts(){
+      try{
+        if (!window.__supabaseReady) return;
+        const supabase = window.supabaseClient;
+
+        const q = ($('#q')?.value || '').trim();
+        const cat = $('#cat')?.value || '';
+
+        let query = supabase.from('hub_posts').select('*').order('created_at', { ascending: false }).limit(60);
+        if (cat) query = query.eq('category', cat);
+
+        const { data, error } = await query;
+        if (error) { console.error(error); toast(t('hub.toast.load_error','Errore caricamento'), true); return; }
+
+        let list = data || [];
+        if (q) {
+          const ql = q.toLowerCase();
+          list = list.filter(p =>
+            (p.title || '').toLowerCase().includes(ql) ||
+            (p.body || '').toLowerCase().includes(ql)
+          );
+        }
+        render(list);
+      } catch(e){ console.error(e); }
+    }
+
+    function render(list){
+      grid.innerHTML = '';
+      if (!list.length){ empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      list.forEach(p=>{
+        const card = document.createElement('div');
+        card.className = 'tile';
+        const title = escapeHtml(p.title || t('hub.card.no_title','Senza titolo'));
+        const catTxt = catLabel(p.category||'altro');
+        const body   = (p.body||'');
+        const bodySafe = escapeHtml(body);
+        const bodyCut  = bodySafe.length>180 ? (bodySafe.slice(0,180)+'…') : bodySafe;
+        card.innerHTML = `
+          ${p.asset_url ? `<img class="thumb" src="${p.asset_url}" alt="${title}">` : ''}
+          <div class="tile-body">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+              <strong>${title}</strong>
+              <span class="chip">${catTxt}</span>
+            </div>
+            ${body ? `<div class="muted">${bodyCut}</div>` : ''}
+            <div class="actions" style="margin-top:6px;">
+              <button class="btn" data-like="${p.id}">👍 ${p.likes_count||0}</button>
+            </div>
+            <div class="muted">${new Date(p.created_at).toLocaleString()}</div>
           </div>
-          ${body ? `<div class="muted">${bodyCut}</div>` : ''}
-          <div class="actions" style="margin-top:6px;">
-            <button class="btn" data-like="${p.id}">👍 ${p.likes_count||0}</button>
-          </div>
-          <div class="muted">${new Date(p.created_at).toLocaleString()}</div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-  }
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-  document.addEventListener('click', async (e)=>{
-    const likeBtn = e.target.closest('[data-like]');
-    if (likeBtn){
+    document.addEventListener('click', async (e)=>{
+      const likeBtn = e.target.closest?.('[data-like]');
+      if (!likeBtn) return;
+      const supabase = window.supabaseClient;
       const postId = likeBtn.getAttribute('data-like');
-      const session = await getSession();
+      const session = await getSession(supabase);
       if (!session){ toast(t('hub.toast.like_need_login','Serve il login per mettere Mi piace'), true); return; }
       const uid = session.user.id;
 
@@ -262,66 +322,71 @@
         console.error(likeErr); toast(t('hub.toast.like_error','Errore like'), true); return;
       }
       await loadPosts();
-    }
-  });
-
-  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-
-  // Pubblica
-  document.getElementById('btnPublish').addEventListener('click', async ()=>{
-    const session = await getSession();
-    if (!session){ toast(t('hub.toast.publish_need_login','Devi essere autenticato per pubblicare'), true); return; }
-
-    const title = (document.getElementById('title').value||'').trim();
-    const category = document.getElementById('category').value || 'altro';
-    const body = (document.getElementById('body').value||'').trim();
-    if (!title){ toast(t('hub.toast.title_required','Titolo obbligatorio'), true); return; }
-
-    let asset_url = null;
-    const file = assetInput.files?.[0];
-    if (file){
-      const path = `${session.user.id}/${Date.now()}_${file.name}`;
-      const up = await supabase.storage.from('hub-assets').upload(path, file, { upsert: false });
-      if (up.error){ console.error(up.error); toast(t('hub.toast.upload_failed','Upload fallito'), true); return; }
-      const pub = supabase.storage.from('hub-assets').getPublicUrl(path);
-      asset_url = pub.data.publicUrl;
-    }
-
-    const { error } = await supabase.from('hub_posts').insert({
-      author: session.user.id, title, category, body, asset_url
     });
-    if (error){ console.error(error); toast(t('hub.toast.publish_error','Errore pubblicazione'), true); return; }
 
-    document.getElementById('title').value=''; document.getElementById('body').value=''; assetInput.value=''; assetName.textContent='—'; document.getElementById('category').value='mappe';
-    toast(t('hub.toast.published','Pubblicato!'));
-    await loadPosts();
-  });
+    document.getElementById('btnPublish')?.addEventListener('click', async ()=>{
+      const supabase = window.supabaseClient;
+      const session = await getSession(supabase);
+      if (!session){ toast(t('hub.toast.publish_need_login','Devi essere autenticato per pubblicare'), true); return; }
 
-  // Init
-  (async function init(){
-    const session = await getSession();
-    if (session){
-      newPostCard.style.display = '';
-      const who = session.user.email || session.user.id;
-      postHint.textContent = t('hub.new.hint_user','Pubblicherai come: ') + who;
-    } else {
-      newPostCard.style.display = 'none';
-      postHint.textContent = t('hub.new.hint_login','Accedi dalla Home per pubblicare o mettere "Mi piace".');
-    }
+      const title = (document.getElementById('title').value||'').trim();
+      const category = document.getElementById('category').value || 'altro';
+      const body = (document.getElementById('body').value||'').trim();
+      if (!title){ toast(t('hub.toast.title_required','Titolo obbligatorio'), true); return; }
 
-    if (window.i18n && window.i18n.apply) window.i18n.apply(document);
+      let asset_url = null;
+      const file = document.getElementById('asset')?.files?.[0];
+      if (file){
+        const path = `${session.user.id}/${Date.now()}_${file.name}`;
+        const up = await supabase.storage.from('hub-assets').upload(path, file, { upsert: false });
+        if (up.error){ console.error(up.error); toast(t('hub.toast.upload_failed','Upload fallito'), true); return; }
+        const pub = supabase.storage.from('hub-assets').getPublicUrl(path);
+        asset_url = pub.data.publicUrl;
+      }
 
-    await loadPosts();
+      const { error } = await supabase.from('hub_posts').insert({ author: session.user.id, title, category, body, asset_url });
+      if (error){ console.error(error); toast(t('hub.toast.publish_error','Errore pubblicazione'), true); return; }
 
-    document.getElementById('btnRefresh').addEventListener('click', loadPosts);
-    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__t); window.__t=setTimeout(loadPosts, 300); });
-    document.getElementById('cat').addEventListener('change', loadPosts);
+      document.getElementById('title').value='';
+      document.getElementById('body').value='';
+      const assetInput = document.getElementById('asset');
+      if (assetInput){ assetInput.value=''; document.getElementById('assetName').textContent='—'; }
+      document.getElementById('category').value='mappe';
 
-    window.addEventListener('i18n:change', ()=>{ 
-      if (window.i18n && window.i18n.apply) window.i18n.apply(document);
-      loadPosts();
+      toast(t('hub.toast.published','Pubblicato!'));
+      await loadPosts();
     });
-  })();
-</script>
+
+    /* ===== Avvio ===== */
+    (async function init(){
+      applyI18n();
+      try{
+        await waitForSupabase();
+        window.__supabaseReady = true;
+
+        const session = await getSession(window.supabaseClient);
+        if (session){
+          newPostCard.style.display = '';
+          const who = session.user.email || session.user.id;
+          postHint.textContent = t('hub.new.hint_user') + who;
+        } else {
+          newPostCard.style.display = 'none';
+          postHint.textContent = t('hub.new.hint_login');
+        }
+
+        await loadPosts();
+
+        document.getElementById('btnRefresh').addEventListener('click', loadPosts);
+        document.getElementById('q').addEventListener('input', ()=>{
+          clearTimeout(window.__hubT);
+          window.__hubT = setTimeout(loadPosts, 300);
+        });
+        document.getElementById('cat').addEventListener('change', loadPosts);
+      }catch(e){
+        console.error(e);
+        toast('Supabase non disponibile', true);
+      }
+    })();
+  </script>
 </body>
 </html>

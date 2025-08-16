@@ -1,4 +1,6 @@
 // main.js (ESM)
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
+
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -50,7 +52,6 @@ function installAutoBack(win) {
         } catch(_) { return 'Logout'; }
       }
 
-      // --- Back "smart": prova history, poi prev salvata, poi referrer, infine fallback a home ---
       function goBackSmart(){
         try {
           if (history.length > 1) { history.back(); return; }
@@ -67,10 +68,8 @@ function installAutoBack(win) {
       }
       window.__goBackSmart = goBackSmart;
 
-      // --- Se siamo in welcome/index: non aggiungere il pulsante, ma mantieni le label comuni aggiornabili ---
       var isHomeLike = /(\\/(welcome|index)\\.html)$/i.test(p);
 
-      // Stili del pulsante (una sola volta)
       if (!document.getElementById('auto-back-style')) {
         var st = document.createElement('style');
         st.id = 'auto-back-style';
@@ -78,7 +77,6 @@ function installAutoBack(win) {
         document.head.appendChild(st);
       }
 
-      // Crea/ri-wira il back solo se NON siamo in welcome/index
       if (!isHomeLike) {
         var existing = document.querySelector('.back-btn');
         if (existing){
@@ -103,7 +101,6 @@ function installAutoBack(win) {
         }
       }
 
-      // Aggiorna anche eventuali elementi Logout comuni
       function updateCommonLabels(){
         var back = document.querySelector('.back-btn');
         if (back) back.textContent = getLabelBack();
@@ -121,7 +118,6 @@ function installAutoBack(win) {
         });
       }
 
-      // Primo aggiornamento + re-apply a cambio lingua
       updateCommonLabels();
       window.addEventListener('i18n:change', updateCommonLabels);
     } catch(e) { console.warn('auto-back inject error', e); }
@@ -144,6 +140,25 @@ function createWindowWithDefaults({ filePath, width = 1200, height = 800 } = {})
       contextIsolation: true,
       nodeIntegration: false
     },
+  });
+
+  // CSP dev-friendly: permette inline e risorse comuni, ma **senza** 'unsafe-eval'
+  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        "Content-Security-Policy": [[
+          "default-src 'self' data: blob:;",
+          "script-src 'self' 'unsafe-inline' blob: https:;",   // <-- rimosso 'unsafe-eval'
+          "style-src 'self' 'unsafe-inline';",
+          "img-src 'self' data: blob:;",
+          "font-src 'self' data:;",
+          "media-src 'self' data: blob:;",
+          "connect-src 'self' https: http: ws: wss:;",
+          "frame-src 'self';"
+        ].join(' ')]
+      }
+    });
   });
 
   installAutoBack(win);

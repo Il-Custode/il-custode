@@ -4,22 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Il Custode — Benvenuto</title>
+
+  <!-- Stile globale (cornice + pergamena per tutte le pagine in root) -->
+  <link rel="stylesheet" href="assets/style.css">
+
   <style>
     :root{ --legno:#4b3621; --pelle:#d2b48c; --inchiostro:#3e2f1c; --pergamena:#fff3d4; }
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
       margin:0; font-family:'Papyrus', fantasy; color:var(--inchiostro);
+      /* Sfondo/cornice sono già in assets/style.css; qui manteniamo coerenza con le altre pagine */
       background:
         radial-gradient(80% 60% at 50% 40%, rgba(0,0,0,.06), transparent 70%),
         var(--pergamena)
-        url('./assets/img/sfondo-pergamena-decor.jpg') no-repeat center/cover fixed;
+        url('assets/sfondo-pergamena-decor.svg') no-repeat center/cover fixed;
       display:flex; align-items:center; justify-content:center;
     }
     .cornice{
       border:40px solid transparent;
-      -webkit-border-image:url('./assets/img/cornice-legno.png') 40 stretch;
-      border-image:url('./assets/img/cornice-legno.png') 40 stretch;
+      -webkit-border-image:url('assets/cornice-legno.svg') 40 stretch;
+      border-image:url('assets/cornice-legno.svg') 40 stretch;
       width:min(1100px, 96vw); min-height:70vh; display:flex; align-items:center; justify-content:center;
       padding:20px;
       background: linear-gradient(180deg, rgba(255,243,212,.35), rgba(255,243,212,.15));
@@ -75,6 +80,7 @@
   <div class="cornice">
     <div class="wrap">
       <div class="mago">
+        <!-- Lasciamo il percorso dell'immagine del mago invariato se il file è già lì -->
         <img id="imgMago" src="./assets/img/mago.png" alt="Il Custode (mago)" />
       </div>
 
@@ -89,7 +95,7 @@
   </div>
 
   <!-- i18n prima degli script della pagina -->
-  <script src="./assets/js/i18n.js"></script>
+  <script src="assets/js/i18n.js"></script>
   <script>
     (function(){
       const fraseEl   = document.getElementById('frase');
